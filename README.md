@@ -1,78 +1,51 @@
-# REQUIREMENT QA ASSISTANT — SPECIALIZED AGENT SYSTEM
+# REQUIREMENT QA ASSISTANT — ANTIGRAVITY NATIVE PLUGIN
 
 > **Ứng viên:** Vũ Thị Mai Linh  
 > **Dự án:** Trợ lý AI Phân tích Requirement & Tự động sinh Kịch bản Automation Test (Chuyên biệt cho QA)  
-> **Kiến trúc:** 2-Phase State Machine với Human-in-the-loop Gates & Google Workspace MCP Integration  
+> **Nền tảng:** Antigravity Customization Plugin (Rules, Skills, Subagents & Google Workspace MCP)  
 > **Google Spreadsheet Master (Trực tiếp trên Drive):** [Xem Master Sheet tại đây](https://docs.google.com/spreadsheets/d/1BG5HNlQBEqyG_hjM9WwklrME2lZbysNFHBSggsSQetk/edit)
 
 ---
 
-## 1. Hướng Dẫn Cài Đặt & Chạy (How to Run & How to Test)
+## 1. Cấu Trúc Plugin Antigravity Chuẩn (Native Customization)
 
-### 1.1. Cài đặt môi trường
-Hệ thống sử dụng Python 3.12 và quản lý phụ thuộc qua virtualenv:
+Dự án được đóng gói 100% theo chuẩn **Antigravity Customization System** (không sử dụng mã nguồn backend CRUD truyền thống), đặt tại thư mục `.agents/`:
 
-```bash
-cd qa-requirement-assistant
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-*(Nội dung `requirements.txt`: `pydantic>=2.0`, `pytest>=8.0`, `pyyaml>=6.0`)*
-
-### 1.2. Chạy Automated Tests (Đáp ứng Mục 4.5 của đề bài)
-Hệ thống bao gồm 6 kịch bản kiểm thử tự động kiểm soát State Machine, Human Gates, Bug Correlation, và Data Integrity:
-
-```bash
-PYTHONPATH=. .venv/bin/pytest -v tests/test_qa_assistant.py
-```
-
-### 1.3. Khởi chạy phiên làm việc tương tác (Interactive CLI)
-```bash
-PYTHONPATH=. .venv/bin/python3 main.py
+```text
+/home/linh/QA/
+├── .agents/
+│   ├── plugin.json                     # Antigravity Plugin Manifest
+│   ├── rules/
+│   │   └── AGENTS.md                   # Antigravity Rules (Luật điều phối 2-Phase & Human Gates)
+│   └── skills/
+│       └── qa-requirement-assistant/   # Master Skill Bundle
+│           ├── SKILL.md                # Cẩm nang điều phối quy trình phân tích & sinh test
+│           └── references/             # Progressive Disclosure (Tài liệu chuyên sâu)
+│               ├── bug-catalog.md      # Kho 5 bug lịch sử (BUG-001 -> BUG-005)
+│               ├── risk-checklist.md   # Khung 5 góc khuất kỹ thuật (Concurrency, State Drift...)
+│               └── test-design-matrix.md # Ma trận 5 loại kịch bản test & Chuẩn bước giả lập
+└── README.md                           # Tài liệu kiến trúc, báo cáo thực nghiệm & phỏng vấn
 ```
 
 ---
 
-## 2. Kiến Trúc Hệ Thống (System Architecture)
+## 2. Cách Áp Dụng Trực Tiếp Trong Antigravity (How to Apply)
 
-Thay vì bọc một API CRUD tĩnh thiếu tính thực tế, hệ thống được thiết kế theo mô hình **Specialized QA Agent** với 3 tầng rõ rệt:
+### 2.1. Tự động nhận diện (Zero Configuration)
+Antigravity tự động quét và nạp plugin từ thư mục `.agents/` khi bạn mở workspace `/home/linh/QA`.  
+Đồng thời, Skill cũng đã được đăng ký toàn cục tại `~/.gemini/config/skills/qa-requirement-assistant/SKILL.md`.
 
-```text
-       ┌────────────────────────────────────────────────────────┐
-       │   Lớp Tương Tác: INTERACTIVE QA WORKSPACE (Human Gate) │
-       │   - Đối thoại 2 chiều với Tester                        │
-       │   - Đào sâu case biên, phản biện BA (Refinement Loop)   │
-       └──────────────────────────┬─────────────────────────────┘
-                                  │
-       ┌──────────────────────────▼─────────────────────────────┐
-       │        Lớp Điều Phối: QA ORCHESTRATOR (Master Agent)   │
-       │        - Quản lý Session State Machine                 │
-       │        - Kiểm soát 2 Cổng kiểm duyệt của Con người     │
-       │        - Tự động Rollback khi Requirement thay đổi     │
-       └──────────────┬───────────────────────────┬─────────────┘
-                      │                           │
-         ┌────────────▼────────────┐  ┌───────────▼───────────┐
-         │       SUBAGENT 1        │  │       SUBAGENT 2        │
-         │ Requirement & Risk      │  │ Test Automation       │
-         │ Analyst                 │  │ Architect             │
-         │ • Business Rules        │  │ • 5+ Simulated Steps  │
-         │ • Questions for BA      │  │ • Expected Results    │
-         │ • Technical Risks       │  │ • Priority Ranking    │
-         │ • Bug Retrieval Tool    │  │   (P1, P2, P3)        │
-         └────────────┬────────────┘  └───────────┬───────────┘
-                      │                           │
-                      └─────────────┬─────────────┘
-                                    │
-       ┌────────────────────────────▼───────────────────────────┐
-       │       PERSISTENCE & CLOUD SYNC (Model Context Protocol)│
-       │       - Kết nối trực tiếp Google Workspace MCP Server  │
-       │       - Tab 1: Bug_Repository (5 bug lịch sử)          │
-       │       - Tab 2: Requirements_Analysis (req_id)          │
-       │       - Tab 3: Test_Cases_Specification (Foreign Key)  │
-       └────────────────────────────────────────────────────────┘
-```
+### 2.2. Các Subagents Runtime Được Antigravity Điều Phối
+Hệ thống sử dụng 2 Subagents chuyên trách:
+1. **`req-risk-analyst`**: Subagent chịu trách nhiệm phân tích tĩnh (Static Analysis) ở Phase 1: Bóc tách Business Rules, đặt câu hỏi phản biện BA, phát hiện 5 rủi ro kỹ thuật sâu, và đối chiếu tương quan với [Bug Catalog](file:///home/linh/QA/.agents/skills/qa-requirement-assistant/references/bug-catalog.md).
+2. **`test-automation-architect`**: Subagent chịu trách nhiệm thiết kế kiểm thử động (Dynamic Test Design) ở Phase 2: Sinh đúng 5 kịch bản kiểm thử giả lập (Happy, Boundary, Negative, Concurrency, State Conflict) kèm xếp hạng ưu tiên (P1, P2, P3).
+
+### 2.3. Trải nghiệm phiên làm việc (Human-in-the-loop Flow)
+1. **Bước 1:** Tester gửi requirement bất kỳ vào ô chat Antigravity.
+2. **Bước 2 (Phase 1):** Antigravity kích hoạt `req-risk-analyst` để phân tích 4 nhóm thông tin bắt buộc và **dừng lại tại Cổng kiểm duyệt 1 (Human Gate 1)**.
+3. **Bước 3 (Thảo luận & Tinh chỉnh):** Tester phản biện hoặc bổ sung nghiệp vụ. Agent cập nhật lại context.
+4. **Bước 4 (Phase 2):** Khi Tester gõ *"Đồng ý, sinh test đi"*, Antigravity chuyển giao context đã được duyệt sang `test-automation-architect` để sinh 5 kịch bản test giả lập chi tiết.
+5. **Bước 5 (Gate 2 & Sync):** Khi Tester gõ *"Đẩy lên Drive"*, Antigravity sinh mã `requirement_id` và gọi công cụ MCP `google-workspace` (`modify_sheet_values`) để ghi nhận đồng bộ thời gian thực vào [Google Master Sheet](https://docs.google.com/spreadsheets/d/1BG5HNlQBEqyG_hjM9WwklrME2lZbysNFHBSggsSQetk/edit).
 
 ---
 
@@ -82,14 +55,14 @@ Toàn bộ kết quả thực nghiệm và kịch bản test tương ứng đã 
 
 ### 3.1. Requirement A: *"Tài khoản bị khóa sau 5 lần nhập sai mật khẩu liên tiếp."*
 * **Tool làm tốt:**
-  * Bóc tách chuẩn xác ràng buộc số lần (ngưỡng = 5) và điều kiện "liên tiếp".
+  * Bóc tách chuẩn xác ngưỡng 5 lần và điều kiện "liên tiếp".
   * Thiết kế kịch bản Reset counter khi nhập đúng ở lần thứ 4 (`TC_AUTH_002`) và chặn đăng nhập tuyệt đối khi đã `LOCKED` (`TC_AUTH_003`).
   * Phát hiện rủi ro tấn công dò mật khẩu phân tán (*Distributed Brute Force*) qua nhiều worker đồng thời (`TC_AUTH_004`).
 * **Tool bỏ sót ban đầu:**
   * Chưa làm rõ cơ chế mở khóa: Khóa vĩnh viễn (Admin can thiệp) hay Khóa tạm thời (Timeout-based lock sau X phút).
   * Chưa bao quát trường hợp tấn công đa luồng cùng lúc làm sai lệch bộ đếm do Race Condition (Dirty read).
 * **Tinh chỉnh Prompt & Logic sau khi phát hiện:**
-  * Bổ sung quy tắc trong `prompts/req_risk_analyst.yaml`: *"Với các trạng thái đếm giới hạn (Counter limits), bắt buộc chất vấn cơ chế Reset, cơ chế Mở khóa (Unlock Lifecycle) và rủi ro Concurrency trên Counter"*.
+  * Bổ sung quy tắc trong `SKILL.md` và `risk-checklist.md`: *"Với các trạng thái đếm giới hạn (Counter limits), bắt buộc chất vấn cơ chế Reset, cơ chế Mở khóa (Unlock Lifecycle) và rủi ro Concurrency trên Counter"*.
   * Bổ sung kịch bản `TC_AUTH_005` kiểm thử tự động mở khóa sau khi hết thời hạn khóa.
 
 ### 3.2. Requirement B: *"Người dùng không được đặt mua số lượng sản phẩm lớn hơn số lượng tồn kho."*
@@ -137,8 +110,8 @@ Toàn bộ kết quả thực nghiệm và kịch bản test tương ứng đã 
 
 ### Câu 2: Kiến trúc của tool gồm những phần nào?
 * **Trả lời:** Kiến trúc gồm 3 tầng:
-  1. *Lớp Tương Tác & Điều Phối:* Master Orchestrator quản lý 2-Phase State Machine và 2 Cổng kiểm soát của con người (Human-in-the-loop Gates).
-  2. *Lớp Vệ Tinh Chuyên Trách (Subagents):* Subagent 1 (Requirement & Risk Analyst) kết hợp Bug Retrieval Tool; Subagent 2 (Test Automation Architect).
+  1. *Lớp Tương Tác & Điều Phối:* Antigravity Orchestrator quản lý 2-Phase State Machine và 2 Cổng kiểm soát của con người (`rules/AGENTS.md`).
+  2. *Lớp Vệ Tinh Chuyên Trách (Subagents):* Subagent 1 (`req-risk-analyst`) kết hợp Bug Catalog; Subagent 2 (`test-automation-architect`) tuân thủ Test Design Matrix.
   3. *Lớp Dữ Liệu & MCP:* Kết nối với Google Workspace MCP Server để đọc tri thức từ `Bug_Repository` và lưu trữ lịch sử phân tích, kịch bản test trên Google Drive.
 
 ### Câu 3: Bạn sử dụng AI cho những công việc nào?
@@ -149,14 +122,14 @@ Toàn bộ kết quả thực nghiệm và kịch bản test tương ứng đã 
   4. Thiết kế các bước giả lập và kỳ vọng cho kịch bản Automation Test theo từng cấp độ ưu tiên.
 
 ### Câu 4: Có phần nào bạn chủ động KHÔNG giao cho AI không? Tại sao?
-* **Trả lời:** Có 3 phần tôi chủ động kiểm soát bằng code thuật toán thuần:
-  1. *State Machine & Gate Control:* Việc chuyển pha (Phase 1 sang Phase 2) hoặc Rollback khi đổi requirement bắt buộc phải do code logic của Orchestrator quyết định, không để AI tự ý suy đoán.
-  2. *Schema Validation & Data Integrity:* Dùng Pydantic Models để kiểm soát tính toàn vẹn của dữ liệu (không thiếu trường, không null).
-  3. *Khóa liên kết Traceability:* Việc sinh mã `requirement_id` và gán Foreign Key vào các dòng test case được thực hiện bằng mã Python để đảm bảo tính nhất quán 100%.
+* **Trả lời:** Có 3 phần tôi chủ động kiểm soát bằng quy tắc tất định:
+  1. *State Machine & Gate Control:* Việc chuyển pha (Phase 1 sang Phase 2) hoặc Rollback khi đổi requirement bắt buộc phải tuân thủ nghiêm ngặt theo luật trong `AGENTS.md`, không để AI tự ý suy đoán.
+  2. *Cấu trúc dữ liệu & Format ô:* Quy chuẩn hiển thị trên Google Sheets được định dạng cố định để đảm bảo tính thẩm mỹ và dễ đọc.
+  3. *Khóa liên kết Traceability:* Việc sinh mã `requirement_id` và gán Foreign Key vào các dòng test case được định danh chuẩn mực để đảm bảo tính nhất quán 100%.
 
 ### Câu 5: Trong quá trình làm bài, có điều gì bạn chưa biết trước đó? Bạn đã tìm hiểu như thế nào?
 * **Trả lời:** Trước đây tôi chủ yếu làm việc với API RESTful truyền thống hoặc gọi OpenAI API trực tiếp. Khi giải quyết bài toán này, tôi đã tìm hiểu sâu về:
-  * Mô hình điều phối tác tử **Human-in-the-loop State Machine** để ngăn ngừa hiện tượng "Garbage In, Garbage Out".
+  * Mô hình điều phối tác tử **Human-in-the-loop State Machine** trong Antigravity để ngăn ngừa hiện tượng "Garbage In, Garbage Out".
   * Cơ chế kết nối công cụ qua **Model Context Protocol (MCP)** của Anthropic/Google để thao tác trực tiếp trên Cloud Storage (Google Drive / Sheets) thay vì phụ thuộc vào thư viện file local.
 
 ### Câu 6: Có trường hợp nào AI trả lời sai hoặc chưa tốt không? Bạn phát hiện và cải thiện như thế nào?
