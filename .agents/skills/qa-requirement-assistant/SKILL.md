@@ -2,13 +2,13 @@
 name: qa-requirement-assistant
 description: >-
   Use this skill whenever the user or tester provides a software requirement, user story,
-  or feature description and asks to analyze business rules, identify risks, match historical bugs,
-  or design prioritized simulated automation test specifications synced to Google Drive via MCP.
+  or feature description and asks to analyze business rules, identify risks, match historical bugs from Google Drive via MCP,
+  or design prioritized simulated automation test specifications synced to Google Drive.
 ---
 
 # QA Requirement Assistant Framework
 
-This skill guides the AI Agent to act as a **Lead QA Engineer & Agent Orchestrator** managing requirement decomposition, risk discovery, human-in-the-loop validation gates, and prioritized automated test design.
+This skill guides the AI Agent to act as a **Lead QA Engineer & Agent Orchestrator** managing requirement decomposition, risk discovery via specialized reference manuals, live historical bug retrieval from Google Drive, human-in-the-loop validation gates, and prioritized automated test design.
 
 ---
 
@@ -20,13 +20,13 @@ This skill guides the AI Agent to act as a **Lead QA Engineer & Agent Orchestrat
          ├───► Pillar 1: Static Requirement & Risk Analysis (Invoke 'req-risk-analyst')
          │          • Decompose 4 Business Rules: Pre-condition, Trigger, Constraints, Post-condition
          │          • Ask sharp Questions for BA (timing window, rollback lifecycle, failure modes)
-         │          • Analyze 5 Technical Risks (Concurrency, State Drift, Clock Drifts, Idempotency, Data Integrity)
-         │          • Correlate with historical bugs from [Bug Catalog](./references/bug-catalog.md)
+         │          • Analyze 5 Technical Risks using [Risk Checklist](./references/risk-checklist.md)
+         │          • Query LIVE bugs from Google Drive via MCP `read_sheet_values` ('Bug_Repository!A2:D')
          │
          ├───► [GATE 1] Await Tester Confirmation (Human-in-the-loop checkpoint)
          │
          ├───► Pillar 2: Prioritized Simulated Test Specification (Invoke 'test-automation-architect')
-         │          • Generate 5 mandatory scenario types: Happy Path, Boundary Value, Negative, Concurrency, State Conflict
+         │          • Generate 5 mandatory scenario types from [Test Design Matrix](./references/test-design-matrix.md)
          │          • Risk-based Priority Ranking: P1 (Critical), P2 (High), P3 (Medium)
          │          • Specify Simulated Actions (API/Payload) and 3-Tier Expected Results (UI + DB + Event)
          │
@@ -34,7 +34,7 @@ This skill guides the AI Agent to act as a **Lead QA Engineer & Agent Orchestrat
          │
          └───► Pillar 3: Cloud Workspace Synchronization (Google Workspace MCP)
                     • Generate unique `requirement_id`
-                    • Sync to Google Spreadsheet via `google-workspace` MCP tools
+                    • Sync to Google Spreadsheet via `google-workspace` MCP tool `modify_sheet_values`
                     • Maintain foreign-key traceability between Analysis and Test Cases
 ```
 
@@ -44,14 +44,19 @@ This skill guides the AI Agent to act as a **Lead QA Engineer & Agent Orchestrat
 
 ### Step 1: Phase 1 Analysis (Subagent `req-risk-analyst`)
 1. Extract the raw requirement text.
-2. Delegate to subagent `req-risk-analyst` via `invoke_subagent` or execute using the guidelines in [Risk Checklist](./references/risk-checklist.md).
-3. Check [Bug Catalog](./references/bug-catalog.md) to correlate matching historical bugs (`BUG-001` through `BUG-005`).
-4. Output the 4 mandatory sections:
+2. Delegate to subagent `req-risk-analyst` via `invoke_subagent` or execute using:
+   * **Technical Risk Analysis:** Consult [Risk Checklist](./references/risk-checklist.md) for 5 dimensions (*Concurrency, State Drift, Clock Drift, Non-idempotency, Distributed Transaction Failure*).
+   * **Live Bug Retrieval from Google Drive:** Call tool `google-workspace:read_sheet_values`:
+     * `spreadsheet_id`: `1BG5HNlQBEqyG_hjM9WwklrME2lZbysNFHBSggsSQetk`
+     * `range_name`: `Bug_Repository!A2:D`
+     * `user_google_email`: `tmi.linhvtm@gmail.com`
+     * Read live bug rows dynamically and perform semantic domain matching.
+3. Output the 4 mandatory sections:
    * **1. Business Rules**
    * **2. Questions for BA**
    * **3. Possible Risks**
-   * **4. Related Historical Bugs**
-5. **STOP AND PROMPT TESTER:**
+   * **4. Related Historical Bugs (queried live from Google Drive)**
+4. **STOP AND PROMPT TESTER:**
    Ask the tester: *"Bạn xem các điểm phân tích trên đã chuẩn chưa, có cần điều chỉnh gì trước khi tiến hành thiết kế bộ kịch bản Automation Test không?"*
    **DO NOT GENERATE TEST CASES YET.**
 

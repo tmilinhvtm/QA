@@ -19,11 +19,13 @@ Dự án được đóng gói 100% theo chuẩn **Antigravity Customization Syst
 │   │   └── AGENTS.md                   # Antigravity Rules (Luật điều phối 2-Phase & Human Gates)
 │   └── skills/
 │       └── qa-requirement-assistant/   # Master Skill Bundle
-│           ├── SKILL.md                # Cẩm nang điều phối quy trình phân tích & sinh test
-│           └── references/             # Progressive Disclosure (Tài liệu chuyên sâu)
-│               ├── bug-catalog.md      # Kho 5 bug lịch sử (BUG-001 -> BUG-005)
+│           └── references/             # Progressive Disclosure (Cẩm nang kỹ thuật chuyên sâu)
 │               ├── risk-checklist.md   # Khung 5 góc khuất kỹ thuật (Concurrency, State Drift...)
-│               └── test-design-matrix.md # Ma trận 5 loại kịch bản test & Chuẩn bước giả lập
+│               └── test-design-matrix.md # Ma trận 5 loại kịch bản & chuẩn bước giả lập
+│           # (Bug lịch sử được truy vấn trực tiếp từ Google Drive qua MCP, không dùng file tĩnh)
+│   └── subagents/                      # Đặc tả chi tiết các Subagents
+│       ├── req-risk-analyst.md         # Subagent Phase 1 (Phân tích & Bug retrieval)
+│       └── test-automation-architect.md# Subagent Phase 2 (Thiết kế Automation Test)
 └── README.md                           # Tài liệu kiến trúc, báo cáo thực nghiệm & phỏng vấn
 ```
 

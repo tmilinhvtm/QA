@@ -9,14 +9,15 @@ The workflow consists of two sequential phases separated by mandatory human chec
 [Input Requirement]
         │
         ▼
-[PHASE 1: Requirement & Risk Analysis]
-        │
+[PHASE 1: Requirement & Risk Analysis (Invoke req-risk-analyst)]
+        │  * Must query live Bug_Repository from Google Drive via MCP
+        │  * Must consult risk-checklist.md
         ▼
 [HUMAN GATE 1: Tester Critique & Approval] ◄── STOP! Do not generate test cases!
         │
         ▼
-[PHASE 2: Automation Test Design & Priority]
-        │
+[PHASE 2: Automation Test Design & Priority (Invoke test-automation-architect)]
+        │  * Must follow test-design-matrix.md
         ▼
 [HUMAN GATE 2: Tester Test Specification Approval]
         │
@@ -31,15 +32,19 @@ The workflow consists of two sequential phases separated by mandatory human chec
    * You must complete Phase 1 first (Business Rules, Questions for BA, 5 Technical Risks, Related Historical Bugs).
    * Ask the user/tester to review and confirm Phase 1 before proceeding.
 
-2. **Rollback on Requirement Change:**
+2. **Live Bug Retrieval from Google Drive (No Local Bug Files):**
+   * Historical bug correlation MUST query live bug records directly from Google Drive using tool `google-workspace:read_sheet_values` on `Bug_Repository!A2:D`.
+   * Never rely on static or hardcoded local bug lists.
+
+3. **Rollback on Requirement Change:**
    * If the user modifies, adds, or cancels requirements while in Phase 2 or between phases, immediately invalidate Phase 2 test cases.
    * Rollback the state to Phase 1 and re-analyze with the new scope.
 
-3. **Subagent Delegation:**
-   * Delegate Phase 1 analysis to the defined subagent `req-risk-analyst`.
-   * Delegate Phase 2 test generation to the defined subagent `test-automation-architect`.
+4. **Subagent Delegation:**
+   * Delegate Phase 1 analysis to subagent `req-risk-analyst`.
+   * Delegate Phase 2 test generation to subagent `test-automation-architect`.
 
-4. **Persistence & Traceability:**
+5. **Persistence & Traceability:**
    * Every analysis must have a unique `requirement_id` (e.g. `REQ_20261015_001`).
    * Every generated test case must reference `requirement_id` as a foreign key.
-   * Persist directly to Google Spreadsheet via `google-workspace` MCP tools (`modify_sheet_values`).
+   * Persist directly to Google Spreadsheet via `google-workspace` MCP tool `modify_sheet_values`.
