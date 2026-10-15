@@ -10,7 +10,10 @@ from schemas.analysis_models import BugCorrelation
 class BugRetrievalTool:
     """Satellite Tool for querying and matching bugs from historical repository."""
 
-    def __init__(self, fallback_path: str = "/home/linh/qa-requirement-assistant/config/bug_catalog.json"):
+    def __init__(self, fallback_path: str = None):
+        if fallback_path is None:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            fallback_path = os.path.join(base_dir, "config", "bug_catalog.json")
         self.fallback_path = fallback_path
         self._cached_bugs: List[Dict[str, Any]] = []
         self.load_bugs()
