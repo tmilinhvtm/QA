@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+payload_cache.json
+analysis_rows.json
+test_rows.json
+test_rows_batch1.json
+test_rows_batch2.json
