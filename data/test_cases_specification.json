@@ -1,0 +1,567 @@
+[
+  {
+    "requirement_id": "REQ_20261016_001",
+    "test_case_id": "TC_VOUCHER_001",
+    "scenario_name": "[Happy Path] Áp dụng thành công voucher dùng 1 lần cho đơn hàng đầu tiên hợp lệ của tài khoản",
+    "test_type": "Happy Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản usr_1001 (user_happy@example.com) ở trạng thái ACTIVE; chưa từng sử dụng voucher WELCOME50 (giảm 50k cho đơn từ 200k); giỏ hàng có sản phẩm trị giá 250.000đ; đang ở màn hình /checkout.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng nhập mã WELCOME50 vào ô 'Mã giảm giá' và bấm nút 'Áp dụng'.",
+        "expected_ui": "Ô nhập hiển thị WELCOME50, badge xanh 'Áp dụng thành công mã WELCOME50', dòng chiết khấu 'Giảm giá voucher: -50.000đ', tổng thanh toán cập nhật còn 200.000đ. Nút 'Đặt hàng' sẵn sàng.",
+        "expected_api": "POST /api/v1/cart/apply-voucher -> HTTP 200 OK, Body: {\"status\": \"success\", \"voucher_code\": \"WELCOME50\", \"discount_amount\": 50000, \"final_total\": 200000, \"is_valid\": true}",
+        "expected_db": "Giỏ hàng lưu tạm thông tin giảm giá. Bảng user_voucher_usages chưa ghi nhận (chờ đặt hàng).",
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng chọn phương thức 'Thanh toán khi nhận hàng (COD)' và bấm nút 'Đặt hàng'.",
+        "expected_ui": "Điều hướng đến /order/success, hiển thị mã đơn ORD_20261016_001, tổng tiền thanh toán 200.000đ, trạng thái 'Chờ xác nhận'.",
+        "expected_api": "POST /api/v1/orders/checkout -> HTTP 201 Created, Body: {\"status\": \"success\", \"order_id\": \"ORD_20261016_001\", \"total_amount\": 250000, \"discount_amount\": 50000, \"final_amount\": 200000, \"voucher_applied\": \"WELCOME50\", \"order_status\": \"PENDING\"}",
+        "expected_db": "Bảng orders thêm bản ghi ORD_20261016_001 (final_amount=200000, voucher_code='WELCOME50', order_status='PENDING'). Bảng user_voucher_usages thêm dòng (user_id='usr_1001', voucher_code='WELCOME50', order_id='ORD_20261016_001', status='COMMITTED'). Bảng vouchers.used_count tăng 1.",
+        "expected_event": "Kafka order-events phát OrderPlacedEvent: {\"order_id\": \"ORD_20261016_001\", \"user_id\": \"usr_1001\", \"voucher_code\": \"WELCOME50\", \"discount_amount\": 50000}"
+      }
+    ],
+    "notes": "Kiểm thử luồng thành công cơ bản (Mainstream Flow), đảm bảo mã voucher trừ đúng số tiền và lưu đúng trạng thái."
+  },
+  {
+    "requirement_id": "REQ_20261016_001",
+    "test_case_id": "TC_VOUCHER_002",
+    "scenario_name": "[Boundary Value] Kiểm tra giá trị biên: Đơn hàng sát ngưỡng tối thiểu (199.999đ vs 200.000đ) và thời gian áp dụng sát giờ hết hạn (T-1s)",
+    "test_type": "Boundary Value",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản usr_1002 (user_boundary@example.com) chưa từng sử dụng mã WELCOME50; cấu hình mã WELCOME50: đơn tối thiểu 200.000đ, hạn chót 23:59:59 16/10/2026.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Chọn sản phẩm có tổng tiền đúng 199.999đ (ngưỡng Min - 1đ), nhập mã WELCOME50 và bấm 'Áp dụng'.",
+        "expected_ui": "Hiển thị cảnh báo màu cam/đỏ: 'Đơn hàng chưa đạt giá trị tối thiểu 200.000đ để áp dụng voucher này (cần thêm 1đ)'. Tổng tiền giữ nguyên 199.999đ.",
+        "expected_api": "POST /api/v1/cart/apply-voucher -> HTTP 422 Unprocessable Entity, Body: {\"status\": \"fail\", \"code\": \"MIN_ORDER_AMOUNT_NOT_MET\", \"min_required\": 200000, \"current_amount\": 199999}",
+        "expected_db": "Bảng user_voucher_usages không có bản ghi mới.",
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Thêm sản phẩm để giỏ hàng đạt đúng 200.000đ (ngưỡng chuẩn: Min) vào thời điểm 23:59:58 (T-1s). Bấm 'Áp dụng'.",
+        "expected_ui": "Badge xanh 'Áp dụng thành công', chiết khấu 'Giảm giá: -50.000đ', tổng thanh toán cập nhật thành 150.000đ.",
+        "expected_api": "POST /api/v1/cart/apply-voucher -> HTTP 200 OK, Body: {\"status\": \"success\", \"voucher_code\": \"WELCOME50\", \"discount_amount\": 50000, \"final_total\": 150000}",
+        "expected_db": "Giỏ hàng cập nhật voucher hợp lệ.",
+        "expected_event": null
+      },
+      {
+        "step_no": 3,
+        "action_step": "Người dùng bấm nút 'Đặt hàng' tại mốc thời gian 23:59:59 (sát mốc hết hạn T).",
+        "expected_ui": "Màn hình /order/success hiển thị mã đơn ORD_20261016_002, tổng tiền 150.000đ.",
+        "expected_api": "POST /api/v1/orders/checkout -> HTTP 201 Created, Body: {\"status\": \"success\", \"order_id\": \"ORD_20261016_002\", \"final_amount\": 150000, \"voucher_applied\": \"WELCOME50\"}",
+        "expected_db": "Bảng orders lưu ORD_20261016_002 (final_amount=150000, voucher_code='WELCOME50'). Bảng user_voucher_usages lưu COMMITTED cho usr_1002.",
+        "expected_event": null
+      }
+    ],
+    "notes": "Kiểm tra độ chính xác tuyệt đối tại ranh giới tiền tối thiểu và cửa sổ thời gian hết hạn."
+  },
+  {
+    "requirement_id": "REQ_20261016_001",
+    "test_case_id": "TC_VOUCHER_003",
+    "scenario_name": "[Negative Path] Cùng tài khoản cố tình áp dụng lại mã voucher lần thứ 2 sau khi đơn trước đã áp dụng thành công",
+    "test_type": "Negative Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản usr_1003 (user_reuse@example.com) đã áp dụng thành công mã WELCOME50 ở đơn hàng trước; bảng user_voucher_usages đã có bản ghi status='COMMITTED'; giỏ hàng mới trị giá 300.000đ tại /checkout.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng nhập lại mã WELCOME50 vào ô 'Mã giảm giá' và bấm 'Áp dụng'.",
+        "expected_ui": "Hệ thống chặn ngay, báo lỗi đỏ: 'Bạn đã sử dụng mã giảm giá này rồi. Mỗi tài khoản chỉ được áp dụng 1 lần.' Tổng tiền giữ nguyên 300.000đ.",
+        "expected_api": "POST /api/v1/cart/apply-voucher -> HTTP 400 Bad Request, Body: {\"status\": \"error\", \"code\": \"VOUCHER_ALREADY_USED\", \"voucher_code\": \"WELCOME50\", \"message\": \"Voucher has already been used by this user\"}",
+        "expected_db": "Bảng user_voucher_usages không thêm bản ghi mới; vouchers.used_count không tăng.",
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng cố tình gọi trực tiếp API POST /api/v1/orders/checkout kèm mã WELCOME50 để bypass giao diện.",
+        "expected_ui": "Giao diện báo lỗi đơn hàng không hợp lệ.",
+        "expected_api": "POST /api/v1/orders/checkout -> HTTP 400 Bad Request, Body: {\"status\": \"error\", \"code\": \"VOUCHER_LIMIT_EXCEEDED\", \"order_id\": null}",
+        "expected_db": "Tuyệt đối không tạo đơn hàng mới nào mang mã WELCOME50 trong bảng orders. Bảng user_voucher_usages chỉ duy trì 1 bản ghi cũ.",
+        "expected_event": null
+      }
+    ],
+    "notes": "Kiểm thử phòng vệ chống lạm dụng mã giảm giá và bypass client."
+  },
+  {
+    "requirement_id": "REQ_20261016_001",
+    "test_case_id": "TC_VOUCHER_004",
+    "scenario_name": "[Concurrency / Race Condition] Cùng tài khoản mở 2 tab/thiết bị cùng áp voucher và bấm 'Đặt hàng' đồng thời trong <= 50ms (Chặn đứng BUG-003)",
+    "test_type": "Concurrency / Race Condition",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản usr_1004 (user_race@example.com) chưa từng sử dụng mã WELCOME50; mở song song 2 phiên Tab 1 và Tab 2 đều chuẩn bị giỏ hàng 250.000đ có áp mã WELCOME50; script test sẵn sàng gửi 2 request checkout với khoảng cách Delta_T <= 50ms.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Chuẩn bị 2 request đặt hàng Req_1 (Tab 1) và Req_2 (Tab 2) cùng mang thông tin user_id='usr_1004' và voucher_code='WELCOME50'.",
+        "expected_ui": "Cả 2 tab đều hiển thị tổng thanh toán tạm tính 200.000đ (đã giảm 50.000đ). Cả 2 nút 'Đặt hàng' đều sẵn sàng.",
+        "expected_api": "Hai payload checkout được đóng gói sẵn tại client queue.",
+        "expected_db": "Bảng user_voucher_usages chưa có dữ liệu của usr_1004.",
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Kích hoạt gửi đồng thời cả 2 request Req_1 và Req_2 lên máy chủ trong khoảng thời gian Delta_T <= 50ms (POST /api/v1/orders/checkout).",
+        "expected_ui": "Tab 1 (thắng): Đặt hàng thành công (/order/success), sinh mã ORD_RACE_001, thanh toán 200.000đ. Tab 2 (chậm hơn/bị chặn): Báo lỗi đỏ: 'Mã giảm giá WELCOME50 đang được xử lý ở giao dịch khác hoặc đã hết lượt dùng.' Không tạo đơn thứ 2.",
+        "expected_api": "Req 1 -> HTTP 201 Created, Body: {\"status\": \"success\", \"order_id\": \"ORD_RACE_001\", \"final_amount\": 200000, \"voucher_applied\": \"WELCOME50\"}. Req 2 -> HTTP 409 Conflict (hoặc 400 Bad Request), Body: {\"status\": \"error\", \"code\": \"VOUCHER_ALREADY_USED_OR_LOCKED\"}",
+        "expected_db": "Nhờ Distributed Lock (Redis Redlock) & ràng buộc UNIQUE(user_id, voucher_code) trên user_voucher_usages, chỉ có duy nhất 1 bản ghi được lưu (order_id='ORD_RACE_001'). vouchers.used_count chỉ tăng đúng 1 lần. Bảng orders chỉ có 1 đơn được giảm giá.",
+        "expected_event": "Kafka order-events chỉ phát DUY NHẤT 1 sự kiện OrderPlacedEvent mang mã WELCOME50."
+      }
+    ],
+    "notes": "Đối chiếu và ngăn chặn 100% nguy cơ tái diễn của bug lịch sử BUG-003."
+  },
+  {
+    "requirement_id": "REQ_20261016_001",
+    "test_case_id": "TC_VOUCHER_005",
+    "scenario_name": "[State Conflict & Recovery] Đơn hàng dùng voucher bị hủy hoặc phiên thanh toán online bị timeout 15 phút -> Tự động hoàn lại quyền sử dụng voucher cho tài khoản",
+    "test_type": "State Conflict & Recovery",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản usr_1005 (user_cancel@example.com) vừa tạo đơn ORD_TIMEOUT_001 trị giá 250.000đ (được giảm 50.000đ từ mã WELCOME50) qua cổng thanh toán trực tuyến; đơn đang ở trạng thái PAYMENT_PENDING (15 phút), voucher tạm giữ ở trạng thái RESERVED.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng không hoàn tất thanh toán sau 15 phút (Timeout) hoặc bấm nút 'Hủy đơn hàng' (POST /api/v1/orders/ORD_TIMEOUT_001/cancel).",
+        "expected_ui": "Màn hình Chi tiết đơn hàng hiển thị huy hiệu 'Đã hủy (Hết hạn thanh toán)'. Thông báo: 'Mã giảm giá WELCOME50 đã được hoàn lại vào kho voucher của bạn.'",
+        "expected_api": "POST /api/v1/orders/ORD_TIMEOUT_001/cancel -> HTTP 200 OK, Body: {\"status\": \"success\", \"order_id\": \"ORD_TIMEOUT_001\", \"order_status\": \"CANCELLED\", \"voucher_released\": \"WELCOME50\"}",
+        "expected_db": "Bảng orders cập nhật order_status='CANCELLED', cancelled_reason='PAYMENT_TIMEOUT'. Bảng user_voucher_usages chuyển trạng thái từ RESERVED sang RELEASED (hoặc xóa bản ghi tạm), giải phóng quyền dùng voucher cho usr_1005. Bảng vouchers.used_count giảm 1 (hoặc giữ nguyên không tính lượt hủy).",
+        "expected_event": "Kafka order-events phát OrderCancelledEvent: {\"order_id\": \"ORD_TIMEOUT_001\", \"voucher_code\": \"WELCOME50\", \"action\": \"RELEASE_VOUCHER\"}"
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng quay lại giỏ hàng tạo đơn hàng mới trị giá 260.000đ, nhập lại mã WELCOME50 và bấm 'Áp dụng'.",
+        "expected_ui": "Mã WELCOME50 được chấp nhận thành công! Badge xanh 'Áp dụng thành công', chiết khấu 'Giảm giá: -50.000đ', tổng tiền thanh toán là 210.000đ.",
+        "expected_api": "POST /api/v1/cart/apply-voucher -> HTTP 200 OK, Body: {\"status\": \"success\", \"voucher_code\": \"WELCOME50\", \"discount_amount\": 50000, \"final_total\": 210000, \"is_valid\": true}",
+        "expected_db": "Truy vấn user_voucher_usages không còn bản ghi nào ở trạng thái COMMITTED, cho phép tài khoản tiếp tục sử dụng voucher hợp lệ.",
+        "expected_event": null
+      }
+    ],
+    "notes": "Kiểm chứng luồng hoàn trả tài sản khuyến mãi (Compensating Transaction) khi giao dịch chính bị hủy."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "test_case_id": "TC_AUTH_LOCK_001",
+    "scenario_name": "Khóa tài khoản sau 5 lần nhập sai mật khẩu liên tiếp và chặn truy cập",
+    "test_type": "Happy Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản tester_user@example.com tồn tại với users.status = 'ACTIVE'. Mật khẩu đúng: P@ssword123. Bộ đếm failed_login_attempts = 0. Đang mở màn hình /login.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng nhập email tester_user@example.com và mật khẩu sai WrongPass@1, bấm Đăng nhập. Lặp lại liên tiếp từ lần 1 đến lần 4.",
+        "expected_ui": "Hiển thị thông báo lỗi màu đỏ: 'Email hoặc mật khẩu không chính xác. Bạn còn X lần thử trước khi tài khoản bị tạm khóa' (X giảm từ 4 xuống 1).",
+        "expected_api": "POST /api/v1/auth/login -> Status: 401 Unauthorized, Body: {\"status\": \"fail\", \"code\": \"AUTH_CREDENTIALS_INVALID\", \"failed_attempts\": 1..4, \"remaining_attempts\": 4..1}",
+        "expected_db": "Bảng users: failed_login_attempts tăng từ 1 lên 4; status = 'ACTIVE'. Bảng user_auth_audit: ghi nhận 4 bản ghi LOGIN_FAILED.",
+        "expected_event": ""
+      },
+      {
+        "step_no": 2,
+        "action_step": "Tại lần thử thứ 5, người dùng tiếp tục nhập mật khẩu sai WrongPass@5 vào ô Mật khẩu.",
+        "expected_ui": "Ký tự mật khẩu được che giấu an toàn, không có lỗi định dạng client, nút Đăng nhập ở trạng thái sẵn sàng (Enabled).",
+        "expected_api": "",
+        "expected_db": "",
+        "expected_event": ""
+      },
+      {
+        "step_no": 3,
+        "action_step": "Người dùng bấm nút 'Đăng nhập' lần thứ 5. (Endpoint: POST /api/v1/auth/login)",
+        "expected_ui": "Hiển thị modal/banner cảnh báo đỏ: 'Tài khoản của bạn đã bị khóa do nhập sai mật khẩu 5 lần liên tiếp. Vui lòng sử dụng Quên mật khẩu hoặc liên hệ Hỗ trợ.' Nút Đăng nhập bị vô hiệu hóa.",
+        "expected_api": "POST /api/v1/auth/login -> Status: 423 Locked (hoặc 403 Forbidden), Body: {\"status\": \"error\", \"code\": \"ACCOUNT_TEMPORARILY_LOCKED\", \"failed_attempts\": 5, \"remaining_attempts\": 0, \"locked_until\": \"2026-10-16T16:30:00Z\"}",
+        "expected_db": "Bảng users: status = 'LOCKED', failed_login_attempts = 5, locked_at = NOW(), locked_reason = 'EXCEEDED_MAX_LOGIN_ATTEMPTS'. Bảng user_auth_audit: ghi nhận bản ghi thứ 5 với action = 'ACCOUNT_LOCKED'.",
+        "expected_event": "Kafka/RabbitMQ topic 'auth-events' phát sự kiện UserAccountLockedEvent: {\"user_id\": \"usr_99123\", \"email\": \"tester_user@example.com\", \"reason\": \"MAX_FAILED_ATTEMPTS\"}"
+      }
+    ],
+    "notes": "Xác thực hành vi chuẩn khi người dùng chạm ngưỡng giới hạn 5 lần sai."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "test_case_id": "TC_AUTH_LOCK_002",
+    "scenario_name": "Kiểm tra giá trị biên: Nhập sai 4 lần liên tiếp, lần thứ 5 nhập ĐÚNG mật khẩu",
+    "test_type": "Boundary Value",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản tester_user2@example.com đang ACTIVE, đã nhập sai 4 lần trước đó (failed_login_attempts = 4). Mật khẩu chính xác: CorrectP@ss2026.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng nhập mật khẩu chính xác CorrectP@ss2026 vào ô Mật khẩu trên màn hình đăng nhập.",
+        "expected_ui": "Ô mật khẩu nhận dữ liệu, các cảnh báo lỗi cũ tự động ẩn đi, nút Đăng nhập sẵn sàng.",
+        "expected_api": "",
+        "expected_db": "",
+        "expected_event": ""
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng bấm nút 'Đăng nhập' lần thứ 5. (Endpoint: POST /api/v1/auth/login)",
+        "expected_ui": "Đăng nhập thành công, điều hướng vào Dashboard (/home), hiển thị 'Chào mừng trở lại, tester_user2'. Không còn cảnh báo khóa.",
+        "expected_api": "POST /api/v1/auth/login -> Status: 200 OK, Body: {\"status\": \"success\", \"access_token\": \"eyJhbGciOi...\", \"user\": {\"id\": \"usr_99124\", \"status\": \"ACTIVE\"}}",
+        "expected_db": "Bảng users: failed_login_attempts được reset về 0, status giữ nguyên 'ACTIVE', last_login_at = NOW(). Redis key login:failed:tester_user2@example.com bị xóa (DEL).",
+        "expected_event": "Broker topic 'auth-events' phát sự kiện UserLoginSuccessEvent: {\"user_id\": \"usr_99124\", \"status\": \"SUCCESS\", \"reset_counter\": true}"
+      }
+    ],
+    "notes": "Kiểm tra ranh giới N-1 = 4 lần sai, kịp thời nhập đúng lần 5 phải reset counter về 0."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "test_case_id": "TC_AUTH_LOCK_003",
+    "scenario_name": "Từ chối đăng nhập đối với tài khoản đang ở trạng thái LOCKED",
+    "test_type": "Negative Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản locked_user@example.com đã bị khóa trước đó (users.status = 'LOCKED'). Mật khẩu hợp lệ: ValidPassword!2026.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng nhập email locked_user@example.com và mật khẩu chính xác ValidPassword!2026 vào form đăng nhập.",
+        "expected_ui": "Thông tin được điền đầy đủ vào các ô dữ liệu, không có lỗi định dạng client.",
+        "expected_api": "",
+        "expected_db": "",
+        "expected_event": ""
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng bấm nút 'Đăng nhập'. (Endpoint: POST /api/v1/auth/login)",
+        "expected_ui": "Hệ thống chặn ngay lập tức, hiển thị thông báo đỏ: 'Tài khoản của bạn hiện đang bị khóa do vi phạm chính sách bảo mật. Vui lòng liên hệ CSKH.' Tuyệt đối không vào Dashboard.",
+        "expected_api": "POST /api/v1/auth/login -> Status: 423 Locked (hoặc 403 Forbidden), Body: {\"status\": \"error\", \"code\": \"ACCOUNT_LOCKED\", \"message\": \"Tài khoản đang bị tạm khóa\"}",
+        "expected_db": "Bảng users: status giữ nguyên 'LOCKED', failed_login_attempts không tăng. Bảng user_auth_audit: ghi nhận LOGIN_REJECTED_ACCOUNT_LOCKED.",
+        "expected_event": "Topic 'security-alerts' phát sự kiện SecurityAlertBlockedLoginEvent: {\"user_id\": \"usr_99120\", \"action\": \"BLOCKED_LOGIN_ATTEMPT\"}"
+      }
+    ],
+    "notes": "Bảo đảm tài khoản bị khóa phải bị phong tỏa tuyệt đối dù nhập đúng mật khẩu."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "test_case_id": "TC_AUTH_LOCK_004",
+    "scenario_name": "5 request đăng nhập sai bắn song song (<= 20ms) -> Kiểm chứng Atomic Counter & Khóa tài khoản chính xác",
+    "test_type": "Concurrency & Race Condition",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản concurrency_target@example.com đang ACTIVE, failed_login_attempts = 0. Cấu hình k6/JMeter bắn 5 threads POST /api/v1/auth/login sai mật khẩu đồng thời (Delta_T <= 20ms).",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Khởi tạo 5 luồng request (5 threads) mang payload đăng nhập với email concurrency_target@example.com và mật khẩu sai WrongParallelPass!.",
+        "expected_ui": "5 phiên kiểm thử song song được chuẩn bị sẵn sàng ở cổng chờ gửi dữ liệu.",
+        "expected_api": "",
+        "expected_db": "",
+        "expected_event": ""
+      },
+      {
+        "step_no": 2,
+        "action_step": "Bắn đồng thời 5 request đăng nhập sai mật khẩu trong khoảng thời gian Delta_T <= 20ms. (Endpoint: POST /api/v1/auth/login)",
+        "expected_ui": "Tài khoản lập tức bị khóa sau khi đếm đủ 5 lần thất bại. Không xuất hiện tình trạng tài khoản vẫn cho phép đăng nhập sau đó.",
+        "expected_api": "5 request đều nhận lỗi. Nhờ Redis INCR hoặc Distributed Lock, số đếm failed_attempts tăng tuần tự từ 1 đến 5 (không bị trùng cùng số đếm do Lost Update). Request thứ 5 nhận 423 Locked: {\"failed_attempts\": 5}.",
+        "expected_db": "Bảng users: failed_login_attempts phải có giá trị chính xác là 5; status = 'LOCKED', locked_at = NOW(). Bảng user_auth_audit: ghi nhận đúng 5 bản ghi thất bại độc lập.",
+        "expected_event": "Topic 'auth-events' chỉ phát DUY NHẤT 1 sự kiện UserAccountLockedEvent khi bộ đếm chạm đúng ngưỡng 5 (Idempotency)."
+      }
+    ],
+    "notes": "Kiểm tra cơ chế Atomic Counter và Distributed Lock chống Race Condition / Lost Update."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "test_case_id": "TC_AUTH_LOCK_005",
+    "scenario_name": "Thu hồi phiên đăng nhập tức thì (Force Logout / Revoke Token) khi tài khoản bị khóa và khôi phục trạng thái",
+    "test_type": "State Conflict & Recovery",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Tài khoản conflict_user@example.com đang active trên Thiết bị A (JWT còn hạn 30p). Trên Thiết bị B, tài khoản bị nhập sai 5 lần và chuyển sang LOCKED.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Trên Thiết bị A (đang active), người dùng bấm nút thực hiện đặt hàng / thanh toán. (Endpoint: POST /api/v1/orders/checkout)",
+        "expected_ui": "Thao tác đặt hàng bị chặn lập tức. Hiển thị thông báo popup: 'Phiên làm việc đã bị thu hồi hoặc tài khoản bị khóa để bảo đảm an toàn'. Đẩy về màn hình Đăng nhập (Force Logout).",
+        "expected_api": "POST /api/v1/orders/checkout -> Status: 401 Unauthorized, Body: {\"status\": \"error\", \"code\": \"TOKEN_REVOKED_ACCOUNT_LOCKED\"}",
+        "expected_db": "Bảng user_tokens: is_revoked = true, revoked_at = NOW(), revocation_reason = 'ACCOUNT_LOCKED'. Redis blacklist jti token.",
+        "expected_event": "Topic 'auth-events' phát sự kiện UserSessionTerminatedEvent thông báo thu hồi toàn bộ token active của usr_99125."
+      },
+      {
+        "step_no": 2,
+        "action_step": "Quản trị viên (Admin) hoặc quy trình xác thực OTP thực hiện kích hoạt mở lại tài khoản cho người dùng. (Endpoint: POST /api/v1/admin/users/usr_99125/unlock)",
+        "expected_ui": "Màn hình Admin báo: 'Mở khóa tài khoản thành công'. Người dùng nhận được email hướng dẫn đăng nhập lại bình thường.",
+        "expected_api": "POST /api/v1/admin/users/usr_99125/unlock -> Status: 200 OK, Body: {\"status\": \"success\", \"user_id\": \"usr_99125\", \"new_status\": \"ACTIVE\", \"failed_attempts\": 0}",
+        "expected_db": "Bảng users: status = 'ACTIVE', failed_login_attempts = 0, unlocked_at = NOW(), unlocked_by = 'ADMIN_SUPPORT'. Bảng user_auth_audit: ghi nhận ACCOUNT_UNLOCKED.",
+        "expected_event": "Topic 'auth-events' phát sự kiện UserAccountUnlockedEvent: {\"user_id\": \"usr_99125\", \"status\": \"ACTIVE\"}"
+      }
+    ],
+    "notes": "Kiểm tra cơ chế Force Logout đa thiết bị và khôi phục trạng thái tài khoản."
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "test_case_id": "TC_INV_001",
+    "scenario_name": "Đặt mua số lượng hợp lệ trong khoảng tồn kho khả dụng",
+    "test_type": "Happy Path",
+    "priority": "P1 (Critical)",
+    "priority_reason": "Luồng doanh thu chính của hệ thống TMĐT. Nếu luồng đặt mua chuẩn bị lỗi, khách không thể hoàn tất đơn hàng.",
+    "status": "NOT_RUN",
+    "pre_conditions": "Sản phẩm iPhone 16 (ID: PROD_IPHONE16_128GB) có sẵn 10 chiếc trong kho (available_stock = 10, reserved_stock = 0). Khách hàng CUST_1001 đã đăng nhập và lưu sẵn địa chỉ nhận hàng hợp lệ.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Tại trang chi tiết sản phẩm, chọn số lượng sản phẩm = 3. Chọn phương thức thanh toán là COD.",
+        "expected_ui": "Ô số lượng hiển thị đúng = 3. Phương thức COD được tích chọn với viền xanh.",
+        "expected_api": "",
+        "expected_db": "",
+        "expected_event": ""
+      },
+      {
+        "step_no": 2,
+        "action_step": "Bấm nút 'Đặt hàng ngay'. (Hệ thống kích hoạt POST /api/v1/checkout/orders)",
+        "expected_ui": "Hiển thị màn hình 'Đặt hàng thành công', hiển thị đúng mã đơn hàng dạng ORD_YYYYMMDD_XXX.",
+        "expected_api": "Trả về HTTP 201 Created. Response body có format: {\"order_id\": \"ORD_20261016_001\", \"status\": \"PENDING_CONFIRMATION\", \"total_amount\": 68970000}, order_id trùng khớp 100% với mã trên UI.",
+        "expected_db": "Bảng orders: Sinh ra 1 bản ghi mới có order_id = 'ORD_20261016_001', customer_id = 'CUST_1001', order_status = 'Pending', quantity = 3, payment_method = 'COD'. Bảng inventory: available_stock giảm từ 10 xuống 7, reserved_stock tăng từ 0 lên 3.",
+        "expected_event": "Kafka topic 'inventory-events' phát StockReservedEvent (reserved_qty: 3, remaining_stock: 7). Topic 'order-events' phát OrderPlacedEvent."
+      }
+    ],
+    "notes": "Verified against ISTQB Happy Path baseline"
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "test_case_id": "TC_INV_002",
+    "scenario_name": "Kiểm tra các giá trị biên của số lượng đặt mua (Biên min = 1, Biên max = Tồn kho)",
+    "test_type": "Boundary Value Analysis",
+    "priority": "P2 (High)",
+    "priority_reason": "Dễ xảy ra lỗi logic toán tử so sánh (< thay vì <=), làm chặn oan khách mua chiếc cuối cùng hoặc không mua được lẻ 1 chiếc.",
+    "status": "NOT_RUN",
+    "pre_conditions": "Sản phẩm iPhone 16 hiện còn đúng 5 chiếc trong kho (available_stock = 5). Khách hàng CUST_1002 đã đăng nhập.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Chọn số lượng = 1 (Biên Min = 1). Bấm nút 'Đặt hàng ngay' (POST /api/v1/checkout/orders với quantity = 1).",
+        "expected_ui": "Hiển thị thông báo 'Đặt hàng thành công', mã đơn hàng dạng ORD_BOUND_001.",
+        "expected_api": "HTTP 201 Created. Response body trả về order_id: 'ORD_BOUND_001', status: 'PENDING_CONFIRMATION'.",
+        "expected_db": "Bảng inventory: available_stock giảm từ 5 xuống 4, reserved_stock tăng 1. Bảng orders: Sinh bản ghi đơn hàng mới tương ứng.",
+        "expected_event": "Topic 'inventory-events' phát StockReservedEvent (quantity: 1)."
+      },
+      {
+        "step_no": 2,
+        "action_step": "Quay lại trang sản phẩm, nhập số lượng mua = 4 (Biên Max bằng đúng tồn kho khả dụng hiện tại). Bấm nút 'Đặt hàng ngay' (POST /api/v1/checkout/orders với quantity = 4).",
+        "expected_ui": "Hiển thị màn hình 'Đặt hàng thành công', mã đơn ORD_BOUND_002. Trang chi tiết sản phẩm chuyển nhãn đỏ 'Hết hàng' và disable nút 'Mua ngay'.",
+        "expected_api": "HTTP 201 Created. Response body trả về order_id: 'ORD_BOUND_002', status: 'PENDING_CONFIRMATION'.",
+        "expected_db": "Bảng inventory: available_stock giảm từ 4 về 0, reserved_stock tăng 4, stock_status = 'OUT_OF_STOCK'.",
+        "expected_event": "Topic 'inventory-events' phát StockReservedEvent (quantity: 4) và StockDepletedEvent."
+      }
+    ],
+    "notes": "Boundary test covering Min (1) and Max (Remaining Stock)"
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "test_case_id": "TC_INV_003",
+    "scenario_name": "Cố tình đặt mua vượt quá tồn kho khả dụng và dữ liệu không hợp lệ",
+    "test_type": "Negative Path",
+    "priority": "P1 (Critical)",
+    "priority_reason": "Ngăn chặn triệt để hành vi đặt khống, bán vượt tồn kho (Overselling) dẫn đến phạt sàn TMĐT và khiếu nại khách hàng.",
+    "status": "NOT_RUN",
+    "pre_conditions": "Sản phẩm iPhone 16 chỉ còn đúng 2 chiếc trong kho (available_stock = 2). Khách hàng CUST_1003 đã đăng nhập.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Nhập số lượng đặt mua = 3 (vượt quá tồn kho khả dụng 2 chiếc). Bấm nút 'Đặt hàng ngay'.",
+        "expected_ui": "Hiển thị modal/banner cảnh báo màu đỏ: 'Rất tiếc, sản phẩm này chỉ còn 2 sản phẩm trong kho. Vui lòng điều chỉnh số lượng'. Nút đặt hàng bị khóa tạm thời.",
+        "expected_api": "Kích hoạt POST /api/v1/checkout/orders trả về HTTP 422 Unprocessable Entity (hoặc 400). Response body: {\"error_code\": \"INSUFFICIENT_STOCK\", \"available_quantity\": 2}.",
+        "expected_db": "Bảng inventory: available_stock giữ nguyên = 2. Bảng orders: Tuyệt đối không sinh bất kỳ bản ghi đơn hàng mới nào.",
+        "expected_event": "Không có bất kỳ sự kiện trừ kho hay đặt hàng nào được phát ra trên Kafka topic."
+      },
+      {
+        "step_no": 2,
+        "action_step": "Thử nhập các giá trị không hợp lệ: số 0, số âm (-1), hoặc chữ ('abc') rồi bấm gửi request.",
+        "expected_ui": "Giao diện báo lỗi inline ngay dưới ô nhập: 'Số lượng mua tối thiểu là 1 và phải là số nguyên dương'.",
+        "expected_api": "HTTP 400 Bad Request. Response body: {\"error_code\": \"INVALID_QUANTITY\", \"message\": \"Quantity must be positive integer\"}.",
+        "expected_db": "Bảng inventory và bảng orders hoàn toàn không thay đổi dữ liệu.",
+        "expected_event": "Không có sự kiện nào được phát sinh."
+      }
+    ],
+    "notes": "Negative test preventing overselling and input injection"
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "test_case_id": "TC_INV_004",
+    "scenario_name": "Hai khách hàng cùng tranh mua chiếc tồn kho cuối cùng (<= 20ms)",
+    "test_type": "Concurrency / Race Condition",
+    "priority": "P1 (Critical)",
+    "priority_reason": "Rủi ro số một trong các đợt Flash Sale. Nếu thiếu khóa phân tán, cả 2 luồng cùng trừ kho làm tồn kho âm (-1) và bán thừa hàng (Double Deduction).",
+    "status": "NOT_RUN",
+    "pre_conditions": "Sản phẩm iPhone 16 chỉ còn duy nhất 1 chiếc cuối cùng trong kho (available_stock = 1, reserved_stock = 0). Hai khách hàng CUST_A và CUST_B cùng mở sẵn trang checkout.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Bắn tải đồng thời 2 request đặt mua cách nhau 10ms:\n- Luồng A: POST /api/v1/checkout/orders (CUST_A, quantity = 1, Idempotency-Key: IDEMP_A_1001)\n- Luồng B: POST /api/v1/checkout/orders (CUST_B, quantity = 1, Idempotency-Key: IDEMP_B_1002)",
+        "expected_ui": "- Luồng A: Màn hình hiển thị 'Đặt hàng thành công', mã đơn ORD_RACE_A01.\n- Luồng B: Hiển thị popup lỗi 'Sản phẩm vừa có khách hàng khác đặt mua và hiện đã hết hàng'.",
+        "expected_api": "- Luồng A: Trả về HTTP 201 Created, Response body có order_id: 'ORD_RACE_A01'.\n- Luồng B: Trả về HTTP 409 Conflict, Response body: {\"error_code\": \"STOCK_ACQUISITION_LOCK_FAILED\", \"message\": \"Item out of stock\"}.",
+        "expected_db": "Cơ chế Redis Distributed Lock kích hoạt bảo vệ. Bảng inventory: available_stock = 0 (tuyệt đối không bị âm -1), reserved_stock = 1. Bảng orders: Chỉ tạo duy nhất 1 đơn cho CUST_A, không tạo đơn cho CUST_B.",
+        "expected_event": "Topic 'inventory-events' chỉ phát đúng 1 sự kiện StockReservedEvent và 1 sự kiện StockDepletedEvent."
+      }
+    ],
+    "notes": "Concurrency race test with distributed lock verification"
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "test_case_id": "TC_INV_005",
+    "scenario_name": "Quá hạn thanh toán / Hủy đơn - Tự động hoàn lại hàng vào kho",
+    "test_type": "State Conflict & Recovery",
+    "priority": "P2 (High)",
+    "priority_reason": "Khách giữ chỗ nhưng không trả tiền. Nếu không tự động bồi hoàn kho, sản phẩm sẽ bị giam lỏng (Ghost Holding), gây thất thoát doanh thu.",
+    "status": "NOT_RUN",
+    "pre_conditions": "Đơn hàng ORD_HOLD_001 đang ở trạng thái giữ chỗ (orders.order_status = 'PendingPayment'), đang giữ 2 chiếc iPhone trong kho (available_stock = 5, reserved_stock = 2). Thời hạn giữ chỗ là 15 phút.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Khách hàng không thực hiện thanh toán. Quá hạn 15 phút, hệ thống tự động kích hoạt hủy đơn: POST /api/v1/orders/ORD_HOLD_001/cancel với payload reason = 'PAYMENT_TIMEOUT'.",
+        "expected_ui": "Khách truy cập lại đơn hàng hiển thị nhãn xám: 'Đơn hàng đã tự động hủy do quá thời gian thanh toán'.",
+        "expected_api": "HTTP 200 OK. Response body: {\"order_id\": \"ORD_HOLD_001\", \"status\": \"CANCELLED\", \"cancellation_reason\": \"PAYMENT_TIMEOUT\"}.",
+        "expected_db": "Thực hiện bồi hoàn kho (Compensating Transaction):\n- Bảng orders: order_status = 'Cancelled', cancelled_at = NOW().\n- Bảng inventory: available_stock bồi hoàn tăng từ 5 lên 7, reserved_stock giảm từ 2 về 0.",
+        "expected_event": "Topic 'inventory-events' phát StockReleasedEvent (released_qty: 2, restored_available_stock: 7). Cache kho Redis lập tức được giải phóng 2 sản phẩm."
+      }
+    ],
+    "notes": "Compensating transaction and inventory release validation"
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "test_case_id": "TC_ORD_CANCEL_001",
+    "scenario_name": "[Happy Path] Hủy đơn hàng hợp lệ trong vòng 2 phút sau khi thanh toán thành công, đơn hàng ở trạng thái PAID",
+    "test_type": "Happy Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Đơn hàng ORD_20261016_C01 của người dùng CUST_8801 vừa thanh toán thành công với số tiền 1.500.000đ (thời gian: T_0 = 120s trước); orders.order_status = 'PAID'; kho đã tạm trừ 2 sản phẩm; voucher SALE50K đã áp dụng; đơn hàng chưa chuyển sang PROCESSING. Người dùng đang ở trang /orders/ORD_20261016_C01.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng bấm nút 'Yêu cầu hủy đơn' trên trang Chi tiết đơn hàng, chọn lý do 'Đổi ý / Muốn đặt sản phẩm khác' từ menu trên modal.",
+        "expected_ui": "Modal popup xác nhận hiển thị: Số tiền hoàn trả dự kiến 1.500.000đ; lý do đã chọn; nút 'Xác nhận hủy đơn' sáng rõ sẵn sàng click.",
+        "expected_api": null,
+        "expected_db": null,
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng bấm nút 'Xác nhận hủy đơn' trên modal popup (POST /api/v1/orders/ORD_20261016_C01/cancel).",
+        "expected_ui": "Modal đóng, Toast xanh 'Hủy đơn hàng thành công! Tiền sẽ được hoàn lại vào tài khoản thanh toán của bạn'. Badge đơn hàng đổi sang Đã hủy (CANCELLED). Nút hủy biến mất.",
+        "expected_api": "HTTP 200 OK, Body: {\"status\": \"success\", \"order_id\": \"ORD_20261016_C01\", \"order_status\": \"CANCELLED\", \"refund_id\": \"REF_20261016_8801\", \"refund_amount\": 1500000, \"cancelled_at\": \"2026-10-16T17:00:00Z\"}",
+        "expected_db": "Bảng orders: order_status = 'CANCELLED', cancelled_at = NOW(), cancel_reason = 'CHANGE_OF_MIND'. Bảng refunds: refund_id = 'REF_20261016_8801', amount = 1500000, status = 'PENDING'. Bảng inventory: available_stock cộng hoàn trả 2 sản phẩm. Bảng user_voucher_usages: mã SALE50K chuyển sang 'RELEASED'.",
+        "expected_event": "Kafka order-events phát OrderCancelledEvent; Kafka payment-events phát RefundInitiatedEvent (refund_amount: 1500000)."
+      }
+    ],
+    "notes": "Kiểm thử luồng hủy đơn và hoàn tiền tiêu chuẩn của khách hàng."
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "test_case_id": "TC_ORD_CANCEL_002",
+    "scenario_name": "[Boundary Value] Kiểm tra giá trị biên thời gian 5 phút: Hủy thành công tại giây thứ 299 (T=299s) vs Bị chặn tại giây thứ 301 (T=301s)",
+    "test_type": "Boundary Value",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Chuẩn bị 2 đơn hàng chưa sang PROCESSING: ORD_BOUND_299 (gọi hủy tại T_0 + 299s, còn 1s trong hạn) và ORD_BOUND_301 (gọi hủy tại T_0 + 301s, quá hạn 1s).",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "[Biên Hợp Lệ: T = 299s] Tại giây 299 sau thanh toán, người dùng mở đơn ORD_BOUND_299, chọn lý do và bấm 'Xác nhận hủy đơn' (POST /api/v1/orders/ORD_BOUND_299/cancel).",
+        "expected_ui": "Thao tác hủy được chấp thuận, badge đơn hàng đổi thành 'Đã hủy', thông báo thành công hiển thị.",
+        "expected_api": "HTTP 200 OK, Body: {\"status\": \"success\", \"order_id\": \"ORD_BOUND_299\", \"order_status\": \"CANCELLED\", \"elapsed_seconds\": 299}",
+        "expected_db": "Bảng orders: order_status = 'CANCELLED'. Bảng refunds: Khởi tạo bản ghi hoàn tiền hợp lệ.",
+        "expected_event": "Phát sự kiện OrderCancelledEvent và RefundInitiatedEvent."
+      },
+      {
+        "step_no": 2,
+        "action_step": "[Biên Quá Hạn: T = 301s] Tại giây 301 sau thanh toán, người dùng đơn ORD_BOUND_301 cố tình bấm hủy kể cả khi chỉnh lùi giờ thiết bị (POST /api/v1/orders/ORD_BOUND_301/cancel).",
+        "expected_ui": "Hệ thống chặn lại, hiển thị popup đỏ: 'Đã quá thời hạn 5 phút cho phép tự hủy đơn hàng (Đã trôi qua 5 phút 01 giây). Vui lòng liên hệ CSKH để được hỗ trợ'. Nút hủy bị vô hiệu hóa.",
+        "expected_api": "HTTP 422 Unprocessable Entity, Body: {\"status\": \"error\", \"code\": \"CANCEL_TIME_WINDOW_EXPIRED\", \"order_id\": \"ORD_BOUND_301\", \"elapsed_seconds\": 301, \"max_allowed_seconds\": 300}",
+        "expected_db": "Bảng orders: order_status giữ nguyên 'PAID', tuyệt đối không đổi CANCELLED. Bảng refunds: Không tạo bản ghi hoàn tiền nào.",
+        "expected_event": "Không phát sinh bất kỳ sự kiện hủy đơn hay hoàn tiền nào."
+      }
+    ],
+    "notes": "Kiểm tra tính chính xác tuyệt đối của ranh giới thời gian 5 phút căn cứ Server Timestamp, phòng chống BUG-010."
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "test_case_id": "TC_ORD_CANCEL_003",
+    "scenario_name": "[Negative Path] Chặn hủy đơn hàng khi đơn đã chuyển sang trạng thái PROCESSING (đang đóng gói) dù mới thanh toán 1 phút (T=60s)",
+    "test_type": "Negative Path",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Đơn hàng ORD_PROC_001 của khách CUST_8803 vừa thanh toán 60s trước (T=60s < 300s), nhưng kho WMS đã tiếp nhận và bấm quét mã đóng gói; orders.order_status = 'PROCESSING'.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng truy cập vào trang Chi tiết đơn hàng ORD_PROC_001 trên Web/App.",
+        "expected_ui": "Thanh tiến trình hiển thị 'Đang đóng gói hàng'. Nút 'Yêu cầu hủy đơn' bị vô hiệu hóa (disabled) kèm tooltip: 'Đơn hàng đang trong quá trình đóng gói, bạn không thể tự hủy đơn lúc này'.",
+        "expected_api": null,
+        "expected_db": null,
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng cố tình vượt rào giao diện gửi request trực tiếp POST /api/v1/orders/ORD_PROC_001/cancel.",
+        "expected_ui": "Giao diện nhận diện lỗi và bật thông báo đỏ: 'Rất tiếc, đơn hàng đã được chuyển sang khâu đóng gói xuất kho và không thể hủy'.",
+        "expected_api": "HTTP 409 Conflict, Body: {\"status\": \"error\", \"code\": \"ORDER_ALREADY_PROCESSING\", \"order_id\": \"ORD_PROC_001\", \"current_status\": \"PROCESSING\", \"message\": \"Order is being packed and cannot be cancelled\"}",
+        "expected_db": "Bảng orders: order_status được bảo vệ toàn vẹn, giữ nguyên 'PROCESSING', không bị cập nhật cancelled_at. Bảng refunds: Không có bản ghi nào.",
+        "expected_event": "Không phát bất kỳ sự kiện hoàn tiền hay hủy đơn nào."
+      }
+    ],
+    "notes": "Ngăn chặn xung đột nghiệp vụ nghiêm trọng giữa bộ phận kho vận và khách hàng (BUG-002)."
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "test_case_id": "TC_ORD_CANCEL_004",
+    "scenario_name": "[Concurrency & Race Condition] Gửi 2 request hủy đơn đồng thời (khoảng cách <= 20ms) từ 2 phiên/thiết bị, kiểm tra ngăn chặn Double Refund và Distributed Lock",
+    "test_type": "Concurrency & Race Condition",
+    "priority": "P1 (Critical)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Đơn hàng ORD_RACE_001 trị giá 2.000.000đ của khách CUST_8804 đang ở trạng thái PAID (thanh toán được 90s). Mở đồng thời Phiên A (Web) và Phiên B (App). Chuẩn bị 2 request POST /api/v1/orders/ORD_RACE_001/cancel với delta T <= 20ms.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Mở popup xác nhận hủy đơn trên cả 2 thiết bị Phiên A (Web) và Phiên B (App) cho đơn ORD_RACE_001.",
+        "expected_ui": "Cả 2 giao diện hiển thị nút 'Xác nhận hủy đơn' sẵn sàng.",
+        "expected_api": "Hai payload nạp vào hàng đợi bắn tải đồng thời.",
+        "expected_db": "Bảng orders: order_status = 'PAID'. Bảng refunds: Chưa có bản ghi nào.",
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Kích hoạt bắn đồng thời 2 request hủy đơn Req_1 (Phiên A) và Req_2 (Phiên B) với độ trễ delta T <= 20ms (POST /api/v1/orders/ORD_RACE_001/cancel).",
+        "expected_ui": "Phiên A hiển thị: 'Hủy đơn hàng thành công! Đang tiến hành hoàn tiền 2.000.000đ', badge đổi 'Đã hủy'. Phiên B hiển thị cảnh báo: 'Yêu cầu hủy đơn đang được xử lý ở một phiên khác hoặc đơn hàng đã hủy. Vui lòng tải lại trang'.",
+        "expected_api": "Req_1: HTTP 200 OK, Body: {\"status\": \"success\", \"order_id\": \"ORD_RACE_001\", \"order_status\": \"CANCELLED\", \"refund_id\": \"REF_RACE_001\", \"refund_amount\": 2000000}. Req_2: HTTP 409 Conflict, Body: {\"status\": \"error\", \"code\": \"CONCURRENT_ORDER_MODIFICATION\", \"order_id\": \"ORD_RACE_001\", \"message\": \"Order is currently locked or already cancelled\"}.",
+        "expected_db": "Redis Distributed Lock (lock:order:ORD_RACE_001) hoặc Row Lock bắt giữ giao dịch đầu tiên. Bảng orders cập nhật CANCELLED đúng duy nhất 1 lần. Bảng refunds chỉ sinh DUY NHẤT 1 bản ghi hoàn tiền 2.000.000đ. Không có bản ghi thứ 2 (chống hoàn tiền kép 100%).",
+        "expected_event": "Kafka topic payment-events chỉ phát DUY NHẤT 1 sự kiện RefundInitiatedEvent."
+      }
+    ],
+    "notes": "Phòng chống rủi ro thất thoát tài chính cao nhất của hệ thống thanh toán: Double Refund (BUG-001)."
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "test_case_id": "TC_ORD_CANCEL_005",
+    "scenario_name": "[State Conflict & Recovery] Kiểm chứng khôi phục và bồi hoàn đa hệ thống sau khi hủy thành công: Hoàn tiền qua cổng thanh toán, hoàn trả tồn kho khả dụng và hoàn trả voucher/điểm thưởng đã áp dụng",
+    "test_type": "State Conflict & Recovery",
+    "priority": "P2 (High)",
+    "status": "NOT_RUN",
+    "pre_conditions": "Đơn hàng ORD_COMP_001 của khách CUST_8805 trị giá 1.000.000đ: Áp dụng voucher VIP100K (giảm 100.000đ) + trừ 50.000 điểm thưởng (50.000đ) + thanh toán VNPay 850.000đ. Đơn giữ 1 sản phẩm SP_IPHONE16 trong kho. Đã thanh toán 3 phút (T=180s), orders.order_status = 'PAID'.",
+    "test_steps": [
+      {
+        "step_no": 1,
+        "action_step": "Người dùng mở modal hủy đơn hàng, chọn lý do 'Muốn thay đổi phương thức thanh toán' và kiểm tra bảng tóm tắt hoàn trả trên popup.",
+        "expected_ui": "Popup hiển thị chi tiết: Tiền hoàn về VNPay: 850.000đ; Điểm thưởng hoàn ví xu: 50.000 điểm; Mã ưu đãi hoàn lại: VIP100K. Nút 'Xác nhận hủy đơn' sẵn sàng.",
+        "expected_api": null,
+        "expected_db": null,
+        "expected_event": null
+      },
+      {
+        "step_no": 2,
+        "action_step": "Người dùng bấm nút 'Xác nhận hủy đơn' trên modal (POST /api/v1/orders/ORD_COMP_001/cancel và điều phối Saga Compensating Transactions).",
+        "expected_ui": "Giao diện thông báo: 'Đơn hàng ORD_COMP_001 đã hủy thành công. Tiền, điểm thưởng và voucher ưu đãi đã được hoàn trả đầy đủ vào tài khoản của bạn'.",
+        "expected_api": "HTTP 200 OK, Body: {\"status\": \"success\", \"order_id\": \"ORD_COMP_001\", \"order_status\": \"CANCELLED\", \"compensation\": {\"refund_amount\": 850000, \"points_restored\": 50000, \"voucher_restored\": \"VIP100K\", \"stock_restored\": 1}}",
+        "expected_db": "Bảng orders: order_status = 'CANCELLED'. Bảng refunds: Tạo bản ghi hoàn tiền 850.000đ trạng thái 'PROCESSING' gửi sang cổng VNPay. Bảng inventory: Cột available_stock của SP_IPHONE16 được cộng lại +1. Bảng loyalty_points: Điểm của CUST_8805 được hoàn lại +50.000. Bảng user_voucher_usages: Trạng thái VIP100K chuyển về 'RELEASED'.",
+        "expected_event": "Kafka phát: OrderCancelledEvent, StockRestoredEvent, LoyaltyPointsRestoredEvent, VoucherReleasedEvent, RefundInitiatedEvent. Tất cả dịch vụ thành phần xử lý thành công, không xung đột hay treo trạng thái."
+      }
+    ],
+    "notes": "Đảm bảo tính toàn vẹn và nhất quán cuối cùng giữa các dịch vụ phân tán thông qua Saga Compensating Transactions."
+  }
+]

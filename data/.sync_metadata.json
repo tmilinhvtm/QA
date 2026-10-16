@@ -1,0 +1,12 @@
+{
+  "spreadsheet_id": "1BG5HNlQBEqyG_hjM9WwklrME2lZbysNFHBSggsSQetk",
+  "spreadsheet_name": "QA_Requirement_Assistant_Master",
+  "user_google_email": "tmi.linhvtm@gmail.com",
+  "last_modified_time_drive": "2026-10-16T16:57:41.300Z",
+  "last_synced_at": "2026-10-16T16:58:06.959971Z",
+  "sheets": {
+    "Bug_Repository": "Bug_Repository!A1:E",
+    "Requirements_Analysis": "Requirements_Analysis!A1:Z",
+    "Test_Cases_Specification": "Test_Cases_Specification!A1:Z"
+  }
+}

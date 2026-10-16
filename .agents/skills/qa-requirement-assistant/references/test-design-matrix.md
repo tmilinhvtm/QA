@@ -1,27 +1,50 @@
-# Test Design Matrix & Priority Guide
+# E-Commerce Test Design Matrix & Priority Guide
 
-Every requirement must generate at least 5 prioritized automated test scenarios:
+Every software requirement must generate at least 5 prioritized automated test scenarios covering the core architectural dimensions of modern shopping systems:
+
+---
 
 ### 1. Mandatory 5 Test Types
 
-| Test Type | Objective | Priority Standard |
+| Test Type | Objective & Scope | Priority Standard |
 | :--- | :--- | :--- |
-| **Happy Path** | Validates mainstream user journey with valid prerequisites. | `P1 (Critical)` |
-| **Boundary Value** | Validates exact edge values (e.g. 4m59s vs 5m01s; Order_Quantity == Available_Stock). | `P2 (High)` |
-| **Negative Path** | Deliberately violates business constraints or state preconditions. | `P1 (Critical)` |
-| **Concurrency** | Simulates parallel multi-threaded requests within a 10ms window. | `P1 (Critical)` |
-| **State Conflict & Recovery** | Validates cross-service race condition and resource recovery/reversal. | `P2 (High)` |
+| **Happy Path** | Validates the mainstream success journey under standard valid conditions and prerequisites. | `P1 (Critical)` |
+| **Boundary Value** | Validates exact business threshold boundaries (e.g. Min/Max order amount, stock edge values, timer thresholds T-1s / T+1s, item quantity limits). | `P2 (High)` |
+| **Negative Path** | Deliberately violates business constraints, invalid state preconditions, unauthorized roles, or insufficient balance/inventory. | `P1 (Critical)` |
+| **Concurrency & Race Condition** | Simulates parallel multi-threaded requests (2+ threads within <= 10ms–50ms) competing for a shared resource (inventory, single-use voucher, wallet balance, flash sale slot). | `P1 (Critical)` |
+| **State Conflict & Recovery** | Simulates cross-service state discrepancies (e.g. Cart vs Order vs Warehouse WMS vs Payment) and verifies atomic rollback / compensation transactions. | `P2 (High)` |
 
-### 2. Simulated Step & Expected Result Format
-Each test case step must follow this structure:
-```text
-Step X: [Action & Input]
-  - Endpoint/UI Action: POST /api/v1/orders/{id}/cancel
-  - Payload/Headers: { "idempotency_key": "uuid", "reason": "user_cancelled" }
-  - Timing: T0 + 150 seconds
+---
 
-Expected Result X:
-  - API Level: HTTP 200 OK, response body contains { "status": "CANCELLED" }
-  - Database Level: `orders.status` updated to 'CANCELLED', `refunds` table records 1 refund entry
-  - Event Bus Level: `OrderCancelledEvent` emitted to Kafka/RabbitMQ
+### 2. Golden Principles for Test Design (3 Nguyên Tắc Vàng)
+
+1. **Step Disaggregation (Không gom cụm hành động độc lập):**
+   - Đưa các tiền đề chuẩn bị vào **Pre-conditions (Điều kiện tiên quyết)**.
+   - Phân tách rõ ràng bước chuẩn bị/lựa chọn dữ liệu và bước kích hoạt gửi request (`Submit / Trigger Action`). Tránh tình huống Dev lỗi ở bước nhập liệu làm chặn đứng toàn bộ bước kiểm thử sau.
+
+2. **Synchronized Deep Verification (Kết quả mong đợi đồng bộ sâu):**
+   - **UI:** Trạng thái trực quan, nội dung thông báo, trường hiển thị, hoặc mã định danh sinh ra.
+   - **API:** Phải nêu rõ HTTP Status Code kèm **các trường dữ liệu cốt lõi trong Response Body** (ví dụ: trường `order_id` phải khớp hoàn toàn với mã đơn hiển thị trên UI).
+
+3. **Database & System State Verification (Bắt buộc kiểm chứng trạng thái Database):**
+   - Mọi hành động có biến động dữ liệu phải nêu rõ kiểm tra bảng nào, cột nào, giá trị mới là gì (ví dụ: `orders.order_status = 'Pending'`, `inventory.available_stock` giảm từ 10 xuống 7).
+   - Kiểm chứng Event phát ra trên Broker (`OrderPlacedEvent`, `StockReservedEvent`).
+
+---
+
+### 3. Standard Test Case Presentation Format
+
+Mỗi kịch bản kiểm thử được trình bày theo cấu trúc chuẩn:
+
+```markdown
+### [TC_ID]: [[Test Type]] [Scenario Name]
+- **Mức độ ưu tiên:** P1 / P2 / P3 - *[Lý do xếp hạng]*
+- **Điều kiện tiên quyết (Pre-conditions):** [Trạng thái tài nguyên, tài khoản đăng nhập, cấu hình hệ thống]
+- **Trạng thái tổng thể:** `NOT_RUN` (Pass / Fail / Blocked)
+
+| STT | Bước thực hiện (Steps) | Kết quả mong đợi (Expected Results) | Trạng thái |
+| :---: | :--- | :--- | :---: |
+| 1 | Thao tác nhập liệu / chọn phương thức | **[UI]** Giá trị hiển thị đúng, trường được chọn | NOT_RUN |
+| 2 | Bấm nút kích hoạt hành động chính<br>*(Endpoint: `POST /api/v1/...`)* | **[UI]** Màn hình kết quả, mã giao dịch hiển thị<br><br>**[API]** HTTP 201/200, Response Body chứa đúng `id`<br><br>**[Database]** Bảng `xyz` sinh bản ghi mới trạng thái `ABC`, cột số lượng cập nhật tương ứng<br><br>**[Event]** Kafka topic phát sự kiện đồng bộ | NOT_RUN |
 ```
+

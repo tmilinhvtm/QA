@@ -1,0 +1,135 @@
+[
+  {
+    "requirement_id": "REQ_20261016_001",
+    "analyzed_at": "2026-10-16T23:08:00+07:00",
+    "requirement_text": "Mỗi voucher chỉ được sử dụng một lần trên mỗi tài khoản.",
+    "business_rules": {
+      "pre_condition": "Tài khoản người dùng đã đăng nhập và đang ở trạng thái hoạt động bình thường (Active). Mã voucher còn hạn sử dụng, còn lượt sử dụng tổng thể của chiến dịch và đơn hàng đạt giá trị tối thiểu theo điều kiện áp mã. Tài khoản người dùng chưa từng áp dụng thành công voucher này trong bất kỳ đơn hàng nào trước đó.",
+      "trigger": "Khách hàng nhập mã voucher hoặc tick chọn mã từ Ví voucher tại màn hình Giỏ hàng hoặc Thanh toán. Khách hàng bấm nút 'Áp dụng' (Apply) hoặc bấm 'Đặt hàng' (Place Order / Checkout).",
+      "constraints": "Hạn mức định lượng: Tối đa đúng 1 lần sử dụng thành công trên mỗi mã định danh tài khoản (Account ID). Cửa sổ thời gian tạm giữ (Holding Window): Khi khách bấm thanh toán chuyển sang cổng thanh toán bên thứ ba, voucher được tạm khóa tối đa 15 phút. Ràng buộc định danh gắn liền với Account ID, số điện thoại, email và thiết bị.",
+      "post_condition": "Thanh toán thành công: Voucher chuyển trạng thái sang ĐÃ SỬ DỤNG (Used), gắn chặt với Order ID. Thanh toán thất bại / Hết hạn giữ chỗ / Hủy đơn: Voucher tự động được mở khóa và trả về trạng thái CHƯA SỬ DỤNG (Available) để khách dùng lại nếu còn hạn."
+    },
+    "questions_for_ba": [
+      "Q1: Voucher được chính thức coi là 'Đã sử dụng' tại thời điểm nào (khi bấm Đặt hàng, khi thanh toán thành công, hay khi giao hàng thành công)?",
+      "Q2: Nếu khách đăng nhập cùng 1 tài khoản trên 2 thiết bị/tab cùng áp voucher và bấm Đặt hàng tại cùng 1 giây thì hệ thống xử lý ra sao?",
+      "Q3: Khi khách chuyển sang cổng thanh toán nhưng bỏ dở (timeout 15 phút) thì voucher được nhả lại lúc nào?",
+      "Q4: Đơn hàng bị hủy do khách hủy hoặc người bán hết hàng thì voucher có được hoàn lại ví ngay lập tức không? Nếu voucher hết hạn thì có cấp mã bù không?",
+      "Q5: Khi khách yêu cầu hoàn tiền/đổi trả 1 phần trong đơn nhiều món thì tính cấn trừ voucher thế nào?",
+      "Q6: Có mở rộng kiểm soát chống gian lận clone tài khoản chung SĐT, Thẻ thanh toán hoặc Device ID không?"
+    ],
+    "possible_risks": [
+      "R1 (Concurrency / Race Condition): Bấm đặt hàng đồng thời trên 2 tab/thiết bị khiến hệ thống kiểm tra điều kiện song song và áp voucher cho cả 2 đơn.",
+      "R2 (State Consistency Drift): Lệch trạng thái giữa giỏ hàng, cổng thanh toán và khuyến mãi khi khách thao tác nhanh tại tab thứ hai lúc tab 1 đang hoàn tất.",
+      "R3 (Clock Drift & Timing Window): Lệch đồng hồ thiết bị hoặc mạng lag khiến voucher hết hạn ngay trong lúc khách đang nhập OTP ngân hàng.",
+      "R4 (Non-Idempotency on Retry): Bấm nút đặt hàng nhiều lần do mạng lag hoặc webhook thanh toán retry làm đơn hàng bị treo hoặc lỗi mã đã dùng.",
+      "R5 (Lifecycle Reversal & Stuck State): Voucher bị kẹt chết ở trạng thái tạm khóa vĩnh viễn khi khách bỏ dở thanh toán hoặc đơn bị hủy."
+    ],
+    "related_historical_bugs": [
+      "BUG-003: Một người dùng sử dụng cùng một mã voucher dùng 1 lần cho 2 đơn hàng khi checkout đồng thời trên 2 tab (Tương quan trực tiếp 100%).",
+      "BUG-008: Người dùng bấm thanh toán bằng số dư Ví Shopper đồng thời từ 2 thiết bị khiến số dư ví bị trừ âm (Tương quan thao tác đa thiết bị).",
+      "BUG-001: Hai request cancel gửi đồng thời gây lỗi Double Refund (Tương quan luồng hủy & bồi hoàn).",
+      "BUG-007: Giữ chỗ tồn kho không tự động giải phóng sau timeout (Tương quan cơ chế giữ chỗ tạm thời)."
+    ],
+    "key_decisions_log": "Tester đã phê duyệt Phase 1 và chấp thuận triển khai 5 kịch bản kiểm thử tự động giả lập chuẩn QA/QC thực chiến."
+  },
+  {
+    "requirement_id": "REQ_AUTH_LOCK_001",
+    "analyzed_at": "2026-10-16T22:40:00+07:00",
+    "requirement_text": "Tài khoản bị khóa sau 5 lần nhập sai mật khẩu liên tiếp.",
+    "business_rules": {
+      "pre_condition": "Tài khoản người dùng đã đăng ký, tồn tại trên hệ thống và đang ở trạng thái Hoạt động (ACTIVE). Bộ đếm số lần đăng nhập sai hiện tại failed_attempts ∈ [0, 4].",
+      "trigger": "Người dùng bấm nút 'Đăng nhập' với mật khẩu không khớp lần thứ 5 liên tiếp (bộ đếm tăng từ 4 lên 5).",
+      "constraints": "Ngưỡng khóa đúng 5 lần sai liên tiếp. Nếu nhập đúng mật khẩu ở bất kỳ lần nào từ 1 đến 4, bộ đếm số lần sai tự động trở về 0. Áp dụng trên toàn bộ các kênh đăng nhập (Web, Mobile App).",
+      "post_condition": "Trạng thái tài khoản chuyển từ ACTIVE sang LOCKED. Giao diện hiển thị cảnh báo tài khoản bị khóa. Chặn mọi nỗ lực đăng nhập tiếp theo. Ghi nhật ký bảo mật Audit Log."
+    },
+    "questions_for_ba": [
+      "[Q1] Thời hạn khóa tài khoản: Khóa tạm thời (15-30 phút tự mở) hay khóa vĩnh viễn chờ Admin/CSKH?",
+      "[Q2] Cửa sổ thời gian đếm lỗi (Time Window / TTL): 5 lần sai có giới hạn trong khung giờ (vd 10 phút) hay tích lũy vô hạn?",
+      "[Q3] Đăng nhập song song đa thiết bị: Bộ đếm theo từng phiên riêng hay cộng dồn tập trung tài khoản?",
+      "[Q4] Số phận active session: Khi bị khóa, các phiên đang đăng nhập trên thiết bị khác có bị Force Logout / Revoke Token tức thì không?",
+      "[Q5] Cơ chế tự mở khóa: Cho phép người dùng tự mở khóa qua Quên mật khẩu & OTP Email/SMS hay phải qua CSKH?",
+      "[Q6] Thông báo cảnh báo: Có gửi Email/SMS cảnh báo tài khoản bị khóa kèm IP và thời gian cho chủ tài khoản không?"
+    ],
+    "possible_risks": [
+      "1. Concurrency (P1): Bắn 5-10 request sai đồng thời trong <= 20ms khiến bộ đếm bị race condition / lost update, kẻ gian thử được nhiều mật khẩu hơn.",
+      "2. State Machine Drift (P1): Auth Service đánh dấu LOCKED nhưng Service Giỏ hàng/Thanh toán dùng cache cũ cho phép tiếp tục giao dịch.",
+      "3. Clock Drift (P2): Chỉnh lùi đồng hồ trên thiết bị client để né thời hạn tạm khóa nếu server tin tưởng client timestamp.",
+      "4. Non-Idempotency (P2): Mạng lag hoặc client retry tự động khiến 1 lần gõ sai bị nhân thành 5 lần, gây khóa oan tài khoản.",
+      "5. Lifecycle & Recovery Failure (P2): Hết thời hạn khóa hoặc đổi pass OTP thành công nhưng tiến trình ngầm không mở khóa, tài khoản bị giam lỏng vĩnh viễn."
+    ],
+    "related_historical_bugs": [
+      "BUG-001 / BUG-003 / BUG-008: Concurrency & Missing Distributed Lock (Bộ đếm failed_attempts cần Atomic Counter/Redis INCR để tránh Lost Update).",
+      "BUG-002 / BUG-007: State Machine Inconsistency & Recovery Failure (Cần đồng bộ trạng thái tài khoản và cơ chế tự động mở khóa sau timeout).",
+      "BUG-010: Clock Drift & Client Timestamp Spoofing (Thời gian khóa và hết hạn phải tuyệt đối căn cứ Authoritative Server Time)."
+    ],
+    "key_decisions_log": "Tester đã phê duyệt Phase 1 và duyệt bộ 5 kịch bản kiểm thử tự động Phase 2."
+  },
+  {
+    "requirement_id": "REQ_INV_001",
+    "analyzed_at": "2026-10-16T22:05:00+07:00",
+    "requirement_text": "Người dùng không được đặt mua số lượng sản phẩm lớn hơn số lượng tồn kho.",
+    "perspective": "business",
+    "business_rules": {
+      "pre_condition": "Sản phẩm ACTIVE, tồn kho khả dụng > 0, phiên mua sắm hợp lệ.",
+      "trigger": "Khách chọn số lượng và bấm 'Thêm vào giỏ', chỉnh sửa số lượng trong giỏ, hoặc bấm 'Đặt hàng' tại Checkout.",
+      "constraints": "1 <= Q_đặt <= Q_khả_dụng. Chặn ngay nếu Q_đặt > Q_khả_dụng. Không nhận số âm, số 0 hoặc chữ cái.",
+      "post_condition": "Thành công: Trừ/giữ chỗ kho khả dụng, tạo đơn hàng mới. Thất bại: Giữ nguyên kho, thông báo lỗi yêu cầu điều chỉnh."
+    },
+    "questions_for_ba": [
+      "Q1: Thời điểm giữ chỗ kho (Giỏ hàng vs Thanh toán vs Đặt hàng)?",
+      "Q2: Thời hạn giữ chỗ thanh toán (Hold timeout) bao nhiêu phút trước khi tự động hủy?",
+      "Q3: Hai khách cùng mua món cuối cùng trong tích tắc (<= 20ms) ai được mua, người kia báo gì?",
+      "Q4: Khi hủy đơn hoặc lỗi thanh toán, kho có được tự động hoàn trả ngay lập tức không?",
+      "Q5: Sản phẩm có áp dụng ngoại lệ cho phép Đặt trước (Pre-order/Backorder) khi hết tồn kho không?",
+      "Q6: Xử lý chặn cùng tài khoản mua trên nhiều tab / nhiều thiết bị như thế nào?"
+    ],
+    "possible_risks": [
+      "1. Concurrency: Bán vượt tồn kho (Overselling) khi nhiều người mua cùng tích tắc.",
+      "2. State Drift: Lệch số liệu giữa giỏ hàng và kho thực tế nếu mở phiên mua sắm quá lâu.",
+      "3. Ghost Stock / Clock Drift: Khách treo hàng thanh toán quá hạn không nhả kho.",
+      "4. Non-Idempotency: Khách ấn nút đặt hàng liên tục do mạng lag gây trùng đơn và trừ kho nhiều lần.",
+      "5. Lifecycle Reversal: Hủy đơn hoặc thanh toán lỗi nhưng quên hoàn trả số lượng vào kho."
+    ],
+    "related_historical_bugs": [
+      "BUG-005 (Timeout kết nối kho dẫn đến tạo đơn mà không trừ kho)",
+      "BUG-007 (Hết hạn phiên giỏ hàng không tự động giải phóng tồn kho khả dụng)",
+      "BUG-003 (Tranh chấp tài nguyên dùng chung khi checkout đồng thời)",
+      "BUG-008 (Thiếu khóa phân tán dẫn đến số dư bị trừ âm)"
+    ],
+    "key_decisions_log": "Tester phê duyệt phân tích nghiệp vụ và 5 kịch bản kiểm thử giả lập 3 tầng."
+  },
+  {
+    "requirement_id": "REQ_ORD_CANCEL_001",
+    "analyzed_at": "2026-10-16T23:55:00+07:00",
+    "requirement_text": "Người dùng được phép hủy đơn hàng trong vòng 5 phút kể từ khi thanh toán thành công nếu đơn hàng chưa chuyển sang trạng thái PROCESSING.",
+    "perspective": "business",
+    "business_rules": {
+      "pre_condition": "Tài khoản người dùng đã đăng nhập và là chủ sở hữu hợp pháp của đơn hàng. Đơn hàng đang ở trạng thái Đã thanh toán thành công (PAID / CONFIRMED). Đơn hàng chưa chuyển sang trạng thái Đang xử lý / Đóng gói (PROCESSING). Thời gian từ lúc thanh toán thành công đến hiện tại <= 5 phút (300 giây) theo giờ máy chủ chuẩn.",
+      "trigger": "Người dùng bấm nút 'Hủy đơn hàng' tại màn hình Chi tiết đơn hàng (Order Details), sau đó chọn lý do hủy và bấm xác nhận 'Đồng ý hủy đơn' trên modal popup.",
+      "constraints": "Cửa sổ thời gian: Đúng 300 giây (5 phút), quá thời hạn nút hủy tự động ẩn hoặc bị vô hiệu hóa. Ràng buộc trạng thái: Khóa quyền tự động hủy ngay khi đơn chuyển sang PROCESSING. Thao tác đơn nhất: Chỉ kích hoạt 1 lần duy nhất, chặn bấm liên tiếp.",
+      "post_condition": "Hủy thành công: Đơn hàng chuyển sang CANCELLED; tự động kích hoạt luồng hoàn tiền gốc; tự động cộng trả lại tồn kho khả dụng; hoàn trả lại mã giảm giá/voucher và điểm thưởng (nếu có); gửi thông báo/email xác nhận hủy đơn. Hủy thất bại: Giữ nguyên trạng thái và hiển thị thông báo giải thích rõ lý do."
+    },
+    "questions_for_ba": [
+      "Q1: Mốc 5 phút được tính chuẩn từ thời điểm nào (lúc cổng thanh toán xác nhận thành công hay lúc đơn hàng ghi nhận vào hệ thống)? Xử lý lệch giờ giữa máy chủ và điện thoại khách ra sao?",
+      "Q2: Nếu đúng lúc khách bấm nút Hủy đơn (giây thứ 299) mà kho cũng bấm bắt đầu đóng gói (PROCESSING), hệ thống sẽ ưu tiên quyền hủy của khách hay ưu tiên chặn hủy để bảo vệ hàng?",
+      "Q3: Tiền thanh toán của khách sẽ hoàn về đâu (hoàn tức thì vào Ví tài khoản hay hoàn về Thẻ/Ngân hàng mất 3-7 ngày làm việc)? Khách có nhận được thông báo tiến độ không?",
+      "Q4: Nếu đơn ban đầu có áp dụng Voucher giảm giá hoặc Điểm thưởng, khi đơn hủy thì Voucher/Điểm có trả lại ngay vào ví không? Nếu voucher hết hạn chiến dịch thì có cấp bù không?",
+      "Q5: Nếu mạng chập chờn khiến khách bấm nút 'Xác nhận hủy' liên tiếp 3-4 lần hoặc mở 2 điện thoại cùng bấm hủy, hệ thống xử lý thế nào để không phát sinh Double Refund?",
+      "Q6: Sau khi hủy đơn thành công, số lượng hàng có được cộng trả ngay lập tức vào kho bán để người khác mua không, hay cần nhân sự kho kiểm đếm lại?"
+    ],
+    "possible_risks": [
+      "1. Concurrency (P1): Bấm hủy liên tiếp hoặc hủy đồng thời từ 2 thiết bị khiến hệ thống tạo lệnh hoàn tiền 2 lần (Double Refund).",
+      "2. State Machine Drift (P1): Khách bấm hủy cùng tích tắc kho bấm đóng gói PROCESSING dẫn đến khách nhận tiền hoàn nhưng hàng vẫn bị gửi đi (mất hàng miễn phí).",
+      "3. Clock Drift (P2): Điện thoại khách chạy chậm giờ hoặc mạng lag khiến request tới server sau mốc 5 phút gây khiếu nại gay gắt.",
+      "4. Non-Idempotency on Retry (P2): Mạng chập chờn gửi lặp lại request hủy khiến đơn bị kẹt hoặc hoàn tiền lặp lại.",
+      "5. Data Integrity / Lifecycle Reversal (P2): Đơn hủy và hoàn tiền xong nhưng quên không hoàn lại tồn kho khả dụng hoặc voucher bị giam không hoàn lại."
+    ],
+    "related_historical_bugs": [
+      "BUG-001: Hai request cancel gửi đồng thời tạo 2 giao dịch hoàn tiền (Double Refund - Tương quan 100%).",
+      "BUG-002: Người dùng vẫn hủy được đơn sau khi kho WMS đã đóng gói xuất kho (Tương quan trực tiếp điều kiện chưa chuyển PROCESSING).",
+      "BUG-010: Client gửi request kèm timestamp thiết bị để vượt rào (Tương quan gian lận mốc 5 phút, bắt buộc kiểm tra theo Server Time).",
+      "BUG-005 & BUG-007: Timeout kết nối nội bộ lệch tồn kho & giữ chỗ kho không giải phóng (Tương quan hoàn trả tồn kho sau hủy)."
+    ],
+    "key_decisions_log": "Tester đã phê duyệt Phase 1 và duyệt bộ 5 kịch bản kiểm thử tự động Phase 2; đồng ý đồng bộ lên Google Drive."
+  }
+]

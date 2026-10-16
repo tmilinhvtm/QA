@@ -1,0 +1,72 @@
+[
+  {
+    "bug_id": "BUG-001",
+    "description": "Hai request cancel được gửi gần như đồng thời và hệ thống tạo hai giao dịch hoàn tiền (Double Refund).",
+    "root_cause_domain": "Concurrency / Race Condition",
+    "impacted_flow": "Order Cancellation & Refund",
+    "severity": "P1 (Critical)"
+  },
+  {
+    "bug_id": "BUG-002",
+    "description": "Người dùng vẫn hủy được đơn hàng sau khi kho vận (WMS) đã bắt đầu đóng gói và xuất kho.",
+    "root_cause_domain": "State Machine Inconsistency",
+    "impacted_flow": "Warehouse Processing vs Cancellation",
+    "severity": "P2 (High)"
+  },
+  {
+    "bug_id": "BUG-003",
+    "description": "Một người dùng sử dụng cùng một mã voucher dùng 1 lần cho 2 đơn hàng khi checkout đồng thời trên 2 tab.",
+    "root_cause_domain": "Concurrency / Missing Distributed Lock",
+    "impacted_flow": "Checkout & Promotion Validation",
+    "severity": "P1 (Critical)"
+  },
+  {
+    "bug_id": "BUG-004",
+    "description": "Payment gateway gửi retry webhook thành công 2 lần do mạng chập chờn dẫn đến tạo 2 đơn hàng trùng lặp.",
+    "root_cause_domain": "Non-idempotent Webhook Callback",
+    "impacted_flow": "Payment Gateway Integration",
+    "severity": "P1 (Critical)"
+  },
+  {
+    "bug_id": "BUG-005",
+    "description": "Đơn hàng thanh toán thành công nhưng dịch vụ kho không trừ tồn kho do lỗi timeout kết nối nội bộ.",
+    "root_cause_domain": "Distributed Transaction Failure",
+    "impacted_flow": "Inventory & Order Sync",
+    "severity": "P1 (Critical)"
+  },
+  {
+    "bug_id": "BUG-006",
+    "description": "Lỗi làm tròn số thập phân khi áp dụng Flash Sale kết hợp voucher phần trăm dẫn đến tổng tiền đơn hàng bị âm hoặc giảm vượt quá mức trần tối đa.",
+    "root_cause_domain": "Pricing Calculation & Rounding Error",
+    "impacted_flow": "Cart Calculation & Promotion Engine",
+    "severity": "P2 (High)"
+  },
+  {
+    "bug_id": "BUG-007",
+    "description": "Khách giữ chỗ tồn kho (Stock Hold) khi thêm vào giỏ, sau khi hết hạn phiên giỏ hàng (Cart Session Timeout) kho không tự động giải phóng tồn kho khả dụng.",
+    "root_cause_domain": "Ghost Stock Holding / Expired State Recovery",
+    "impacted_flow": "Cart Reservation & Inventory Management",
+    "severity": "P2 (High)"
+  },
+  {
+    "bug_id": "BUG-008",
+    "description": "Người dùng bấm thanh toán đơn hàng bằng số dư Ví Shopper đồng thời từ 2 thiết bị khiến số dư ví bị trừ âm do thiếu Distributed Lock.",
+    "root_cause_domain": "Concurrency / Account Balance Race Condition",
+    "impacted_flow": "E-Wallet & Internal Balance Deduction",
+    "severity": "P1 (Critical)"
+  },
+  {
+    "bug_id": "BUG-009",
+    "description": "Khách yêu cầu hoàn trả 1 trong 3 sản phẩm, sau khi hoàn tiền thì toàn bộ đơn hàng bị chuyển nhầm sang trạng thái RETURNED_ALL và khóa quyền khiếu nại các món còn lại.",
+    "root_cause_domain": "Partial Return State Drift",
+    "impacted_flow": "After-sales, Partial Refund & Fulfillment",
+    "severity": "P2 (High)"
+  },
+  {
+    "bug_id": "BUG-010",
+    "description": "Client gửi request mua sản phẩm Flash Sale kèm timestamp thiết bị trước giờ mở bán nhưng server tin cậy client timestamp dẫn đến mua sớm trái phép.",
+    "root_cause_domain": "Clock Drift & Client Timestamp Spoofing",
+    "impacted_flow": "Flash Sale & Time-limited Campaign",
+    "severity": "P1 (Critical)"
+  }
+]
