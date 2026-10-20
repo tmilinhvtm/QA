@@ -2,7 +2,7 @@
 > **Ứng viên:** Vũ Thị Mai Linh  
 > **Dự án thực nghiệm:** Antigravity Native QA Assistant (Requirement Analysis & Simulated Test Specification)  
 > **Mục tiêu trọng tâm:** Đảm bảo tính đúng đắn của dữ liệu đầu ra & Đột phá Effort (Năng suất) của Team QA trong 3 tháng.  
-> **Google Slides Trực Tiếp Trên Drive:** [Mở Google Slides tại đây](https://docs.google.com/presentation/d/1IKuVKcfW5AIfOmO8CHJTDl2j8hnI8Pahe0d2DmeBdTg/edit?usp=drivesdk)
+> **Google Slides Trực Tiếp Trên Drive:** [Mở Google Slides tại đây](https://docs.google.com/presentation/d/1h1JpMhKIRf5wjqcwC-nGmCjU5mCCH5jNxw2e2ybTyWQ/edit?usp=drivesdk)
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## PHẦN II: KỊCH BẢN THUYẾT TRÌNH 5-7 PHÚT (PITCH SCRIPT THEO SLIDE)
 
-*Lưu ý khi trình bày: Mở slide trình chiếu tại tệp [docs/presentation.html](file:///home/linh/code/QA/docs/presentation.html) trên trình duyệt hoặc dùng [docs/QA_AI_Assistant_Interview_Presentation.pptx](file:///home/linh/code/QA/docs/QA_AI_Assistant_Interview_Presentation.pptx).*
+*Lưu ý khi trình bày: Mở slide trình chiếu tại tệp [docs/presentation.html](file:///home/linh/QA/docs/presentation.html) trên trình duyệt hoặc dùng [docs/QA_AI_Assistant_Interview_Presentation.pptx](file:///home/linh/QA/docs/QA_AI_Assistant_Interview_Presentation.pptx).*
 
 ---
 

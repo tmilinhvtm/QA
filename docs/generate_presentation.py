@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 """
 generate_presentation.py
-Generates a professional 16:9 executive presentation for the QA AI Specialist interview.
-Theme: Ant Design Blue (#1677FF), Slate (#1E293B, #64748B), Modern Enterprise QA.
+Generates an executive, flowchart-centric 16:9 presentation for the QA AI Specialist interview.
+Theme: 100% Light Theme - Clean White & Ant Design Blue (#1677FF), Slate (#1E293B, #64748B), Emerald (#16A34A), Rose (#E11D48).
+Structure:
+  Slide 1: Executive Title & Định Vị Hệ Thống (What It Does & Core Mission - Light Theme)
+  Slide 2: HỆ THỐNG ĐANG LÀM GÌ? Khả Năng Xử Lý Chuyên Sâu Từng Khâu (Inputs -> Core Processing -> Outputs)
+  Slide 3: HỆ THỐNG NHẰM NHIỆM VỤ GÌ? 4 Sứ Mệnh Kiểm Thử Chiến Lược (Shift-Left, Giải Phóng Thủ Công, Zero Hallucination, Automation Ready)
+  Slide 4: SƠ ĐỒ LUỒNG TỔNG QUAN: 2-Phase State Machine & 2 Human Gates (Flowchart Overview)
+  Slide 5: SƠ ĐỒ LUỒNG CHẶNG 0: Pre-Flight, Quản Trị Góc Nhìn & Xác Thực Cache (Flowchart Stage 0)
+  Slide 6: SƠ ĐỒ LUỒNG PHA 1: Bóc Tách Yêu Cầu & Quét 5 Rủi Ro (Flowchart Phase 1)
+  Slide 7: SƠ ĐỒ LUỒNG ĐIỂM CHẶN: 2 Human Gates & Cơ Chế Tự Động Rollback (Flowchart Gates)
+  Slide 8: SƠ ĐỒ LUỒNG PHA 2: Thiết Kế Test Automation & 3 Tầng Sâu (Flowchart Phase 2)
+  Slide 9: SƠ ĐỒ LUỒNG PHA 3: Local-First & Đồng Bộ Google Workspace 2 Chiều (Flowchart Phase 3)
+  Slide 10: Minh Chứng Thực Nghiệm: Vòng Lặp Tự Nắn Chỉnh Qua 3 Bài Toán Mẫu (Auth, Inv, Voucher)
+  Slide 11: Kế Hoạch Triển Khai Thực Chiến 3 Tháng
+  Slide 12: Kết Luận & Cam Kết Thực Thi (Closing Callout)
 """
 
 import os
@@ -12,36 +25,43 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 
-# --- Color Palette ---
-COLOR_PRIMARY = RGBColor(22, 119, 255)       # Ant Design Blue #1677FF
-COLOR_PRIMARY_DARK = RGBColor(9, 88, 217)   # Deep Blue #0958D9
+# --- Color Palette (100% Light Theme) ---
+COLOR_PRIMARY = RGBColor(22, 119, 255)         # Ant Design Blue #1677FF
+COLOR_PRIMARY_DARK = RGBColor(9, 88, 217)     # Deep Blue #0958D9
 COLOR_PRIMARY_LIGHT = RGBColor(230, 244, 255) # Light Blue Tint #E6F4FF
-COLOR_TEXT_MAIN = RGBColor(30, 41, 59)      # Slate 800 #1E293B
-COLOR_TEXT_MUTED = RGBColor(100, 116, 139)  # Slate 500 #64748B
+COLOR_TEXT_MAIN = RGBColor(30, 41, 59)        # Slate 800 #1E293B
+COLOR_TEXT_MUTED = RGBColor(100, 116, 139)    # Slate 500 #64748B
 COLOR_WHITE = RGBColor(255, 255, 255)
-COLOR_BG_CARD = RGBColor(248, 250, 252)     # Slate 50 #F8FAFC
-COLOR_BORDER = RGBColor(226, 232, 240)      # Slate 200 #E2E8F0
-COLOR_SUCCESS = RGBColor(22, 163, 74)       # Emerald Green #16A34A
-COLOR_SUCCESS_LIGHT = RGBColor(240, 253, 244)
-COLOR_ACCENT = RGBColor(13, 148, 136)       # Teal #0D9488
-COLOR_CARD_BORDER = RGBColor(203, 213, 225) # Slate 300 #CBD5E1
+COLOR_BG_LIGHT = RGBColor(248, 250, 252)      # Slate 50 #F8FAFC
+COLOR_BORDER = RGBColor(226, 232, 240)        # Slate 200 #E2E8F0
+COLOR_CARD_BORDER = RGBColor(203, 213, 225)   # Slate 300 #CBD5E1
+
+COLOR_SUCCESS = RGBColor(22, 163, 74)         # Emerald Green #16A34A
+COLOR_SUCCESS_LIGHT = RGBColor(220, 252, 231) # Green 100 #DCFCE7
+COLOR_DANGER = RGBColor(225, 29, 72)          # Rose Red #E11D48
+COLOR_DANGER_LIGHT = RGBColor(254, 226, 226)  # Red 100 #FEE2E2
+COLOR_WARNING = RGBColor(217, 119, 6)         # Amber #D97706
+COLOR_WARNING_LIGHT = RGBColor(254, 243, 199) # Amber 100 #FEF3C7
+COLOR_ACCENT = RGBColor(13, 148, 136)         # Teal #0D9488
+COLOR_ACCENT_LIGHT = RGBColor(204, 251, 241)  # Teal 100 #CCFBF1
+COLOR_PURPLE = RGBColor(124, 58, 237)         # Purple 600 #7C3AED
+COLOR_PURPLE_LIGHT = RGBColor(245, 243, 255)  # Purple 50 #F5F3FF
 
 def create_deck():
     prs = pptx.Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank_layout = prs.slide_layouts[6]
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Helper: Add Standard Header
+    # Helper: Add Standard Header (Light Theme)
     def add_header(slide, title_text, category_tag, subtitle_text=None):
-        # Top accent bar
-        top_bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(0.12))
+        top_bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(0.1))
         top_bar.fill.solid()
         top_bar.fill.fore_color.rgb = COLOR_PRIMARY
         top_bar.line.fill.background()
 
-        # Category Tag badge
-        badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.4), Inches(2.2), Inches(0.35))
+        badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.32), Inches(3.6), Inches(0.32))
         badge.fill.solid()
         badge.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
         badge.line.color.rgb = COLOR_PRIMARY
@@ -50,709 +70,674 @@ def create_deck():
         tf_b.word_wrap = True
         p_b = tf_b.paragraphs[0]
         p_b.text = category_tag.upper()
-        p_b.font.size = Pt(10)
+        p_b.font.size = Pt(9.5)
         p_b.font.bold = True
         p_b.font.color.rgb = COLOR_PRIMARY_DARK
         p_b.alignment = PP_ALIGN.CENTER
 
-        # Main Title
-        title_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.85), Inches(11.7), Inches(0.7))
+        title_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.68), Inches(11.7), Inches(0.72))
         tf = title_box.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
         p.text = title_text
-        p.font.size = Pt(22)
+        p.font.size = Pt(20)
         p.font.bold = True
         p.font.color.rgb = COLOR_TEXT_MAIN
 
         if subtitle_text:
             p2 = tf.add_paragraph()
             p2.text = subtitle_text
-            p2.font.size = Pt(12)
+            p2.font.size = Pt(10.5)
             p2.font.color.rgb = COLOR_TEXT_MUTED
 
+    # Helper: Embed Flowchart Image
+    def embed_flowchart(slide, png_filename):
+        png_path = os.path.join(current_dir, png_filename)
+        if os.path.exists(png_path):
+            slide.shapes.add_picture(png_path, Inches(0.8), Inches(1.58), Inches(11.733), Inches(4.99))
+
     # =========================================================================
-    # SLIDE 1: Title Slide (Executive Dark & Clean)
+    # SLIDE 1: Title Slide (100% Light Theme + Định Vị Hệ Thống & Sứ Mệnh)
     # =========================================================================
     s1 = prs.slides.add_slide(blank_layout)
-    
-    # Background full shape
     bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
     bg1.fill.solid()
-    bg1.fill.fore_color.rgb = RGBColor(15, 23, 42) # Slate 900
+    bg1.fill.fore_color.rgb = COLOR_BG_LIGHT
     bg1.line.fill.background()
 
-    # Accent glow top bar
-    bar1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(0.2))
+    # Top accent bar
+    bar1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(0.15))
     bar1.fill.solid()
     bar1.fill.fore_color.rgb = COLOR_PRIMARY
     bar1.line.fill.background()
 
-    # Title container
-    tbox = s1.shapes.add_textbox(Inches(1.2), Inches(1.5), Inches(11.0), Inches(4.5))
+    # Badge & Title Box
+    tbox = s1.shapes.add_textbox(Inches(0.8), Inches(0.55), Inches(11.7), Inches(1.8))
     tf1 = tbox.text_frame
     tf1.word_wrap = True
 
-    # Tag
-    p_tag = tf1.paragraphs[0]
-    p_tag.text = "CHIẾN LƯỢC ỨNG DỤNG AI TRONG KIỂM THỬ PHẦN MỀM (AI-DRIVEN QA LEAD)"
-    p_tag.font.size = Pt(13)
-    p_tag.font.bold = True
-    p_tag.font.color.rgb = COLOR_PRIMARY
-    p_tag.space_after = Pt(14)
+    p_badge = tf1.paragraphs[0]
+    p_badge.text = "CHIẾN LƯỢC ỨNG DỤNG AI TRONG KIỂM THỬ (AI-DRIVEN QA SYSTEM)"
+    p_badge.font.size = Pt(10.5)
+    p_badge.font.bold = True
+    p_badge.font.color.rgb = COLOR_PRIMARY_DARK
+    p_badge.space_after = Pt(4)
 
-    # Main Headline
-    p_main = tf1.add_paragraph()
-    p_main.text = "Tối Ưu Năng Suất (Effort) & Đảm Bảo Tính Đúng Đắn\nBộ Dữ Liệu QA Bằng Tác Tử AI Trong 3 Tháng"
-    p_main.font.size = Pt(30)
-    p_main.font.bold = True
-    p_main.font.color.rgb = COLOR_WHITE
-    p_main.space_after = Pt(18)
+    p_title = tf1.add_paragraph()
+    p_title.text = "QA REQUIREMENT & RISK ASSISTANT\nHệ Tác Tử Tự Động Phân Tích Yêu Cầu & Thiết Kế Kiểm Thử Thực Chiến"
+    p_title.font.size = Pt(24)
+    p_title.font.bold = True
+    p_title.font.color.rgb = COLOR_TEXT_MAIN
+    p_title.space_after = Pt(4)
 
-    # Subtitle
     p_sub = tf1.add_paragraph()
-    p_sub.text = "Mô hình thực chiến: Antigravity Native Plugin • 2-Phase State Machine • 3 Tầng Kiểm Chứng Sâu"
-    p_sub.font.size = Pt(15)
-    p_sub.font.color.rgb = RGBColor(148, 163, 184) # Slate 400
-    p_sub.space_after = Pt(36)
+    p_sub.text = "Chuyển hóa tài liệu yêu cầu thô thành Test Suite chuẩn 3 tầng UI/API/DB • Chặn đứng lỗi sớm • Chuẩn hóa dữ liệu QA"
+    p_sub.font.size = Pt(12)
+    p_sub.font.color.rgb = COLOR_TEXT_MUTED
 
-    # Candidate Meta
-    p_meta = tf1.add_paragraph()
-    p_meta.text = "Ứng viên: Vũ Thị Mai Linh  |  Vị trí: AI QA Specialist / Senior QA Engineer  |  Tháng 10/2026"
-    p_meta.font.size = Pt(13)
-    p_meta.font.color.rgb = RGBColor(203, 213, 225)
+    # Center Box: 2 Columns (What It Does vs Core Mission)
+    c_outer = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(2.55), Inches(11.7), Inches(2.6))
+    c_outer.fill.solid()
+    c_outer.fill.fore_color.rgb = COLOR_WHITE
+    c_outer.line.color.rgb = COLOR_CARD_BORDER
+    c_outer.line.width = Pt(1.5)
 
-    # Highlight Card on Slide 1
-    card_kpi = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.2), Inches(5.6), Inches(10.9), Inches(1.2))
-    card_kpi.fill.solid()
-    card_kpi.fill.fore_color.rgb = RGBColor(30, 41, 59)
-    card_kpi.line.color.rgb = COLOR_PRIMARY
-    card_kpi.line.width = Pt(1.5)
-    tf_kpi = card_kpi.text_frame
-    tf_kpi.word_wrap = True
-    p_kpi1 = tf_kpi.paragraphs[0]
-    p_kpi1.text = "🎯 MỤC TIÊU 90 NGÀY CAM KẾT VỚI DOANH NGHIỆP:"
-    p_kpi1.font.size = Pt(11)
-    p_kpi1.font.bold = True
-    p_kpi1.font.color.rgb = COLOR_PRIMARY
-    p_kpi2 = tf_kpi.add_paragraph()
-    p_kpi2.text = "1. Nâng Effort (Throughput) Team lên gấp 2.5x  •  2. Độ Chính Xác (Accuracy/Ground Truth) Bộ Dữ Liệu Đầu Ra ≥ 92%  •  3. Giảm 50% Defect Lọt Sang Dev/Prod"
-    p_kpi2.font.size = Pt(12)
-    p_kpi2.font.bold = True
-    p_kpi2.font.color.rgb = COLOR_WHITE
+    # Left Sub-box: HỆ THỐNG ĐANG LÀM GÌ?
+    b_left = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(2.75), Inches(5.5), Inches(2.2))
+    b_left.fill.solid()
+    b_left.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
+    b_left.line.color.rgb = COLOR_PRIMARY
+    b_left.line.width = Pt(1.5)
+    tf_l = b_left.text_frame
+    tf_l.word_wrap = True
+    p_lh = tf_l.paragraphs[0]
+    p_lh.text = "🤖 HỆ THỐNG ĐANG LÀM GÌ? (WHAT IT DOES)"
+    p_lh.font.size = Pt(11)
+    p_lh.font.bold = True
+    p_lh.font.color.rgb = COLOR_PRIMARY_DARK
+    p_lh.space_after = Pt(6)
+
+    l_items = [
+        ("• Tiếp nhận tài liệu thô:", "User Story, PRD, API Swagger chưa rõ nét hoặc thiếu kịch bản biên."),
+        ("• Bóc tách 4 thành tố:", "Tự động phân tách Business Rules, Boundary Limits, Exceptions & User Flow."),
+        ("• Quét 5 rủi ro kiến trúc:", "Phát hiện lỗi ngầm: Concurrency (<=50ms), Lost Update, Deadlock, JWT Drift."),
+        ("• Thiết kế Test 3 tầng sâu:", "Sinh kịch bản tách bước kiểm chứng UI + API Body + DB & Sync Google Sheets.")
+    ]
+    for it_h, it_d in l_items:
+        p_it = tf_l.add_paragraph()
+        p_it.text = it_h + " " + it_d
+        p_it.font.size = Pt(9.5)
+        p_it.font.color.rgb = COLOR_TEXT_MAIN
+        p_it.space_after = Pt(3)
+
+    # Right Sub-box: NHIỆM VỤ TRỌNG TÂM CỦA HỆ THỐNG
+    b_right = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(2.75), Inches(5.5), Inches(2.2))
+    b_right.fill.solid()
+    b_right.fill.fore_color.rgb = COLOR_SUCCESS_LIGHT
+    b_right.line.color.rgb = COLOR_SUCCESS
+    b_right.line.width = Pt(1.5)
+    tf_r = b_right.text_frame
+    tf_r.word_wrap = True
+    p_rh = tf_r.paragraphs[0]
+    p_rh.text = "🎯 NHIỆM VỤ TRỌNG TÂM CỦA HỆ THỐNG (SYSTEM MISSIONS)"
+    p_rh.font.size = Pt(11)
+    p_rh.font.bold = True
+    p_rh.font.color.rgb = RGBColor(21, 128, 61)
+    p_rh.space_after = Pt(6)
+
+    r_items = [
+        ("• Shift-Left QA:", "Chặn đứng 50% lỗi ngay từ khâu phân tích yêu cầu trước khi Dev code."),
+        ("• Giải phóng thao tác thủ công:", "Tự động hóa toàn diện khâu đọc hiểu tài liệu và soạn đặc tả kịch bản."),
+        ("• Triệt tiêu 100% ảo giác:", "Ép AI bám sát 10 bugs production thực tế, Tester phê duyệt qua 2 cổng."),
+        ("• Chuẩn hóa tài sản kiểm thử:", "Lưu trữ tích lũy bền vững và làm bệ phóng trực tiếp cho Playwright E2E.")
+    ]
+    for it_h, it_d in r_items:
+        p_it = tf_r.add_paragraph()
+        p_it.text = it_h + " " + it_d
+        p_it.font.size = Pt(9.5)
+        p_it.font.color.rgb = COLOR_TEXT_MAIN
+        p_it.space_after = Pt(3)
+
+    # 3 Strategic Focus Cards at Bottom (Light Theme)
+    focus_items = [
+        ("🎯 ĐỘ CHÍNH XÁC DỮ LIỆU", "≥ 92%", "Kiểm chứng sâu 3 tầng, 0 ảo giác", COLOR_PRIMARY),
+        ("🛡️ CHẤT LƯỢNG RELEASE", "Giảm 50% Defect", "Chặn đứng lỗi sớm ngay khâu Spec", COLOR_SUCCESS),
+        ("⚡ TỰ ĐỘNG HÓA QUY TRÌNH", "80% Tác Vụ", "Tự động hóa đọc hiểu & viết test case", COLOR_WARNING)
+    ]
+    k_w = Inches(3.7)
+    k_gap = Inches(0.3)
+    for i, (ktitle, kval, kdesc, kcol) in enumerate(focus_items):
+        kbox = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(k_w + k_gap), Inches(5.35), k_w, Inches(1.5))
+        kbox.fill.solid()
+        kbox.fill.fore_color.rgb = COLOR_WHITE
+        kbox.line.color.rgb = COLOR_CARD_BORDER
+        kbox.line.width = Pt(1.5)
+        tf_k = kbox.text_frame
+        tf_k.word_wrap = True
+        
+        p1 = tf_k.paragraphs[0]
+        p1.text = ktitle
+        p1.font.size = Pt(9.5)
+        p1.font.bold = True
+        p1.font.color.rgb = kcol
+        
+        p2 = tf_k.add_paragraph()
+        p2.text = kval
+        p2.font.size = Pt(18)
+        p2.font.bold = True
+        p2.font.color.rgb = COLOR_TEXT_MAIN
+        
+        p3 = tf_k.add_paragraph()
+        p3.text = kdesc
+        p3.font.size = Pt(9.5)
+        p3.font.color.rgb = COLOR_TEXT_MUTED
 
     # =========================================================================
-    # SLIDE 2: Bối Cảnh, Nỗi Đau & Bài Toán Cốt Lõi
+    # SLIDE 2: HỆ THỐNG ĐANG LÀM GÌ? (What The System Does - Capabilities & Pipeline)
     # =========================================================================
     s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "Bối Cảnh & Bài Toán Cốt Lõi: Năng Suất (Effort) vs. Độ Đúng Sai Dữ Liệu", "1. Problem & Opportunity",
-               "Vì sao các giải pháp AI Test Case thông thường đều thất bại và tiêu chuẩn mới của chúng ta là gì?")
+    add_header(s2, "Hệ Thống Đang Làm Gì? Khả Năng Xử Lý Chuyên Sâu Từng Khâu",
+               "1. ĐỊNH DANH HỆ THỐNG",
+               "Cơ chế tự động hóa toàn diện từ lúc nhận tài liệu yêu cầu thô đến khi xuất ra bộ test suite hoàn chỉnh.")
 
-    # 3 Column Cards
-    col_width = Inches(3.7)
-    col_gap = Inches(0.3)
-    col_top = Inches(1.8)
-    col_height = Inches(5.1)
+    c_w = Inches(3.7)
+    c_gap = Inches(0.3)
+    top_pos = Inches(1.6)
+    card_h = Inches(5.4)
 
-    # Card 1: Nỗi đau QA truyền thống
-    c1 = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), col_top, col_width, col_height)
-    c1.fill.solid()
-    c1.fill.fore_color.rgb = COLOR_BG_CARD
-    c1.line.color.rgb = COLOR_CARD_BORDER
-    tf_c1 = c1.text_frame
-    tf_c1.word_wrap = True
-    
-    p = tf_c1.paragraphs[0]
-    p.text = "🚨 NỖI ĐAU EFFORT HIỆN TẠI"
-    p.font.size = Pt(13)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(225, 29, 72)
-    p.space_after = Pt(10)
-    
-    bullets_1 = [
-        "60-70% Thời gian QA bị chôn vào việc đọc requirement mập mờ và gõ test case thủ công lặp lại.",
-        "Năng suất thấp: Trung bình 1 QA chỉ phân tích được 2-3 User Stories phức tạp mỗi sprint.",
-        "Thiếu chiều sâu kỹ thuật: Bỏ sót các lỗi rủi ro kiến trúc cao (Race Condition, State Drift, Timeout).",
-        "Tắc nghẽn bàn giao: Dev chờ Test Case, QA chờ BA chốt yêu cầu, kéo dài lead-time release."
+    s2_cards = [
+        {
+            "badge": "📥 GIAI ĐOẠN 1: ĐẦU VÀO",
+            "title": "Tiếp Nhận & Đọc Hiểu Spec",
+            "subtitle": "Xử lý đa dạng mọi nguồn tài liệu dự án",
+            "border_color": COLOR_PRIMARY,
+            "items": [
+                ("📄 User Story & Acceptance Criteria:", "Đọc hiểu bối cảnh người dùng, tiêu chí nghiệm thu còn sơ sài hoặc diễn đạt mơ hồ."),
+                ("📑 Tài liệu BA / PRD Chi Tiết:", "Phân tích tài liệu nghiệp vụ dài, phức tạp nhiều phân hệ chức năng."),
+                ("⚙️ API Swagger / JSON Schema:", "Đọc hiểu method HTTP, headers, request body, query params và response schema."),
+                ("🧠 Bộ nhớ góc nhìn (user_preferences):", "Tự động điều chỉnh giọng văn phân tích: Business (dễ hiểu) vs Technical (chuyên sâu).")
+            ]
+        },
+        {
+            "badge": "⚙️ GIAI ĐOẠN 2: TÁC VỤ THỰC HIỆN",
+            "title": "Phân Tích, Phản Biện & Thiết Kế",
+            "subtitle": "5 tác vụ AI chuyên sâu thay thế công việc thủ công",
+            "border_color": COLOR_PURPLE,
+            "items": [
+                ("📋 Bóc tách 4 thành tố cốt lõi:", "Tự động phân tách Rules, Boundary Limits, Exception Flows và User Journey."),
+                ("❓ Soạn câu hỏi phản biện cho BA:", "Chỉ ra các điểm hở tài liệu, mâu thuẫn logic để chốt sớm với BA/PO."),
+                ("🔍 Quét 5 rủi ro kiến trúc sâu:", "Race condition (<=50ms), Lost Update, Concurrency Deadlock, JWT Drift, Clock Drift."),
+                ("🗄️ Đối chiếu 10 Bugs Ground Truth:", "Gắn mã Defect ID tương đồng từ kho bug thực tế để neo chuẩn logic."),
+                ("💎 3 Nguyên Tắc Vàng QA:", "Tách bước độc lập (Disaggregation), Verify 3 tầng sâu (UI/API/DB), Gán Status NOT_RUN.")
+            ]
+        },
+        {
+            "badge": "📤 GIAI ĐOẠN 3: ĐẦU RA BÀN GIAO",
+            "title": "Sản Phẩm Bàn Giao Sạch 100%",
+            "subtitle": "Trực quan hóa Google Sheets & Lưu trữ bền vững",
+            "border_color": COLOR_SUCCESS,
+            "items": [
+                ("📊 Google Sheets Master Ant Design Blue:", "Tự động ghi nối tiếp vào 2 tab Requirements & Test Cases, Header xanh #1677FF, freeze row 1."),
+                ("🎯 Dropdown Status & Conditional Format:", "Menu chọn nhanh PASS/FAIL/BLOCKED/NOT_RUN tự đổi màu tiện lợi cho Tester."),
+                ("💾 Local-First Append-Only:", "Lưu tích lũy vào file JSON cục bộ, bảo toàn 100% lịch sử các sprint trước, cấm reset."),
+                ("🤖 Sẵn sàng Playwright E2E Automation:", "Kịch bản đã chia nhỏ bước, code tự động hóa ngay mà không cần viết lại.")
+            ]
+        }
     ]
-    for b in bullets_1:
-        p_b = tf_c1.add_paragraph()
-        p_b.text = "• " + b
-        p_b.font.size = Pt(11)
-        p_b.font.color.rgb = COLOR_TEXT_MAIN
-        p_b.space_after = Pt(8)
 
-    # Card 2: Cạm bẫy khi dùng AI ngây thơ (Naive AI)
-    c2 = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + col_width + col_gap, col_top, col_width, col_height)
-    c2.fill.solid()
-    c2.fill.fore_color.rgb = COLOR_BG_CARD
-    c2.line.color.rgb = COLOR_CARD_BORDER
-    tf_c2 = c2.text_frame
-    tf_c2.word_wrap = True
-    
-    p = tf_c2.paragraphs[0]
-    p.text = "⚠️ BẪY 'ẢO GIÁC' CỦA AI CHUNG CHUNG"
-    p.font.size = Pt(13)
-    p.font.bold = True
-    p.font.color.rgb = RGBColor(217, 119, 6) # Amber
-    p.space_after = Pt(10)
-    
-    bullets_2 = [
-        "Vấn đề 'Garbage In - Garbage Out': Requirement thiếu ngữ cảnh dẫn đến test case sinh ra sai hoàn toàn.",
-        "Ảo giác (Hallucination): Tự bịa API endpoint, tự suy diễn quy tắc sai so với luồng nghiệp vụ thực tế.",
-        "Gộp cụm hành động (Action Bundling): Dồn chọn số lượng + thanh toán + click vào 1 bước, dev không thể chạy Automation.",
-        "Kỳ vọng chung chung: Chỉ ghi 'Verify HTTP 200' mà không có JSON Body hay thay đổi dữ liệu Database."
-    ]
-    for b in bullets_2:
-        p_b = tf_c2.add_paragraph()
-        p_b.text = "• " + b
-        p_b.font.size = Pt(11)
-        p_b.font.color.rgb = COLOR_TEXT_MAIN
-        p_b.space_after = Pt(8)
-
-    # Card 3: Giải pháp kiến trúc của chúng ta
-    c3 = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (col_width + col_gap)*2, col_top, col_width, col_height)
-    c3.fill.solid()
-    c3.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
-    c3.line.color.rgb = COLOR_PRIMARY
-    c3.line.width = Pt(1.5)
-    tf_c3 = c3.text_frame
-    tf_c3.word_wrap = True
-    
-    p = tf_c3.paragraphs[0]
-    p.text = "✨ GIẢI PHÁP ĐỘT PHÁ CỦA REPO"
-    p.font.size = Pt(13)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY_DARK
-    p.space_after = Pt(10)
-    
-    bullets_3 = [
-        "Strict 2-Phase State Machine: Chặn cổng duyệt người (Human Gate 1), yêu cầu chốt logic trước khi sinh test.",
-        "3 Nguyên Tắc Vàng QA/QC: Step Disaggregation (Tách bước) + 3 Tầng kiểm chứng sâu (UI/API Body/DB State).",
-        "Anchoring Kho Bug Thực Tế: Đối chiếu 10 Bug Production Patterns chuẩn hóa chống ảo giác.",
-        "Local-First & Drive Sync: Lưu trữ tích lũy (Append-Only) và đẩy lên Google Sheets Enterprise thời gian thực."
-    ]
-    for b in bullets_3:
-        p_b = tf_c3.add_paragraph()
-        p_b.text = "✔ " + b
-        p_b.font.size = Pt(11)
-        p_b.font.bold = True
-        p_b.font.color.rgb = COLOR_TEXT_MAIN
-        p_b.space_after = Pt(8)
+    for i, c in enumerate(s2_cards):
+        left_pos = Inches(0.8) + i * (c_w + c_gap)
+        box = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos, top_pos, c_w, card_h)
+        box.fill.solid()
+        box.fill.fore_color.rgb = COLOR_WHITE
+        box.line.color.rgb = c["border_color"]
+        box.line.width = Pt(1.5)
+        
+        tf = box.text_frame
+        tf.word_wrap = True
+        
+        p_badge = tf.paragraphs[0]
+        p_badge.text = c["badge"]
+        p_badge.font.size = Pt(9.5)
+        p_badge.font.bold = True
+        p_badge.font.color.rgb = c["border_color"]
+        p_badge.space_after = Pt(2)
+        
+        p_t = tf.add_paragraph()
+        p_t.text = c["title"]
+        p_t.font.size = Pt(13)
+        p_t.font.bold = True
+        p_t.font.color.rgb = COLOR_TEXT_MAIN
+        p_t.space_after = Pt(2)
+        
+        p_s = tf.add_paragraph()
+        p_s.text = c["subtitle"]
+        p_s.font.size = Pt(9)
+        p_s.font.color.rgb = COLOR_TEXT_MUTED
+        p_s.space_after = Pt(8)
+        
+        for item_title, item_desc in c["items"]:
+            p_it = tf.add_paragraph()
+            p_it.text = item_title
+            p_it.font.size = Pt(9.5)
+            p_it.font.bold = True
+            p_it.font.color.rgb = COLOR_TEXT_MAIN
+            
+            p_id = tf.add_paragraph()
+            p_id.text = item_desc
+            p_id.font.size = Pt(8.5)
+            p_id.font.color.rgb = COLOR_TEXT_MUTED
+            p_id.space_after = Pt(5)
 
     # =========================================================================
-    # SLIDE 3: Kiến Trúc Hệ Thống: 2-Phase State Machine & Subagents
+    # SLIDE 3: HỆ THỐNG NHẰM NHIỆM VỤ GÌ? (4 Core Missions)
     # =========================================================================
     s3 = prs.slides.add_slide(blank_layout)
-    add_header(s3, "Kiến Trúc Tác Tử: 2-Phase State Machine & Human Gates", "2. Architecture & Design",
-               "Hệ thống Native Plugin không cần Backend cồng kềnh - Vận hành bằng Orchestrator và 2 Subagents độc lập.")
+    add_header(s3, "Hệ Thống Nhằm Nhiệm Vụ Gì? 4 Sứ Mệnh Kiểm Thử Chiến Lược",
+               "2. NHIỆM VỤ TRỌNG TÂM CỦA HỆ THỐNG",
+               "Giải quyết triệt để các nút thắt cổ chai về chất lượng phần mềm, phát hiện lỗi sớm và chuẩn hóa dữ liệu.")
 
-    # Left Column: State Machine Flow
-    w_left = Inches(5.7)
-    c_left = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.8), w_left, Inches(5.1))
-    c_left.fill.solid()
-    c_left.fill.fore_color.rgb = COLOR_BG_CARD
-    c_left.line.color.rgb = COLOR_CARD_BORDER
-    tf_l = c_left.text_frame
-    tf_l.word_wrap = True
-
-    p = tf_l.paragraphs[0]
-    p.text = "🔄 QUY TRÌNH ĐIỀU PHỐI 2 PHA NGHIÊM NGẶT"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY
-    p.space_after = Pt(8)
-
-    steps = [
-        ("BƯỚC 0: PRE-FLIGHT CACHE VALIDATION", "Kiểm tra Drive modifiedTime vs .sync_metadata.json. Offline Fallback tự động khi mất mạng."),
-        ("PHASE 1: STATIC ANALYSIS (req-risk-analyst)", "Bóc tách 4 thành tố Business Rules • Đặt câu hỏi phản biện BA • Quét 5 rủi ro kỹ thuật sâu • Đối chiếu 10 Bug lịch sử."),
-        ("🛑 HUMAN GATE 1 (CỔNG KIỂM SOÁT 1)", "BẮT BUỘC DỪNG! Tester duyệt & tinh chỉnh logic. Rollback ngay nếu requirement thay đổi."),
-        ("PHASE 2: TEST DESIGN (test-automation-architect)", "Sinh 5 kịch bản chuẩn: Happy Path, Boundary, Negative, Concurrency (≤50ms), State Conflict & Recovery."),
-        ("🛑 HUMAN GATE 2 & SYNC CLOUD", "Tester xác nhận kịch bản -> Append vào local JSON -> Đẩy lên Google Sheets Master qua MCP.")
+    c_w3 = Inches(2.7)
+    c_gap3 = Inches(0.3)
+    s3_cards = [
+        {
+            "badge": "🎯 NHIỆM VỤ 1",
+            "title": "Shift-Left QA\nChặn Đứng Lỗi Sớm",
+            "subtitle": "Phát hiện kẽ hở ngay tại Spec",
+            "border_color": COLOR_PRIMARY,
+            "items": [
+                ("⚠️ Thực trạng:", "70% lỗi phần mềm xuất phát từ yêu cầu mơ hồ, thiếu biên, mâu thuẫn logic."),
+                ("💡 Nhiệm vụ:", "Bắt lỗi và kẽ hở nghiệp vụ ngay trong Sprint Planning trước khi Dev viết code."),
+                ("💰 Giá trị ROI:", "Chi phí sửa lỗi tại Spec rẻ hơn 10 - 30 lần so với sửa lỗi tại UAT hoặc Production."),
+                ("🤝 Hợp tác:", "Tạo cầu nối phản biện chủ động giữa QA, BA và Tech Lead.")
+            ]
+        },
+        {
+            "badge": "🚀 NHIỆM VỤ 2",
+            "title": "Tối Ưu Chu Trình QA\nGiải Phóng Thủ Công",
+            "subtitle": "Tự động hóa đọc hiểu & viết test",
+            "border_color": COLOR_ACCENT,
+            "items": [
+                ("⚠️ Thực trạng:", "QA mất nhiều thời gian sprint chỉ để đọc spec dài, kẻ bảng excel, format sheet."),
+                ("💡 Nhiệm vụ:", "Tự động hóa 80% khâu đọc hiểu, bóc tách rules và viết đặc tả test cases."),
+                ("⏳ Tốc độ vượt trội:", "Chuẩn bị test suite hoàn chỉnh trong vài phút thay vì cả buổi làm việc."),
+                ("🧠 Nâng tầm QA:", "Dành thời gian tập trung vào Exploratory Testing, Security & UX.")
+            ]
+        },
+        {
+            "badge": "🛡️ NHIỆM VỤ 3",
+            "title": "Triệt Tiêu Ảo Giác\nChính Xác Dữ Liệu",
+            "subtitle": "Kiểm chứng 3 tầng & Con người duyệt",
+            "border_color": COLOR_DANGER,
+            "items": [
+                ("⚠️ Thực trạng:", "Prompt AI tự do luôn tạo test case hời hợt 'HTTP 200', bịa endpoint giả."),
+                ("💡 Nhiệm vụ:", "Kiểm chứng sâu 3 tầng UI + API Body + DB State & Event."),
+                ("🛑 Human-in-the-Loop:", "2 Chốt chặn Human Gates trao quyền kiểm soát tối cao cho Tester."),
+                ("↩️ Tự động Rollback:", "Đổi requirement là tự động hủy test cũ và phân tích lại từ đầu.")
+            ]
+        },
+        {
+            "badge": "📈 NHIỆM VỤ 4",
+            "title": "Chuẩn Hóa Tri Thức\nBệ Phóng E2E Auto",
+            "subtitle": "Tài sản kiểm thử tích lũy lâu dài",
+            "border_color": COLOR_SUCCESS,
+            "items": [
+                ("⚠️ Thực trạng:", "Tri thức kiểm thử nằm rải rác trên máy cá nhân, dễ thất thoát khi đổi nhân sự."),
+                ("💡 Nhiệm vụ:", "Tích lũy bền vững vào Local JSON & Google Sheets Master theo cơ chế Append-Only."),
+                ("🔒 Bảo toàn lịch sử:", "Không bao giờ xóa/reset, truy vết toàn diện theo requirement_id."),
+                ("🤖 Cầu nối Automation:", "Cung cấp đầu vào hoàn hảo để framework Playwright E2E chạy tự động.")
+            ]
+        }
     ]
-    for stitle, sdesc in steps:
-        p_st = tf_l.add_paragraph()
-        p_st.text = stitle
-        p_st.font.size = Pt(10)
-        p_st.font.bold = True
-        p_st.font.color.rgb = COLOR_TEXT_MAIN
+
+    for i, c in enumerate(s3_cards):
+        left_pos = Inches(0.8) + i * (c_w3 + c_gap3)
+        box = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos, top_pos, c_w3, card_h)
+        box.fill.solid()
+        box.fill.fore_color.rgb = COLOR_WHITE
+        box.line.color.rgb = c["border_color"]
+        box.line.width = Pt(1.5)
         
-        p_sd = tf_l.add_paragraph()
-        p_sd.text = sdesc
-        p_sd.font.size = Pt(9.5)
-        p_sd.font.color.rgb = COLOR_TEXT_MUTED
-        p_sd.space_after = Pt(6)
-
-    # Right Column: Subagents & Specialization
-    w_right = Inches(5.7)
-    c_right = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.8), w_right, Inches(5.1))
-    c_right.fill.solid()
-    c_right.fill.fore_color.rgb = COLOR_WHITE
-    c_right.line.color.rgb = COLOR_PRIMARY
-    c_right.line.width = Pt(1.5)
-    tf_r = c_right.text_frame
-    tf_r.word_wrap = True
-
-    p = tf_r.paragraphs[0]
-    p.text = "🤖 PHÂN QUYỀN TÁC TỬ & BỘ NHỚ GÓC NHÌN"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY_DARK
-    p.space_after = Pt(10)
-
-    subagent_items = [
-        ("Subagent 1: req-risk-analyst", 
-         "Đảm nhiệm Static Analysis. Tham chiếu risk-checklist.md bao gồm 5 góc khuất: Concurrency, State Drift, Clock Drift, Non-Idempotency, Distributed Transaction Failure. Tuyệt đối không sinh test case."),
-        ("Subagent 2: test-automation-architect", 
-         "Chỉ được kích hoạt khi Phase 1 đã duyệt. Áp dụng test-design-matrix.md để xếp hạng độ ưu tiên P1/P2/P3 và mô tả chi tiết bước giả lập 3 tầng."),
-        ("Bộ nhớ góc nhìn (Perspective Persistence)", 
-         "Lưu tại user_preferences.json: Hỗ trợ 3 chế độ: 'business' (ngôn ngữ đời sống trực quan cho BA), 'technical' (thuật ngữ SDET chuyên sâu), 'hybrid'. Tự động ghi nhớ qua các phiên."),
-        ("Cơ chế Progressive Disclosure", 
-         "Tối ưu hóa Token & Context Window: Cẩm nang kỹ thuật được chia nhỏ vào thư mục references/ thay vì nhồi nhét vào prompt chính, tránh làm loãng context.")
-    ]
-    for stitle, sdesc in subagent_items:
-        p_st = tf_r.add_paragraph()
-        p_st.text = "🔹 " + stitle
-        p_st.font.size = Pt(11)
-        p_st.font.bold = True
-        p_st.font.color.rgb = COLOR_PRIMARY_DARK
+        tf = box.text_frame
+        tf.word_wrap = True
         
-        p_sd = tf_r.add_paragraph()
-        p_sd.text = sdesc
-        p_sd.font.size = Pt(9.5)
-        p_sd.font.color.rgb = COLOR_TEXT_MAIN
-        p_sd.space_after = Pt(6)
+        p_badge = tf.paragraphs[0]
+        p_badge.text = c["badge"]
+        p_badge.font.size = Pt(9.5)
+        p_badge.font.bold = True
+        p_badge.font.color.rgb = c["border_color"]
+        p_badge.space_after = Pt(2)
+        
+        p_t = tf.add_paragraph()
+        p_t.text = c["title"]
+        p_t.font.size = Pt(12)
+        p_t.font.bold = True
+        p_t.font.color.rgb = COLOR_TEXT_MAIN
+        p_t.space_after = Pt(2)
+        
+        p_s = tf.add_paragraph()
+        p_s.text = c["subtitle"]
+        p_s.font.size = Pt(8.5)
+        p_s.font.color.rgb = COLOR_TEXT_MUTED
+        p_s.space_after = Pt(8)
+        
+        for item_title, item_desc in c["items"]:
+            p_it = tf.add_paragraph()
+            p_it.text = item_title
+            p_it.font.size = Pt(9)
+            p_it.font.bold = True
+            p_it.font.color.rgb = COLOR_TEXT_MAIN
+            
+            p_id = tf.add_paragraph()
+            p_id.text = item_desc
+            p_id.font.size = Pt(8.5)
+            p_id.font.color.rgb = COLOR_TEXT_MUTED
+            p_id.space_after = Pt(5)
 
     # =========================================================================
-    # SLIDE 4: Đánh Giá Tính Đúng - Sai Của Bộ Dữ Liệu Đầu Ra (Core Evaluation)
+    # SLIDE 4: SƠ ĐỒ LUỒNG TỔNG QUAN (Flowchart Overview)
     # =========================================================================
     s4 = prs.slides.add_slide(blank_layout)
-    add_header(s4, "Khung Đánh Giá & Kiểm Định Độ Đúng Sai Của Dữ Liệu Đầu Ra", "3. Quality & Accuracy Assurance",
-               "Làm thế nào để đo lường, kiểm soát ảo giác và đảm bảo dữ liệu sinh ra đạt chuẩn kiểm thử thực tế?")
-
-    # Top KPI 4 Cards
-    kpi_w = Inches(2.7)
-    kpi_h = Inches(1.3)
-    kpi_gap = Inches(0.3)
-    kpi_top = Inches(1.8)
-
-    metrics = [
-        ("SEMANTIC ACCURACY", "≥ 92%", "Tính đúng đắn logic & quy tắc nghiệp vụ", COLOR_PRIMARY),
-        ("SCHEMA VALIDITY", "100%", "Chuẩn 3 tầng UI/API Body/DB & Disaggregation", COLOR_SUCCESS),
-        ("RISK COVERAGE", "100%", "Bao phủ đủ 5 nhóm kịch bản & 5 góc khuất", COLOR_PRIMARY_DARK),
-        ("HALLUCINATION", "< 5%", "Tỷ lệ suy diễn sai lệch so với requirement", RGBColor(225, 29, 72))
-    ]
-    for i, (mtitle, mval, msub, mcol) in enumerate(metrics):
-        box = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (kpi_w + kpi_gap)*i, kpi_top, kpi_w, kpi_h)
-        box.fill.solid()
-        box.fill.fore_color.rgb = COLOR_BG_CARD
-        box.line.color.rgb = mcol
-        box.line.width = Pt(1.5)
-        tf_m = box.text_frame
-        tf_m.word_wrap = True
-        
-        p1 = tf_m.paragraphs[0]
-        p1.text = mtitle
-        p1.font.size = Pt(9)
-        p1.font.bold = True
-        p1.font.color.rgb = COLOR_TEXT_MUTED
-        
-        p2 = tf_m.add_paragraph()
-        p2.text = mval
-        p2.font.size = Pt(22)
-        p2.font.bold = True
-        p2.font.color.rgb = mcol
-        
-        p3 = tf_m.add_paragraph()
-        p3.text = msub
-        p3.font.size = Pt(8.5)
-        p3.font.color.rgb = COLOR_TEXT_MAIN
-
-    # Bottom Split: 3 Golden Principles vs. Verification Framework
-    b_top = Inches(3.35)
-    b_h = Inches(3.6)
-    b_w = Inches(5.7)
-
-    # Box 1: 3 Nguyên Tắc Vàng
-    c_gp = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), b_top, b_w, b_h)
-    c_gp.fill.solid()
-    c_gp.fill.fore_color.rgb = COLOR_WHITE
-    c_gp.line.color.rgb = COLOR_CARD_BORDER
-    tf_gp = c_gp.text_frame
-    tf_gp.word_wrap = True
-    
-    p = tf_gp.paragraphs[0]
-    p.text = "💎 3 NGUYÊN TẮC VÀNG CHUẨN QA/QC THỰC CHIẾN"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY
-    p.space_after = Pt(8)
-
-    gp_items = [
-        ("1. Step Disaggregation (Không gom cụm hành động):",
-         "Tách biệt hoàn toàn bước chuẩn bị dữ liệu (nhập input/chọn option) và bước kích hoạt (submit). Đưa tiền đề vào Pre-conditions để Automation chạy ổn định."),
-        ("2. Synchronized Deep Verification (Kiểm chứng sâu 3 tầng):",
-         "UI: Thông báo, highlight, ID hiển thị.\nAPI: HTTP Status + trường cụ thể trong Response Body (ví dụ: order_id khớp UI).\nDB & Broker: Tên bảng, tên cột, giá trị cập nhật và Kafka event phát ra."),
-        ("3. Trạng thái thực thi rõ ràng (Execution Status):",
-         "Mặc định là NOT_RUN kèm dropdown Pass/Fail/Blocked và Conditional Formatting giúp theo dõi tiến độ trực quan.")
-    ]
-    for gtitle, gdesc in gp_items:
-        p_t = tf_gp.add_paragraph()
-        p_t.text = gtitle
-        p_t.font.size = Pt(10)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_TEXT_MAIN
-        p_d = tf_gp.add_paragraph()
-        p_d.text = gdesc
-        p_d.font.size = Pt(9)
-        p_d.font.color.rgb = COLOR_TEXT_MUTED
-        p_d.space_after = Pt(4)
-
-    # Box 2: Cơ Chế Đánh Giá Thực Tế (Evaluation Loop)
-    c_ev = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), b_top, b_w, b_h)
-    c_ev.fill.solid()
-    c_ev.fill.fore_color.rgb = COLOR_WHITE
-    c_ev.line.color.rgb = COLOR_CARD_BORDER
-    tf_ev = c_ev.text_frame
-    tf_ev.word_wrap = True
-    
-    p = tf_ev.paragraphs[0]
-    p.text = "🛡️ CƠ CHẾ ĐẢM BẢO CHẤT LƯỢNG DỮ LIỆU ĐẦU RA"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_ACCENT
-    p.space_after = Pt(8)
-
-    ev_items = [
-        ("Anchor bằng Ground Truth (Kho 10 Bug Lịch Sử):",
-         "Agent luôn đối chiếu rủi ro với các bug thực chiến đã xảy ra trên hệ thống (BUG-001 đến BUG-010), buộc AI căn cứ vào bài học thực tế thay vì suy diễn viển vông."),
-        ("Syntactic & Schema Validator:",
-         "Quy chuẩn kiểm tra tự động: Mọi test case thiếu bảng DB hoặc thiếu trường API Response Body đều bị từ chối trước khi hiển thị cho Tester."),
-        ("Human-in-the-Loop Feedback Loop:",
-         "Tester là 'Quality Gatekeeper' cuối cùng. Mọi câu hỏi BA và rủi ro được Tester xác nhận, tạo dữ liệu chuẩn xác cho Phase 2 sinh kịch bản."),
-        ("Traceability Không Rời Rạc:",
-         "Khóa ngoại requirement_id kết nối xuyên suốt từ bảng Phân tích Yêu cầu sang bảng Kịch bản Test, đảm bảo 100% test case đều truy vết được nguồn gốc.")
-    ]
-    for etitle, edesc in ev_items:
-        p_t = tf_ev.add_paragraph()
-        p_t.text = etitle
-        p_t.font.size = Pt(10)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_TEXT_MAIN
-        p_d = tf_ev.add_paragraph()
-        p_d.text = edesc
-        p_d.font.size = Pt(9)
-        p_d.font.color.rgb = COLOR_TEXT_MUTED
-        p_d.space_after = Pt(4)
+    add_header(s4, "Sơ Đồ Luồng Tổng Quan: 2-Phase State Machine, 2 Human Gates & Cloud Sync",
+               "3. KIẾN TRÚC TỔNG QUAN",
+               "Sơ đồ luồng trạng thái tuần tự: Điểm rẽ nhánh điều kiện, 2 điểm dừng Tester và cơ chế tự động Rollback.")
+    embed_flowchart(s4, "flowchart_overview.png")
 
     # =========================================================================
-    # SLIDE 5: Minh Chứng Thực Nghiệm Trên 3 Requirement Mẫu
+    # SLIDE 5: SƠ ĐỒ LUỒNG CHẶNG 0: PRE-FLIGHT (Flowchart Stage 0)
     # =========================================================================
     s5 = prs.slides.add_slide(blank_layout)
-    add_header(s5, "Minh Chứng Thực Nghiệm: Bắt Lỗ Hổng & Tự Nắn Chỉnh Qua Thực Tế", "4. Experimental Proof Points",
-               "Bằng chứng cụ thể từ Repo: Những điểm làm tốt, sai sót ban đầu được phát hiện và khắc phục ra sao.")
-
-    # Table of 3 Case Studies
-    rows = 4
-    cols = 4
-    left_t = Inches(0.8)
-    top_t = Inches(1.8)
-    w_t = Inches(11.7)
-    h_t = Inches(5.1)
-
-    table_shape = s5.shapes.add_table(rows, cols, left_t, top_t, w_t, h_t)
-    table = table_shape.table
-
-    # Column widths
-    table.columns[0].width = Inches(2.2) # Tiêu chí
-    table.columns[1].width = Inches(3.1) # Req A (Auth)
-    table.columns[2].width = Inches(3.2) # Req B (Inventory)
-    table.columns[3].width = Inches(3.2) # Req C (Voucher)
-
-    headers_table = ["TIÊU CHÍ ĐÁNH GIÁ", "REQ A: KHÓA TÀI KHOẢN (Auth)", "REQ B: CHỐNG BÁN ÂM KHO (Inventory)", "REQ C: VOUCHER 1 LẦN (Promotion)"]
-    for j, htext in enumerate(headers_table):
-        cell = table.cell(0, j)
-        cell.fill.solid()
-        cell.fill.fore_color.rgb = COLOR_PRIMARY
-        p = cell.text_frame.paragraphs[0]
-        p.text = htext
-        p.font.size = Pt(10)
-        p.font.bold = True
-        p.font.color.rgb = COLOR_WHITE
-        p.alignment = PP_ALIGN.CENTER
-
-    row_data = [
-        ("Điểm làm tốt nổi bật",
-         "• Phát hiện kẽ hở Force Logout / Thu hồi Token tức thì trên thiết bị khác.\n• Đặt câu hỏi Sliding Window đếm sai.\n• Liên kết BUG-001, BUG-003, BUG-008.",
-         "• Phân biệt rõ Tồn kho vật lý vs Tồn kho khả dụng (Holding Window).\n• Thiết kế test Concurrency: 2 user tranh mua 1 hàng cuối (N=1) trong ≤50ms.\n• Ánh xạ BUG-005, BUG-007.",
-         "• Bóc tách trọn vẹn Vòng đời Voucher & Giao dịch bù trừ (Compensating Transaction) khi hủy đơn/timeout.\n• Bắt lỗi Race condition 2 tab đồng thời.\n• Ánh xạ BUG-003 chuẩn 100%."),
-        ("Sai sót ban đầu phát hiện",
-         "• Lạm dụng thuật ngữ hàn lâm (Lost Update, Redis INCR) khiến BA khó hiểu.\n• Bố cục dạng khối văn bản dài (Text Wall).\n• Bỏ sót kiểm tra Token trên service vệ tinh.",
-         "• Gom cụm hành động: dồn chọn số lượng + checkout vào 1 bước.\n• Kỳ vọng API/DB sơ sài (chỉ ghi HTTP 200/400, không chỉ rõ tên bảng/cột).\n• Bảng Sheets ban đầu bị co rúm, xấu.",
-         "• Bỏ sót chính sách hoàn tiền 1 phần khi mua nhiều món có áp voucher.\n• Bỏ sót nguy cơ kẹt voucher vĩnh viễn ở trạng thái tạm khóa (RESERVED) nếu cronjob timeout chết."),
-        ("Cải tiến Prompt & Code",
-         "• Thêm cấu hình user_preferences.json ghi nhớ góc nhìn (business vs technical).\n• Tái cấu trúc sang dạng Thẻ & Bảng Ma trận.\n• Bổ sung kịch bản kiểm tra Event thu hồi Token.",
-         "• Đưa 3 Nguyên Tắc Vàng vào prompt & AGENTS.md (Tách bước, Verify 3 tầng).\n• Viết script Styler Ant Design Blue tự động định dạng Sheets, thêm Dropdown Status.",
-         "• Mở rộng risk-checklist.md thêm rủi ro Lifecycle Reversal & Partial Refund.\n• Bổ sung kịch bản kiểm chứng khôi phục voucher tự động khi hết hạn giữ chỗ.")
-    ]
-
-    for i, row in enumerate(row_data):
-        for j, val in enumerate(row):
-            cell = table.cell(i+1, j)
-            cell.fill.solid()
-            if j == 0:
-                cell.fill.fore_color.rgb = COLOR_BG_CARD
-            else:
-                cell.fill.fore_color.rgb = COLOR_WHITE
-            p = cell.text_frame.paragraphs[0]
-            p.text = val
-            p.font.size = Pt(9.5)
-            if j == 0:
-                p.font.bold = True
-                p.font.color.rgb = COLOR_PRIMARY_DARK
-            else:
-                p.font.color.rgb = COLOR_TEXT_MAIN
+    add_header(s5, "Sơ Đồ Luồng Chặng 0: Quản Trị Góc Nhìn & Xác Thực Cache Hai Chiều",
+               "3A. ĐI SÂU CHẶNG 0: PRE-FLIGHT",
+               "Sơ đồ luồng kiểm tra cache: Nhánh trùng khớp (<50ms), nhánh Drive thay đổi và cơ chế Offline Fallback.")
+    embed_flowchart(s5, "flowchart_stage0.png")
 
     # =========================================================================
-    # SLIDE 6: Kế Hoạch 3 Tháng Nâng Vọt Effort Của Team (The 90-Day Roadmap)
+    # SLIDE 6: SƠ ĐỒ LUỒNG PHA 1: REQ-RISK-ANALYST (Flowchart Phase 1)
     # =========================================================================
     s6 = prs.slides.add_slide(blank_layout)
-    add_header(s6, "Lộ Trình 3 Tháng: Nâng 2.5x Effort Của Team QA", "5. The 90-Day Roadmap",
-               "Kế hoạch triển khai thực chiến từng giai đoạn để biến AI thành bệ phóng năng suất cho toàn bộ QA Team.")
-
-    r_w = Inches(3.7)
-    r_gap = Inches(0.3)
-    r_top = Inches(1.8)
-    r_h = Inches(5.1)
-
-    # Month 1
-    m1 = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), r_top, r_w, r_h)
-    m1.fill.solid()
-    m1.fill.fore_color.rgb = COLOR_BG_CARD
-    m1.line.color.rgb = COLOR_CARD_BORDER
-    tf_m1 = m1.text_frame
-    tf_m1.word_wrap = True
-    
-    p = tf_m1.paragraphs[0]
-    p.text = "THÁNG 1: FOUNDATION & BASELINE"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY
-    p_sub = tf_m1.add_paragraph()
-    p_sub.text = "Chuẩn Hóa Quy Trình & Pilot Thử Nghiệm"
-    p_sub.font.size = Pt(13)
-    p_sub.font.bold = True
-    p_sub.font.color.rgb = COLOR_TEXT_MAIN
-    p_sub.space_after = Pt(8)
-
-    m1_points = [
-        ("Xây dựng Golden Dataset:", "Chuẩn bị 50 User Stories thực tế kèm kịch bản mẫu của dự án làm thước đo Ground Truth."),
-        ("Đóng gói Agentic Plugin:", "Cài đặt bộ Rules, Skills, Subagents cho 1 Scrum Team (3-5 QA) thử nghiệm."),
-        ("Training & Guideline:", "Đào tạo QA cách review Phase 1, chất vấn BA và phê duyệt kịch bản giả lập."),
-        ("🎯 KPI Tháng 1:", "• Độ chính xác dữ liệu ≥ 85%\n• Giảm 40% thời gian viết test case\n• Bắt sớm ít nhất 5 lỗi logic ngay khâu review requirement.")
-    ]
-    for ptitle, pdesc in m1_points:
-        p_t = tf_m1.add_paragraph()
-        p_t.text = "• " + ptitle
-        p_t.font.size = Pt(10)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_PRIMARY_DARK if "KPI" in ptitle else COLOR_TEXT_MAIN
-        p_d = tf_m1.add_paragraph()
-        p_d.text = pdesc
-        p_d.font.size = Pt(9)
-        p_d.font.color.rgb = COLOR_SUCCESS if "KPI" in ptitle else COLOR_TEXT_MUTED
-        p_d.space_after = Pt(4)
-
-    # Month 2
-    m2 = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + r_w + r_gap, r_top, r_w, r_h)
-    m2.fill.solid()
-    m2.fill.fore_color.rgb = COLOR_BG_CARD
-    m2.line.color.rgb = COLOR_CARD_BORDER
-    tf_m2 = m2.text_frame
-    tf_m2.word_wrap = True
-    
-    p = tf_m2.paragraphs[0]
-    p.text = "THÁNG 2: INTEGRATION & SCALING"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_ACCENT
-    p_sub = tf_m2.add_paragraph()
-    p_sub.text = "Tích Hợp Hệ Sinh Thái & Mở Rộng"
-    p_sub.font.size = Pt(13)
-    p_sub.font.bold = True
-    p_sub.font.color.rgb = COLOR_TEXT_MAIN
-    p_sub.space_after = Pt(8)
-
-    m2_points = [
-        ("Tích hợp Jira / Xray MCP:", "Kết nối trực tiếp Jira để đọc Story Description và sync ngược Test Cases lên Xray/TestRail."),
-        ("Cơ chế Feedback Loop:", "Thêm tính năng Upvote/Downvote test case để liên tục nắn chỉnh Prompt theo văn hóa công ty."),
-        ("Mở rộng ra toàn bộ QA Team:", "Áp dụng cho 10-15 QA trên toàn bộ các squad."),
-        ("🎯 KPI Tháng 2:", "• Độ chính xác dữ liệu ≥ 92%\n• Giảm 60% lead-time phân tích & test design\n• Tăng gấp 3 lần số kịch bản Concurrency & Edge-case được bao phủ.")
-    ]
-    for ptitle, pdesc in m2_points:
-        p_t = tf_m2.add_paragraph()
-        p_t.text = "• " + ptitle
-        p_t.font.size = Pt(10)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_ACCENT if "KPI" in ptitle else COLOR_TEXT_MAIN
-        p_d = tf_m2.add_paragraph()
-        p_d.text = pdesc
-        p_d.font.size = Pt(9)
-        p_d.font.color.rgb = COLOR_SUCCESS if "KPI" in ptitle else COLOR_TEXT_MUTED
-        p_d.space_after = Pt(4)
-
-    # Month 3
-    m3 = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (r_w + r_gap)*2, r_top, r_w, r_h)
-    m3.fill.solid()
-    m3.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
-    m3.line.color.rgb = COLOR_PRIMARY
-    m3.line.width = Pt(1.5)
-    tf_m3 = m3.text_frame
-    tf_m3.word_wrap = True
-    
-    p = tf_m3.paragraphs[0]
-    p.text = "THÁNG 3: AUTONOMOUS MULTIPLIER"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY_DARK
-    p_sub = tf_m3.add_paragraph()
-    p_sub.text = "Sinh Automation Code & Đột Phá Effort"
-    p_sub.font.size = Pt(13)
-    p_sub.font.bold = True
-    p_sub.font.color.rgb = COLOR_TEXT_MAIN
-    p_sub.space_after = Pt(8)
-
-    m3_points = [
-        ("Simulated to Executable Code:", "Chuyển đổi các bước giả lập 3 tầng thành Playwright Script / k6 Load Script chạy trực tiếp."),
-        ("CI/CD Regression Trigger:", "Tự động chạy test case P1 ngay khi Dev tạo Pull Request."),
-        ("Đo lường & Báo cáo ROI:", "Dashboard đo lường Defect Leakage Rate, QA Throughput và Man-hours saved."),
-        ("🎯 KPI Tháng 3:", "• Nâng Effort (Throughput) Team lên GẤP 2.5X\n• Giảm 50% bug lọt sang môi trường Staging/Prod\n• Tiết kiệm 15-20 giờ làm việc/QA/sprint.")
-    ]
-    for ptitle, pdesc in m3_points:
-        p_t = tf_m3.add_paragraph()
-        p_t.text = "• " + ptitle
-        p_t.font.size = Pt(10)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_PRIMARY_DARK if "KPI" in ptitle else COLOR_TEXT_MAIN
-        p_d = tf_m3.add_paragraph()
-        p_d.text = pdesc
-        p_d.font.size = Pt(9)
-        p_d.font.color.rgb = COLOR_SUCCESS if "KPI" in ptitle else COLOR_TEXT_MUTED
-        p_d.space_after = Pt(4)
+    add_header(s6, "Sơ Đồ Luồng Pha 1: Bóc Tách Yêu Cầu & Quét 5 Rủi Ro Kỹ Thuật",
+               "3B. ĐI SÂU PHA 1: REQ-RISK-ANALYST",
+               "Sơ đồ luồng phân tích tĩnh: Bóc tách 4 thành tố, rẽ nhánh phát hiện kẽ hở BA, quét 5 rủi ro và điểm chặn cấm sinh test.")
+    embed_flowchart(s6, "flowchart_phase1.png")
 
     # =========================================================================
-    # SLIDE 7: Kết Luận & Định Hướng Đóng Góp (Closing & Value Proposition)
+    # SLIDE 7: SƠ ĐỒ LUỒNG ĐIỂM CHẶN: 2 HUMAN GATES & ROLLBACK (Flowchart Gates)
     # =========================================================================
     s7 = prs.slides.add_slide(blank_layout)
-    add_header(s7, "Kết Luận: Chuyển Dịch Vị Thế QA Từ 'Thủ Công' Sang 'AI Orchestrator'", "6. Strategic Conclusion",
-               "Giá trị mang lại cho đội ngũ và định hướng phát triển sự nghiệp tại doanh nghiệp.")
+    add_header(s7, "Sơ Đồ Luồng Điểm Chặn: 2 Human Gates & Cơ Chế Tự Động Rollback",
+               "3C. KIỂM SOÁT CON NGƯỜI (HUMAN-IN-THE-LOOP)",
+               "Sơ đồ luồng quyết định của Tester: Duyệt logic Gate 1, nghiệm thu test Gate 2 và luồng Rollback xóa test case khi đổi spec.")
+    embed_flowchart(s7, "flowchart_gates.png")
 
-    # 3 Summary Pillar Cards
-    c_w7 = Inches(3.7)
-    c_gap7 = Inches(0.3)
-    c_top7 = Inches(1.8)
-    c_h7 = Inches(4.0)
+    # =========================================================================
+    # SLIDE 8: SƠ ĐỒ LUỒNG PHA 2: TEST DESIGN & 3 TẦNG SÂU (Flowchart Phase 2)
+    # =========================================================================
+    s8 = prs.slides.add_slide(blank_layout)
+    add_header(s8, "Sơ Đồ Luồng Pha 2: Thiết Kế Test Automation & 3 Tầng Kiểm Chứng Sâu",
+               "3D. ĐI SÂU PHA 2: TEST-AUTOMATION-ARCHITECT",
+               "Sơ đồ luồng thiết kế kịch bản: Tách bước độc lập, rẽ nhánh 5 nhóm ma trận và kiểm chứng sâu UI + API Body + DB.")
+    embed_flowchart(s8, "flowchart_phase2.png")
 
-    # Card 1: Tư duy sản phẩm
-    card1 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), c_top7, c_w7, c_h7)
-    card1.fill.solid()
-    card1.fill.fore_color.rgb = COLOR_BG_CARD
-    card1.line.color.rgb = COLOR_CARD_BORDER
-    tf_c1 = card1.text_frame
-    tf_c1.word_wrap = True
-    p = tf_c1.paragraphs[0]
-    p.text = "🎯 TƯ DUY KIỂM ĐỊNH SỚM (SHIFT-LEFT)"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY
-    p.space_after = Pt(10)
-    texts_1 = [
-        "AI không chỉ giúp viết test nhanh hơn, mà giúp QA chặn đứng lỗi ngay từ khâu viết requirement.",
-        "Bộ câu hỏi chất vấn BA sắc bén giúp cả team Dev & Product cùng nhìn thấy góc khuất trước khi viết code.",
-        "Chi phí sửa lỗi ở giai đoạn Requirement rẻ hơn gấp 10-30 lần so với sửa lỗi ở Production."
+    # =========================================================================
+    # SLIDE 9: SƠ ĐỒ LUỒNG PHA 3: LOCAL-FIRST & GOOGLE SHEETS (Flowchart Phase 3)
+    # =========================================================================
+    s9 = prs.slides.add_slide(blank_layout)
+    add_header(s9, "Sơ Đồ Luồng Pha 3: Cơ Chế Local-First & Đồng Bộ Google Workspace 2 Chiều",
+               "3E. ĐI SÂU PHA 3: WORKSPACE SYNC MANAGER",
+               "Sơ đồ luồng lưu trữ & đồng bộ: Bước 1 Append local, Bước 2 Push Sheets qua MCP và Bước 3 Cập nhật cache metadata.")
+    embed_flowchart(s9, "flowchart_phase3.png")
+
+    # =========================================================================
+    # SLIDE 10: Minh Chứng Thực Nghiệm & Vòng Lặp Tự Nắn Chỉnh (Self-Correction)
+    # =========================================================================
+    s10 = prs.slides.add_slide(blank_layout)
+    add_header(s10, "Minh Chứng Thực Nghiệm: Vòng Lặp Tự Nắn Chỉnh Qua 3 Bài Toán Mẫu",
+               "4. MINH CHỨNG THỰC NGHIỆM",
+               "Bằng chứng thực tế từ Repo: Cách hệ thống tự phát hiện sai sót, nắn chỉnh prompt và chuẩn hóa kết quả đầu ra.")
+
+    top_loop = s10.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.75), Inches(11.7), Inches(0.55))
+    top_loop.fill.solid()
+    top_loop.fill.fore_color.rgb = COLOR_BG_LIGHT
+    top_loop.line.color.rgb = COLOR_PRIMARY
+    tf_loop = top_loop.text_frame
+    p_l = tf_loop.paragraphs[0]
+    p_l.text = "🔄 VÒNG LẶP NẮN CHỈNH:   [1. Chạy Thực Nghiệm]  ➔  [2. Phát Hiện Sai Sót]  ➔  [3. Nắn Chỉnh Rules & Code]  ➔  [4. Chuẩn Hóa Bền Vững]"
+    p_l.font.size = Pt(10)
+    p_l.font.bold = True
+    p_l.font.color.rgb = COLOR_PRIMARY_DARK
+    p_l.alignment = PP_ALIGN.CENTER
+
+    c_w5 = Inches(3.7)
+    c_gap5 = Inches(0.3)
+    c_top5 = Inches(2.45)
+    c_h5 = Inches(4.5)
+
+    cases = [
+        ("🔐 REQ A: KHÓA TÀI KHOẢN (Auth)",
+         "Sai mật khẩu 5 lần liên tiếp",
+         "✔ Điểm sáng:",
+         "Bắt kẽ hở Force Logout trên thiết bị khác; liên kết BUG-001 & BUG-003.",
+         "⚠️ Sai sót ban đầu:",
+         "Dùng từ ngữ quá hàn lâm (Lost Update, Redis INCR) khiến BA khó hiểu.",
+         "🛠️ Nắn chỉnh kỹ thuật:",
+         "Thêm user_preferences.json ghi nhớ góc nhìn BA vs SDET; bổ sung kịch bản kiểm tra Event thu hồi Token."),
+        ("📦 REQ B: BÁN ÂM KHO (Inventory)",
+         "Flash Sale Concurrency cao",
+         "✔ Điểm sáng:",
+         "Phân biệt Tồn kho vật lý vs Khả dụng; sinh test 2 user tranh mua N=1 trong ≤50ms.",
+         "⚠️ Sai sót ban đầu:",
+         "Gom cụm bước (chọn số lượng + checkout dồn 1 bước); verify API sơ sài.",
+         "🛠️ Nắn chỉnh kỹ thuật:",
+         "Đưa 3 Nguyên Tắc Vàng vào Rules cứng; viết script Styler tự động kẻ viền & format Sheets."),
+        ("🎟️ REQ C: VOUCHER 1 LẦN (Promo)",
+         "Áp mã thanh toán giỏ hàng",
+         "✔ Điểm sáng:",
+         "Thiết kế Race condition ≤50ms; verify hoàn tiền rollback voucher khi hủy đơn.",
+         "⚠️ Sai sót ban đầu:",
+         "Format sheet chưa đẹp; chưa có cột Status Pass/Fail tiện dụng cho Tester.",
+         "🛠️ Nắn chỉnh kỹ thuật:",
+         "Bổ sung Dropdown Data Validation PASS/FAIL/BLOCKED/NOT_RUN và Conditional Formatting màu tự động.")
     ]
-    for t in texts_1:
-        p_t = tf_c1.add_paragraph()
-        p_t.text = "• " + t
-        p_t.font.size = Pt(10.5)
-        p_t.font.color.rgb = COLOR_TEXT_MAIN
-        p_t.space_after = Pt(8)
 
-    # Card 2: Chất lượng dữ liệu
-    card2 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + c_w7 + c_gap7, c_top7, c_w7, c_h7)
-    card2.fill.solid()
-    card2.fill.fore_color.rgb = COLOR_BG_CARD
-    card2.line.color.rgb = COLOR_CARD_BORDER
-    tf_c2 = card2.text_frame
-    tf_c2.word_wrap = True
-    p = tf_c2.paragraphs[0]
-    p.text = "🛡️ DỮ LIỆU ĐÚNG ĐẮN LÀ TỐI THƯỢNG"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_SUCCESS
-    p.space_after = Pt(10)
-    texts_2 = [
-        "Không đánh đổi tốc độ lấy ảo giác (hallucination). Human-in-the-loop là nguyên tắc bất di bất dịch.",
-        "Quy chuẩn kiểm chứng sâu 3 tầng (UI/API Body/DB Schema) giúp test case có thể tự động hóa ngay mà không cần làm lại.",
-        "Cơ chế Local-First & Cloud Sync giúp dữ liệu được tích lũy bền vững, không bao giờ mất mát."
+    for i, (ctitle, csub, cs1, cd1, cs2, cd2, cs3, cd3) in enumerate(cases):
+        cbox = s10.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(c_w5 + c_gap5), c_top5, c_w5, c_h5)
+        cbox.fill.solid()
+        cbox.fill.fore_color.rgb = COLOR_WHITE
+        cbox.line.color.rgb = COLOR_CARD_BORDER
+        cbox.line.width = Pt(1.5)
+        tf_c = cbox.text_frame
+        tf_c.word_wrap = True
+        
+        p = tf_c.paragraphs[0]
+        p.text = ctitle
+        p.font.size = Pt(11.5)
+        p.font.bold = True
+        p.font.color.rgb = COLOR_PRIMARY
+        p.space_after = Pt(2)
+        
+        p_sub = tf_c.add_paragraph()
+        p_sub.text = csub
+        p_sub.font.size = Pt(9.5)
+        p_sub.font.color.rgb = COLOR_TEXT_MUTED
+        p_sub.space_after = Pt(6)
+        
+        sections = [(cs1, cd1, COLOR_SUCCESS), (cs2, cd2, COLOR_DANGER), (cs3, cd3, COLOR_PRIMARY_DARK)]
+        for stitle, sdesc, scol in sections:
+            p_s = tf_c.add_paragraph()
+            p_s.text = stitle
+            p_s.font.size = Pt(10)
+            p_s.font.bold = True
+            p_s.font.color.rgb = scol
+            
+            p_sd = tf_c.add_paragraph()
+            p_sd.text = sdesc
+            p_sd.font.size = Pt(8.5)
+            p_sd.font.color.rgb = COLOR_TEXT_MAIN
+            p_sd.space_after = Pt(5)
+
+    # =========================================================================
+    # SLIDE 11: Kế Hoạch Triển Khai Thực Chiến 3 Tháng
+    # =========================================================================
+    s11 = prs.slides.add_slide(blank_layout)
+    add_header(s11, "Kế Hoạch Triển Khai Thực Chiến Trong 3 Tháng: Từng Bước Vững Chắc",
+               "5. KẾ HOẠCH TRIỂN KHAI THỰC CHIẾN",
+               "Lộ trình cụ thể để đưa hệ thống vào dự án thực tế, từ Pilot, mở rộng toàn team đến tối ưu hóa tự động.")
+
+    m_w6 = Inches(3.7)
+    m_gap6 = Inches(0.3)
+    m_top6 = Inches(1.75)
+    m_h6 = Inches(5.2)
+
+    months = [
+        ("THÁNG 1: PILOT & CHUẨN HÓA DỮ LIỆU",
+         "Mục tiêu: Đưa vào 1 squad thử nghiệm, chuẩn hóa Rules",
+         COLOR_PRIMARY,
+         [("Tuần 1: Setup & Ground Truth", "Triển khai Antigravity Native Plugin; nạp 10-20 bug production của dự án vào bug_repository.json."),
+          ("Tuần 2: Pilot 1 Squad", "Áp dụng cho 1 squad kiểm thử (2 Tester + 1 BA). Chạy song song AI và thủ công để đối soát."),
+          ("Tuần 3-4: Đánh Giá & Nắn Chỉnh", "Đo lường độ chính xác Semantic Accuracy. Bổ sung các quy tắc nghiệp vụ đặc thù của công ty vào Rules.")]),
+        ("THÁNG 2: MỞ RỘNG TOÀN DỰ ÁN & CI/CD",
+         "Mục tiêu: Đào tạo toàn bộ QA Team & kết nối pipeline",
+         COLOR_ACCENT,
+         [("Tuần 5-6: Workshop Đào Tạo QA", "Hướng dẫn đội ngũ Tester cách review phân tích Pha 1, kiểm duyệt kịch bản Pha 2 và sử dụng Google Sheets."),
+          ("Tuần 7: Tích Hợp Jira / Confluence", "Kết nối tự động kéo User Story từ Jira và đẩy kết quả phân tích ngược lại Ticket."),
+          ("Tuần 8: Tự Động Hóa 50% Test", "Chuyển giao các test case đã tách bước sang Playwright E2E để tự động chạy trên CI/CD.")]),
+        ("THÁNG 3: ĐO LƯỜNG HIỆU QUẢ & TỰ ĐỘNG HÓA",
+         "Mục tiêu: Hoàn thiện quy trình tự động hóa kiểm thử & Giảm 50% Defect",
+         COLOR_SUCCESS,
+         [("Tuần 9-10: Tự Nắn Chỉnh Mô Hình", "Xây dựng cơ chế tự động học từ các lỗi Tester sửa trên Sheets để cập nhật lại bug repository."),
+          ("Tuần 11: Đo Lường Hiệu Quả (ROI)", "Tổng hợp dữ liệu: Rút ngắn thời gian chuẩn bị kịch bản; Số lỗi lọt sang UAT giảm 50%."),
+          ("Tuần 12: Báo Cáo Ban Lãnh Đạo", "Trình bày báo cáo ROI toàn diện và đề xuất mở rộng mô hình cho các dự án khác.")])
     ]
-    for t in texts_2:
-        p_t = tf_c2.add_paragraph()
-        p_t.text = "• " + t
-        p_t.font.size = Pt(10.5)
-        p_t.font.color.rgb = COLOR_TEXT_MAIN
-        p_t.space_after = Pt(8)
 
-    # Card 3: Nâng tầm vai trò QA
-    card3 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (c_w7 + c_gap7)*2, c_top7, c_w7, c_h7)
-    card3.fill.solid()
-    card3.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
-    card3.line.color.rgb = COLOR_PRIMARY
-    card3.line.width = Pt(1.5)
-    tf_c3 = card3.text_frame
-    tf_c3.word_wrap = True
-    p = tf_c3.paragraphs[0]
-    p.text = "🚀 NÂNG TẦM VỊ THẾ CỦA QA"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_PRIMARY_DARK
-    p.space_after = Pt(10)
-    texts_3 = [
-        "QA không còn là 'người gõ test case thủ công' mà trở thành 'AI QA Orchestrator & System Thinker'.",
-        "Giải phóng 60% thời gian cơ bắp để QA tập trung vào Exploratory Testing, Security, Performance và AI Tuning.",
-        "Sẵn sàng dẫn dắt team QA của quý công ty chuyển đổi số thành công bằng các công cụ AI thực chiến."
+    for i, (mtitle, msub, mcol, msteps) in enumerate(months):
+        mbox = s11.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(m_w6 + m_gap6), m_top6, m_w6, m_h6)
+        mbox.fill.solid()
+        mbox.fill.fore_color.rgb = COLOR_WHITE
+        mbox.line.color.rgb = mcol
+        mbox.line.width = Pt(1.5)
+        tf_m = mbox.text_frame
+        tf_m.word_wrap = True
+        
+        p = tf_m.paragraphs[0]
+        p.text = mtitle
+        p.font.size = Pt(11)
+        p.font.bold = True
+        p.font.color.rgb = mcol
+        p.space_after = Pt(2)
+        
+        p_sub = tf_m.add_paragraph()
+        p_sub.text = msub
+        p_sub.font.size = Pt(9)
+        p_sub.font.color.rgb = COLOR_TEXT_MUTED
+        p_sub.space_after = Pt(8)
+        
+        for stitle, sdesc in msteps:
+            p_s = tf_m.add_paragraph()
+            p_s.text = "📌 " + stitle
+            p_s.font.size = Pt(9.5)
+            p_s.font.bold = True
+            p_s.font.color.rgb = COLOR_TEXT_MAIN
+            
+            p_sd = tf_m.add_paragraph()
+            p_sd.text = sdesc
+            p_sd.font.size = Pt(8.5)
+            p_sd.font.color.rgb = COLOR_TEXT_MUTED
+            p_sd.space_after = Pt(6)
+
+    # =========================================================================
+    # SLIDE 12: Q&A & Cam Kết Thực Thi (Light Theme Callout)
+    # =========================================================================
+    s12 = prs.slides.add_slide(blank_layout)
+    add_header(s12, "Cam Kết Thực Thi & Sẵn Sàng Đồng Hành Cùng Doanh Nghiệp",
+               "6. CAM KẾT & KẾT LUẬN",
+               "Tổng kết giá trị cốt lõi và khẳng định tính sẵn sàng triển khai ngay từ ngày đầu tiên nhận việc.")
+
+    p_w7 = Inches(3.7)
+    p_gap7 = Inches(0.3)
+    p_top7 = Inches(1.75)
+    p_h7 = Inches(4.2)
+
+    pillars = [
+        ("🎯 NĂNG LỰC THỰC CHIẾN",
+         "Không chỉ nói lý thuyết suông — Đã xây dựng hoàn chỉnh Plugin, State Machine, Rules, Script và đồng bộ Google Workspace sẵn sàng hoạt động.",
+         COLOR_PRIMARY,
+         ["• Đã kiểm chứng qua 3 bài toán khó (Auth, Kho, Voucher)",
+          "• Hiểu sâu kiến trúc Microservices & Distributed System",
+          "• Tự động hóa E2E từ Spec đến Google Sheets"]),
+        ("🤝 TINH THẦN ĐỒNG HÀNH",
+         "Xem AI là trợ thủ đắc lực nâng tầm con người chứ không phải công cụ thay thế. Giúp đội ngũ QA hiện tại tăng trưởng kỹ năng và năng lực kiểm soát.",
+         COLOR_ACCENT,
+         ["• Đào tạo, chuyển giao tri thức tận tâm cho đồng nghiệp",
+          "• Lắng nghe phản hồi từ BA/PO/Dev để hoàn thiện quy trình",
+          "• Tinh thần trách nhiệm cao nhất với chất lượng release"]),
+        ("📈 CAM KẾT HIỆU QUẢ RÕ RÀNG",
+         "Mang lại giá trị đo đếm được ngay trong tháng đầu tiên và tối ưu hóa chi phí vận hành cho toàn bộ tổ chức.",
+         COLOR_SUCCESS,
+         ["• Rút ngắn thời gian chuẩn bị test suite hoàn chỉnh",
+          "• Độ chính xác dữ liệu kiểm thử đạt >= 92%",
+          "• Giảm 50% lỗi lọt sang môi trường Production"])
     ]
-    for t in texts_3:
-        p_t = tf_c3.add_paragraph()
-        p_t.text = "✔ " + t
-        p_t.font.size = Pt(10.5)
-        p_t.font.bold = True
-        p_t.font.color.rgb = COLOR_TEXT_MAIN
-        p_t.space_after = Pt(8)
 
-    # Bottom Callout on Slide 7
-    callout = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(6.0), Inches(11.7), Inches(1.0))
+    for i, (ptitle, pdesc, pcol, ppoints) in enumerate(pillars):
+        pbox = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(p_w7 + p_gap7), p_top7, p_w7, p_h7)
+        pbox.fill.solid()
+        pbox.fill.fore_color.rgb = COLOR_WHITE
+        pbox.line.color.rgb = pcol
+        pbox.line.width = Pt(1.5)
+        tf_p = pbox.text_frame
+        tf_p.word_wrap = True
+        
+        p = tf_p.paragraphs[0]
+        p.text = ptitle
+        p.font.size = Pt(12)
+        p.font.bold = True
+        p.font.color.rgb = pcol
+        p.space_after = Pt(4)
+        
+        p = tf_p.add_paragraph()
+        p.text = pdesc
+        p.font.size = Pt(9.5)
+        p.font.color.rgb = COLOR_TEXT_MAIN
+        p.space_after = Pt(8)
+
+        for pt in ppoints:
+            p_pt = tf_p.add_paragraph()
+            p_pt.text = pt
+            p_pt.font.size = Pt(9)
+            p_pt.font.color.rgb = COLOR_TEXT_MUTED
+            p_pt.space_after = Pt(3)
+
+    # Light Theme Callout
+    callout = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(6.15), Inches(11.7), Inches(0.85))
     callout.fill.solid()
-    callout.fill.fore_color.rgb = RGBColor(15, 23, 42)
+    callout.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
     callout.line.color.rgb = COLOR_PRIMARY
+    callout.line.width = Pt(1.5)
     tf_call = callout.text_frame
     tf_call.word_wrap = True
+    
     p_c1 = tf_call.paragraphs[0]
-    p_c1.text = "💬 'Mục tiêu của tôi không phải là thay thế QA bằng AI, mà là biến mỗi QA trong team thành một Super QA có năng suất và tầm nhìn gấp 3 lần.'"
-    p_c1.font.size = Pt(12)
+    p_c1.text = "💬 \"Tôi không thay thế tester bằng AI — Tôi biến mỗi tester thành một Super QA có năng lực phân tích sâu, làm chủ công nghệ và kiểm soát chất lượng toàn diện!\""
+    p_c1.font.size = Pt(11)
     p_c1.font.bold = True
-    p_c1.font.color.rgb = COLOR_WHITE
+    p_c1.font.color.rgb = COLOR_PRIMARY_DARK
     p_c1.alignment = PP_ALIGN.CENTER
+    
     p_c2 = tf_call.add_paragraph()
-    p_c2.text = "Sẵn sàng trao đổi chi tiết và thực chiến cùng quý công ty ngay ngày mai!"
-    p_c2.font.size = Pt(11)
-    p_c2.font.color.rgb = RGBColor(148, 163, 184)
+    p_c2.text = "Sẵn sàng cống hiến và đồng hành cùng quý công ty ngay từ tuần đầu tiên 🤝"
+    p_c2.font.size = Pt(10)
+    p_c2.font.color.rgb = COLOR_PRIMARY
     p_c2.alignment = PP_ALIGN.CENTER
 
-    # Save presentation
-    output_path = "/home/linh/code/QA/docs/QA_AI_Assistant_Interview_Presentation.pptx"
-    prs.save(output_path)
-    print(f"Presentation saved successfully to {output_path}")
+    out_interview = os.path.join(current_dir, "QA_AI_Assistant_Interview_Presentation.pptx")
+    out_requirement = os.path.join(current_dir, "QA_Requirement_Assistant_Presentation.pptx")
+    
+    prs.save(out_interview)
+    prs.save(out_requirement)
+    print(f"Presentation saved successfully to:")
+    print(f"  - {out_interview}")
+    print(f"  - {out_requirement}")
 
 if __name__ == "__main__":
     create_deck()

@@ -10,14 +10,19 @@
       --primary-dark: #0958D9;
       --primary-light: #E6F4FF;
       --bg-dark: #0F172A;
+      --bg-slate: #1E293B;
       --bg-card: #FFFFFF;
       --text-main: #1E293B;
       --text-muted: #64748B;
       --border-color: #E2E8F0;
       --success: #16A34A;
+      --success-light: #DCFCE7;
       --danger: #E11D48;
+      --danger-light: #FEE2E2;
       --warning: #D97706;
+      --warning-light: #FEF3C7;
       --accent: #0D9488;
+      --accent-light: #CCFBF1;
     }
 
     * {
@@ -41,12 +46,12 @@
     /* Presentation Container (16:9 Aspect Ratio) */
     .deck-container {
       position: relative;
-      width: 92vw;
-      max-width: 1400px;
+      width: 94vw;
+      max-width: 1440px;
       aspect-ratio: 16 / 9;
       background: #F8FAFC;
       border-radius: 16px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -55,11 +60,11 @@
     .slide {
       position: absolute;
       inset: 0;
-      padding: 40px 56px;
+      padding: 34px 50px 70px 50px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s ease, transform 0.35s ease;
-      transform: translateX(30px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(25px);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -80,45 +85,47 @@
       left: 0;
       right: 0;
       height: 6px;
-      background: linear-gradient(90deg, #1677FF, #0D9488);
+      background: linear-gradient(90deg, #1677FF, #0D9488, #16A34A);
     }
 
     /* Slide Header */
     .slide-badge {
-      display: inline-block;
-      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: var(--primary-light);
       color: var(--primary-dark);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      padding: 4px 14px;
+      padding: 3px 12px;
       border-radius: 20px;
       border: 1px solid rgba(22, 119, 255, 0.3);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      width: fit-content;
     }
 
     .slide-title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--text-main);
-      line-height: 1.25;
-      margin-bottom: 6px;
+      line-height: 1.2;
+      margin-bottom: 4px;
     }
 
     .slide-subtitle {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--text-muted);
-      margin-bottom: 24px;
+      margin-bottom: 18px;
     }
 
-    /* Title Slide (Special Dark Layout) */
+    /* Title Slide (Dark Theme) */
     .slide-dark {
       background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
       color: #FFFFFF;
       justify-content: center;
-      padding: 60px 80px;
+      padding: 40px 60px 70px 60px;
     }
 
     .slide-dark .slide-badge {
@@ -129,215 +136,607 @@
 
     .slide-dark .slide-title {
       color: #FFFFFF;
-      font-size: 38px;
+      font-size: 32px;
       font-weight: 900;
-      line-height: 1.2;
-      margin-bottom: 16px;
+      line-height: 1.25;
+      margin-bottom: 10px;
     }
 
     .slide-dark .slide-subtitle {
       color: #94A3B8;
-      font-size: 18px;
-      margin-bottom: 32px;
-    }
-
-    .candidate-meta {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      font-size: 14px;
-      color: #CBD5E1;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 16px;
       margin-bottom: 24px;
     }
 
-    .target-highlight-box {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1.5px solid var(--primary);
-      border-radius: 12px;
-      padding: 16px 24px;
+    /* Process Flow Pipelines */
+    .process-pipeline {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      align-items: stretch;
+      gap: 8px;
+      width: 100%;
     }
 
-    .target-highlight-box h4 {
-      color: #60A5FA;
-      font-size: 13px;
-      text-transform: uppercase;
+    .process-step {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      transition: transform 0.2s;
+    }
+
+    .process-step:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .process-step.step-primary {
+      border-color: var(--primary);
+      border-top: 4px solid var(--primary);
+    }
+
+    .process-step.step-gate {
+      border-color: var(--danger);
+      border-top: 4px solid var(--danger);
+      background: #FFF5F5;
+      flex: 0.9;
+    }
+
+    .process-step.step-success {
+      border-color: var(--success);
+      border-top: 4px solid var(--success);
+      background: #F0FDF4;
+    }
+
+    .process-step.step-accent {
+      border-color: var(--accent);
+      border-top: 4px solid var(--accent);
+    }
+
+    .step-num {
+      font-size: 10px;
+      font-weight: 800;
       letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .target-highlight-box p {
-      color: #F8FAFC;
-      font-size: 15px;
+    .step-primary .step-num { color: var(--primary-dark); }
+    .step-gate .step-num { color: var(--danger); }
+    .step-success .step-num { color: var(--success); }
+    .step-accent .step-num { color: var(--accent); }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .step-tag {
+      margin-top: auto;
+      padding-top: 6px;
+      font-size: 10.5px;
       font-weight: 600;
+      display: inline-block;
     }
 
-    /* Grids & Cards */
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      flex: 1;
+    .step-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      font-size: 18px;
+      font-weight: bold;
+      user-select: none;
+      padding: 0 2px;
     }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      flex: 1;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
+    /* Multi-Agent Role Diagram (Slide 3) */
+    .role-diagram-wrapper {
       display: flex;
       flex-direction: column;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      gap: 10px;
+      flex: 1;
     }
 
-    .card.highlight {
-      background: var(--primary-light);
-      border: 1.5px solid var(--primary);
+    .orchestrator-banner {
+      background: #EFF6FF;
+      border: 1.5px solid #3B82F6;
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
 
-    .card-header {
-      font-size: 14px;
+    .orch-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 12.5px;
+      color: #1E40AF;
+      white-space: nowrap;
+    }
+
+    .orch-items {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: #1E293B;
+    }
+
+    .orch-pill {
+      background: #FFFFFF;
+      border: 1px solid #BFDBFE;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #1D4ED8;
+    }
+
+    .role-columns-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1.15fr 1.3fr;
+      gap: 10px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .role-box {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    .role-box.role-analyst {
+      border-top: 4px solid #6366F1;
+      border-color: #C7D2FE;
+      background: #F8FAFF;
+    }
+
+    .role-box.role-gate {
+      border-top: 4px solid var(--danger);
+      border-color: #FECACA;
+      background: #FFF8F8;
+    }
+
+    .role-box.role-architect {
+      border-top: 4px solid var(--accent);
+      border-color: #99F6E4;
+      background: #F0FDFB;
+    }
+
+    .role-box.role-storage {
+      border-top: 4px solid var(--success);
+      border-color: #BBF7D0;
+      background: #F0FDF4;
+    }
+
+    .role-tag {
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-bottom: 2px;
+    }
+
+    .role-analyst .role-tag { background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE; }
+    .role-gate .role-tag { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+    .role-architect .role-tag { background: #CCFBF1; color: #0F766E; border: 1px solid #99F6E4; }
+    .role-storage .role-tag { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+
+    .role-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+    }
+
+    .role-sub-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 10.5px;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    /* Comparison Flows (Slide 2) */
+    .compare-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .compare-row {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 14px 18px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .compare-row.fail {
+      border-left: 5px solid var(--danger);
+      background: #FFFDFD;
+    }
+
+    .compare-row.pass {
+      border-left: 5px solid var(--success);
+      background: #F8FFF9;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.08);
+    }
+
+    .compare-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .compare-title {
+      font-size: 13px;
       font-weight: 700;
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     }
 
-    .card-header.danger { color: var(--danger); }
-    .card-header.warning { color: var(--warning); }
-    .card-header.primary { color: var(--primary-dark); }
-    .card-header.accent { color: var(--accent); }
-    .card-header.success { color: var(--success); }
+    .compare-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-    .bullet-list {
-      list-style: none;
+    .flow-pill {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      position: relative;
+    }
+
+    .flow-pill.red {
+      border-color: #FECACA;
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    .flow-pill.green {
+      border-color: #BBF7D0;
+      background: #F0FDF4;
+      color: #166534;
+    }
+
+    .flow-pill-title {
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+
+    .flow-pill-sub {
+      font-size: 10px;
+      color: #64748B;
+    }
+
+    /* 3-Tier Deep Verification Stack (Slide 4) */
+    .tier-stack {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      font-size: 13px;
-      line-height: 1.5;
+      flex: 1.2;
     }
 
-    .bullet-list li {
+    .tier-box {
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1.5px solid var(--border-color);
+      background: #FFFFFF;
       position: relative;
-      padding-left: 18px;
-      color: #334155;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
 
-    .bullet-list li::before {
-      content: '•';
-      position: absolute;
-      left: 0;
-      color: var(--primary);
-      font-weight: bold;
-      font-size: 16px;
-      line-height: 1;
+    .tier-box.tier-ui {
+      border-left: 6px solid var(--primary);
+      background: #F0F7FF;
     }
 
-    .bullet-list.danger li::before { color: var(--danger); }
-    .bullet-list.warning li::before { color: var(--warning); }
-    .bullet-list.success li::before { content: '✔'; font-size: 12px; color: var(--success); }
+    .tier-box.tier-api {
+      border-left: 6px solid var(--accent);
+      background: #F0FDFA;
+    }
 
-    /* KPI Metric Bar */
-    .kpi-row {
+    .tier-box.tier-db {
+      border-left: 6px solid #4338CA;
+      background: #EEF2FF;
+    }
+
+    .tier-badge {
+      width: 110px;
+      font-weight: 800;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tier-ui .tier-badge { color: var(--primary-dark); }
+    .tier-api .tier-badge { color: var(--accent); }
+    .tier-db .tier-badge { color: #4338CA; }
+
+    .tier-content {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .tier-example {
+      background: #FFFFFF;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 10.5px;
+      border: 1px solid var(--border-color);
+      color: #0F172A;
+      max-width: 320px;
+    }
+
+    /* 3 Case Study Cards (Slide 5) */
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .case-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+    .case-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid #F1F5F9;
+    }
+
+    .case-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .flow-node {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .flow-icon {
+      font-size: 12px;
+      width: 18px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    /* Timeline & Roadmap (Slide 6) */
+    .roadmap-pipeline {
+      display: flex;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .roadmap-stage {
+      flex: 1;
+      background: #FFFFFF;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+    }
+
+    .roadmap-stage.stage-1 { border-top: 5px solid var(--primary); }
+    .roadmap-stage.stage-2 { border-top: 5px solid var(--accent); }
+    .roadmap-stage.stage-3 {
+      border-top: 5px solid var(--success);
+      background: #FAFDFB;
+      border-color: #86EFAC;
+    }
+
+    .stage-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .stage-month {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stage-1 .stage-month { color: var(--primary); }
+    .stage-2 .stage-month { color: var(--accent); }
+    .stage-3 .stage-month { color: var(--success); }
+
+    .stage-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .stage-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .stage-kpi {
+      margin-top: auto;
+      background: #F0FDF4;
+      border: 1.5px solid #BBF7D0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11.5px;
+      color: #166534;
+      line-height: 1.45;
+    }
+
+    /* Transformation & Shift (Slide 7) */
+    .shift-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .shift-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .shift-label {
+      width: 140px;
+      font-weight: 700;
+      font-size: 12.5px;
+      color: var(--text-main);
+    }
+
+    .shift-bar {
+      flex: 1;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-align: center;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .bar-seg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      white-space: nowrap;
+      transition: flex 0.3s ease;
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .kpi-box {
+    .metric-card {
       background: #FFFFFF;
       border: 1px solid var(--border-color);
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       text-align: center;
-      border-top: 4px solid var(--primary);
+      border-top: 3.5px solid var(--primary);
     }
 
-    .kpi-box.green { border-top-color: var(--success); }
-    .kpi-box.red { border-top-color: var(--danger); }
-    .kpi-box.teal { border-top-color: var(--accent); }
+    .metric-card.green { border-top-color: var(--success); }
+    .metric-card.teal { border-top-color: var(--accent); }
+    .metric-card.red { border-top-color: var(--danger); }
 
-    .kpi-title {
-      font-size: 11px;
+    .metric-num {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin: 2px 0;
+    }
+
+    .metric-title {
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .kpi-value {
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--text-main);
-      margin: 4px 0;
+    .metric-desc {
+      font-size: 10px;
+      color: #64748B;
     }
 
-    .kpi-sub {
-      font-size: 11px;
-      color: #475569;
-    }
-
-    /* Comparison Table */
-    .table-container {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      background: #FFFFFF;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .table-container th {
-      background: var(--primary);
-      color: #FFFFFF;
-      padding: 10px 14px;
-      font-weight: 700;
-      text-align: left;
-    }
-
-    .table-container td {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-color);
-      vertical-align: top;
-      line-height: 1.45;
-    }
-
-    .table-container tr:last-child td {
-      border-bottom: none;
-    }
-
-    .table-container td:first-child {
-      font-weight: 700;
-      background: #F8FAFC;
-      color: var(--primary-dark);
-      width: 18%;
-    }
-
-    /* Footer Controls */
+    /* Deck Footer Controls */
     .deck-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 32px;
+      padding: 0 32px;
       background: #FFFFFF;
       border-top: 1px solid var(--border-color);
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-muted);
       z-index: 10;
     }
@@ -380,249 +779,463 @@
 
   <div class="deck-container">
 
-    <!-- SLIDE 1: Title -->
+    <!-- =====================================================================
+         SLIDE 1: Title & End-to-End System Diagram
+         ===================================================================== -->
     <div class="slide slide-dark active" id="slide-1">
-      <div class="slide-badge">CHIẾN LƯỢC ỨNG DỤNG AI TRONG QA (AI-DRIVEN QA LEAD)</div>
-      <h1 class="slide-title">Tối Ưu Năng Suất (Effort) & Đảm Bảo Tính Đúng Đắn<br>Bộ Dữ Liệu QA Bằng Tác Tử AI Trong 3 Tháng</h1>
+      <div class="slide-badge">CHIẾN LƯỢC ỨNG DỤNG AI TRONG KIỂM THỬ PHẦN MỀM (AI-DRIVEN QA LEAD)</div>
+      <h1 class="slide-title">Tối Ưu Năng Suất (Effort) & Đảm Bảo Tính Đúng Đắn Dữ Liệu QA<br>Bằng Hệ Tác Tử Thông Minh Trong 3 Tháng</h1>
       <p class="slide-subtitle">Mô hình thực chiến: Antigravity Native Plugin • 2-Phase State Machine • 3 Tầng Kiểm Chứng Sâu</p>
       
-      <div class="candidate-meta">
-        <div><strong>Ứng viên:</strong> Vũ Thị Mai Linh</div>
-        <div><strong>Vị trí:</strong> AI QA Specialist / Senior QA Engineer</div>
-        <div><strong>Thời gian:</strong> Tháng 10/2026</div>
+      <!-- Sơ đồ quy trình tổng quan (Diagram) -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1.5px solid #334155; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;">
+        <div style="font-size: 11px; font-weight: 800; color: #60A5FA; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+          🗺️ SƠ ĐỒ ĐƯỜNG ỐNG VẬN HÀNH TỔNG QUAN (END-TO-END PIPELINE)
+        </div>
+        <div class="process-pipeline" style="gap: 10px;">
+          <div class="process-step" style="background:#1E293B; border-color:#3B82F6; color:#FFF;">
+            <div class="step-num" style="color:#60A5FA;">BƯỚC 1: ĐẦU VÀO</div>
+            <div class="step-title" style="color:#FFF;">Requirement Thô</div>
+            <div class="step-desc" style="color:#94A3B8;">User Story, BA Spec hoặc API Docs chưa rõ nét.</div>
+          </div>
+          <div class="step-arrow" style="color:#3B82F6;">➔</div>
+          <div class="process-step" style="background:#1E293B; border-color:#0D9488; color:#FFF;">
+            <div class="step-num" style="color:#2DD4BF;">BƯỚC 2: AI MULTI-AGENT</div>
+            <div class="step-title" style="color:#FFF;">Phân Tích & Đối Chiếu</div>
+            <div class="step-desc" style="color:#94A3B8;">Bóc tách Rule, quét 5 rủi ro kỹ thuật & gắn 10 bug lịch sử.</div>
+          </div>
+          <div class="step-arrow" style="color:#2DD4BF;">➔</div>
+          <div class="process-step" style="background:#31151B; border-color:#F43F5E; color:#FFF;">
+            <div class="step-num" style="color:#FDA4AF;">BƯỚC 3: HUMAN GATES</div>
+            <div class="step-title" style="color:#FFF;">Tester Kiểm Duyệt</div>
+            <div class="step-desc" style="color:#FCA5A5;">Chốt logic, hỏi BA phản biện. Ngăn chặn 100% ảo giác.</div>
+          </div>
+          <div class="step-arrow" style="color:#F43F5E;">➔</div>
+          <div class="process-step" style="background:#142D21; border-color:#22C55E; color:#FFF;">
+            <div class="step-num" style="color:#86EFAC;">BƯỚC 4: ĐẦU RA CHUẨN</div>
+            <div class="step-title" style="color:#FFF;">3 Tầng Kiểm Chứng</div>
+            <div class="step-desc" style="color:#BBF7D0;">UI + API Body + DB/Event. Tự động sync Google Sheets.</div>
+          </div>
+        </div>
       </div>
 
-      <div class="target-highlight-box">
-        <h4>🎯 MỤC TIÊU 90 NGÀY CAM KẾT VỚI DOANH NGHIỆP</h4>
-        <p>1. Nâng Effort (Throughput) Team lên gấp 2.5x  •  2. Độ Chính Xác (Accuracy/Ground Truth) Bộ Dữ Liệu Đầu Ra ≥ 92%  •  3. Giảm 50% Defect Lọt Sang Dev/Prod</p>
+      <!-- 3 Cam kết cốt lõi -->
+      <div style="display: flex; gap: 16px;">
+        <div style="flex:1; background:rgba(30,41,59,0.8); border:1px solid #334155; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:24px;">🚀</div>
+          <div>
+            <div style="font-size:11px; color:#94A3B8; text-transform:uppercase; font-weight:700;">Năng Suất (Effort)</div>
+            <div style="font-size:15px; font-weight:800; color:#60A5FA;">Nâng gấp 2.5x</div>
+          </div>
+        </div>
+        <div style="flex:1; background:rgba(30,41,59,0.8); border:1px solid #334155; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:24px;">🎯</div>
+          <div>
+            <div style="font-size:11px; color:#94A3B8; text-transform:uppercase; font-weight:700;">Độ Chính Xác Dữ Liệu</div>
+            <div style="font-size:15px; font-weight:800; color:#4ADE80;">Đạt ≥ 92% Chuẩn Logic</div>
+          </div>
+        </div>
+        <div style="flex:1; background:rgba(30,41,59,0.8); border:1px solid #334155; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:24px;">🛡️</div>
+          <div>
+            <div style="font-size:11px; color:#94A3B8; text-transform:uppercase; font-weight:700;">Chất Lượng Release</div>
+            <div style="font-size:15px; font-weight:800; color:#FBBF24;">Giảm 50% Defect Dev/Prod</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- SLIDE 2: Problem & Context -->
+    <!-- =====================================================================
+         SLIDE 2: Problem & Comparative Process Flows
+         ===================================================================== -->
     <div class="slide" id="slide-2">
-      <div class="slide-badge">1. Problem & Opportunity</div>
-      <h2 class="slide-title">Bối Cảnh & Bài Toán Cốt Lõi: Năng Suất (Effort) vs. Độ Đúng Sai Dữ Liệu</h2>
-      <p class="slide-subtitle">Vì sao các giải pháp AI Test Case ngây thơ đều thất bại và giải pháp thực chiến của chúng ta là gì?</p>
+      <div class="slide-badge">1. Bối Cảnh & Bài Toán Cốt Lõi</div>
+      <h2 class="slide-title">Đối Chiếu Quá Trình: AI Ngây Thơ (Thất Bại) vs. Agentic QA (Thực Chiến)</h2>
+      <p class="slide-subtitle">Vì sao prompt tự do luôn tạo ra rác dữ liệu và giải pháp quy trình có kỷ luật giải quyết triệt để ra sao?</p>
 
-      <div class="grid-3">
-        <div class="card">
-          <div class="card-header danger">🚨 NỖI ĐAU EFFORT HIỆN TẠI</div>
-          <ul class="bullet-list danger">
-            <li><strong>60-70% thời gian QA</strong> bị chôn vào việc đọc requirement mập mờ và gõ test case thủ công lặp lại.</li>
-            <li><strong>Năng suất thấp:</strong> Trung bình 1 QA chỉ phân tích được 2-3 User Stories phức tạp mỗi sprint.</li>
-            <li><strong>Thiếu chiều sâu kỹ thuật:</strong> Bỏ sót các lỗi rủi ro kiến trúc cao (Race Condition, State Drift, Timeout).</li>
-            <li><strong>Tắc nghẽn bàn giao:</strong> Dev chờ Test Case, QA chờ BA chốt yêu cầu, kéo dài lead-time release.</li>
-          </ul>
+      <div class="compare-container">
+        <!-- Quá trình AI Ngây Thơ (Fail Loop) -->
+        <div class="compare-row fail">
+          <div class="compare-header">
+            <div class="compare-title" style="color:var(--danger)">
+              <span>❌ QUÁ TRÌNH 1: DÙNG AI NGÂY THƠ / PROMPT CHATGPT TỰ DO (VÒNG LẶP THẤT BẠI)</span>
+            </div>
+            <span style="font-size:11px; font-weight:700; color:var(--danger); background:#FEE2E2; padding:2px 8px; border-radius:4px;">
+              HẬU QUẢ: TỐN THÊM CÔNG SỨC SỬA LỖI
+            </span>
+          </div>
+          <div class="compare-pills">
+            <div class="flow-pill red">
+              <span class="flow-pill-title">1. Spec Sơ Sài</span>
+              <span class="flow-pill-sub">Gõ prompt tự do không có context</span>
+            </div>
+            <div class="step-arrow" style="color:var(--danger)">➔</div>
+            <div class="flow-pill red">
+              <span class="flow-pill-title">2. AI Ảo Giác</span>
+              <span class="flow-pill-sub">Tự bịa endpoint & rule nghiệp vụ</span>
+            </div>
+            <div class="step-arrow" style="color:var(--danger)">➔</div>
+            <div class="flow-pill red">
+              <span class="flow-pill-title">3. Gom Cụm Bước</span>
+              <span class="flow-pill-sub">Dồn chọn món + checkout vào 1 dòng</span>
+            </div>
+            <div class="step-arrow" style="color:var(--danger)">➔</div>
+            <div class="flow-pill red">
+              <span class="flow-pill-title">4. Verify Hời Hợt</span>
+              <span class="flow-pill-sub">Chỉ ghi "HTTP 200", thiếu API & DB</span>
+            </div>
+            <div class="step-arrow" style="color:var(--danger)">➔</div>
+            <div class="flow-pill red" style="background:#FEE2E2; border-color:#EF4444;">
+              <span class="flow-pill-title" style="color:#7F1D1D;">💥 Rác Dữ Liệu</span>
+              <span class="flow-pill-sub">Automation không dùng được</span>
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header warning">⚠️ BẪY 'ẢO GIÁC' CỦA AI THƯỜNG</div>
-          <ul class="bullet-list warning">
-            <li><strong>Garbage In - Garbage Out:</strong> Requirement mập mờ khiến AI sinh test case sai hoàn toàn với nghiệp vụ.</li>
-            <li><strong>Ảo giác (Hallucination):</strong> Tự bịa API endpoint, tự suy diễn logic trái với quy tắc thực tế của cty.</li>
-            <li><strong>Gộp cụm hành động (Bundling):</strong> Dồn chọn số lượng + checkout vào 1 bước, dev automation không dùng được.</li>
-            <li><strong>Kỳ vọng sơ sài:</strong> Chỉ ghi "Verify HTTP 200" mà không có JSON Body hay thay đổi dữ liệu Database.</li>
-          </ul>
+        <!-- Quá trình Agentic QA (Success Loop) -->
+        <div class="compare-row pass">
+          <div class="compare-header">
+            <div class="compare-title" style="color:var(--success)">
+              <span>✔ QUÁ TRÌNH 2: HỆ TÁC TỬ ANTIGRAVITY 2-PHASE & CHỐT CHẶN KIỂM SOÁT (THỰC CHIẾN)</span>
+            </div>
+            <span style="font-size:11px; font-weight:700; color:var(--success); background:#DCFCE7; padding:2px 8px; border-radius:4px;">
+              KẾT QUẢ: DỮ LIỆU SẠCH - NÂNG EFFORT 2.5X
+            </span>
+          </div>
+          <div class="compare-pills">
+            <div class="flow-pill green">
+              <span class="flow-pill-title">1. Bóc Tách 4 Yếu Tố</span>
+              <span class="flow-pill-sub">Rule • Boundary • Exception • Flow</span>
+            </div>
+            <div class="step-arrow" style="color:var(--success)">➔</div>
+            <div class="flow-pill green">
+              <span class="flow-pill-title">2. Quét 5 Rủi Ro Sâu</span>
+              <span class="flow-pill-sub">Concurrency, State Drift, Idempotency</span>
+            </div>
+            <div class="step-arrow" style="color:var(--success)">➔</div>
+            <div class="flow-pill green" style="background:#EFF6FF; border-color:#93C5FD; color:#1E40AF;">
+              <span class="flow-pill-title">3. Chốt Human Gate</span>
+              <span class="flow-pill-sub">Tester duyệt logic trước khi sinh test</span>
+            </div>
+            <div class="step-arrow" style="color:var(--success)">➔</div>
+            <div class="flow-pill green">
+              <span class="flow-pill-title">4. Tách Bước Độc Lập</span>
+              <span class="flow-pill-sub">Phân rã chuẩn Pre-condition & Action</span>
+            </div>
+            <div class="step-arrow" style="color:var(--success)">➔</div>
+            <div class="flow-pill green" style="background:#DCFCE7; border-color:#22C55E;">
+              <span class="flow-pill-title" style="color:#14532D;">✨ Verify 3 Tầng</span>
+              <span class="flow-pill-sub">UI + API Body + DB & Event sẵn sàng</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="card highlight">
-          <div class="card-header primary">✨ GIẢI PHÁP ĐỘT PHÁ CỦA REPO</div>
-          <ul class="bullet-list success">
-            <li><strong>Strict 2-Phase State Machine:</strong> Bắt buộc dừng ở Human Gate 1 để chốt logic trước khi sinh test.</li>
-            <li><strong>3 Nguyên Tắc Vàng QA/QC:</strong> Step Disaggregation + Kiểm chứng sâu 3 tầng (UI/API Body/DB State).</li>
-            <li><strong>Grounding Kho Bug Lịch Sử:</strong> Đối chiếu 10 Bug Production Patterns làm tri thức chuẩn hóa.</li>
-            <li><strong>Local-First & Drive Sync:</strong> Lưu trữ tích lũy (Append-Only) và đẩy lên Google Sheets thời gian thực.</li>
-          </ul>
-        </div>
+      <!-- Callout kết luận ngắn -->
+      <div style="margin-top:14px; background:#F1F5F9; border-radius:8px; padding:10px 16px; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--text-main);">
+        <div><strong>💡 Triết lý cốt lõi:</strong> Không dùng AI để sinh rác nhanh hơn — Dùng AI có kỷ luật điều phối để giải phóng 60% thời gian thủ công cho QA!</div>
+        <span style="font-weight:700; color:var(--primary);">Strict State Machine • 0 Hallucination</span>
       </div>
     </div>
 
-    <!-- SLIDE 3: Architecture -->
+    <!-- =====================================================================
+         SLIDE 3: Architecture & 2-Phase State Machine Diagram
+         ===================================================================== -->
     <div class="slide" id="slide-3">
-      <div class="slide-badge">2. Architecture & Design</div>
-      <h2 class="slide-title">Kiến Trúc Tác Tử: 2-Phase State Machine & Human Gates</h2>
-      <p class="slide-subtitle">Hệ thống Native Customization Plugin không cần backend CRUD - Tự điều phối qua Subagents & Rules.</p>
+      <div class="slide-badge">2. Kiến Trúc Tác Tử & Điều Phối</div>
+      <h2 class="slide-title">Sơ Đồ Quy Trình 2-Phase State Machine, 2 Human Gates & Cloud Sync</h2>
+      <p class="slide-subtitle">Phân định rõ 6 chặng vận hành: Pre-flight Cache -> Pha 1 Phân tích -> Human Gate 1 -> Pha 2 Test Design -> Human Gate 2 -> Pha 3 Sync.</p>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header primary">🔄 QUY TRÌNH ĐIỀU PHỐI 2 PHA NGHIÊM NGẶT</div>
-          <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
-            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
-              <strong>BƯỚC 0: PRE-FLIGHT CACHE VALIDATION</strong><br>
-              <span style="color:var(--text-muted)">Kiểm tra Drive modifiedTime vs .sync_metadata.json. Tự động fallback Offline khi mất mạng.</span>
-            </div>
-            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
-              <strong>PHASE 1: STATIC ANALYSIS (req-risk-analyst)</strong><br>
-              <span style="color:var(--text-muted)">Bóc tách 4 thành tố Business Rules • Hỏi phản biện BA • Quét 5 rủi ro kỹ thuật • Đối chiếu 10 Bug lịch sử.</span>
-            </div>
-            <div style="background:#FEE2E2; padding:8px 12px; border-radius:6px; border-left:3px solid var(--danger);">
-              <strong style="color:var(--danger)">🛑 HUMAN GATE 1 (CỔNG KIỂM DUYỆT 1)</strong><br>
-              <span style="color:#7F1D1D">DỪNG LẠI! Tester duyệt & tinh chỉnh logic. Tự động Rollback nếu requirement thay đổi.</span>
-            </div>
-            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
-              <strong>PHASE 2: TEST SPECIFICATION (test-automation-architect)</strong><br>
-              <span style="color:var(--text-muted)">Sinh 5 kịch bản chuẩn: Happy Path, Boundary, Negative, Concurrency (≤50ms), State Conflict & Recovery.</span>
-            </div>
-            <div style="background:#DCFCE7; padding:8px 12px; border-radius:6px; border-left:3px solid var(--success);">
-              <strong style="color:var(--success)">🛑 HUMAN GATE 2 & LOCAL-FIRST CLOUD SYNC</strong><br>
-              <span style="color:#14532D">Tester duyệt kịch bản -> Append JSON local -> Đẩy lên Google Sheets Master bằng MCP.</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header accent">🤖 PHÂN QUYỀN TÁC TỬ & BỘ NHỚ GÓC NHÌN</div>
-          <ul class="bullet-list" style="gap:14px; font-size:12.5px;">
-            <li><strong>Subagent 1: req-risk-analyst:</strong> Đảm nhiệm Static Analysis. Tham chiếu <code>risk-checklist.md</code> quét 5 góc khuất: Concurrency, State Drift, Clock Drift, Non-Idempotency, Distributed Transaction Failure.</li>
-            <li><strong>Subagent 2: test-automation-architect:</strong> Chỉ kích hoạt khi Phase 1 đã duyệt. Áp dụng <code>test-design-matrix.md</code> để xếp hạng P1/P2/P3 và mô tả chi tiết bước giả lập 3 tầng.</li>
-            <li><strong>Bộ nhớ góc nhìn (user_preferences.json):</strong> Hỗ trợ 3 góc nhìn: <em>business</em> (nghiệp vụ đời sống cho BA), <em>technical</em> (kiến trúc SDET chuyên sâu), <em>hybrid</em>. Tự động ghi nhớ xuyên suốt.</li>
-            <li><strong>Progressive Disclosure tối ưu Context:</strong> Đưa cẩm nang kỹ thuật vào thư mục <code>references/</code>, nạp khi cần thay vì nhồi nhét vào prompt chính làm loãng context.</li>
-          </ul>
-        </div>
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:4px 0;">
+        <img src="state_machine_diagram.svg" alt="Sơ Đồ Quy Trình 2-Phase State Machine & Điều Phối Tác Tử" style="width:100%; height:auto; max-height:100%; object-fit:contain; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.06); border:1px solid var(--border-color);"/>
       </div>
     </div>
 
-    <!-- SLIDE 4: Data Quality & Evaluation -->
+    <!-- =====================================================================
+         SLIDE 4: Data Accuracy & 3-Tier Deep Verification Stack
+         ===================================================================== -->
     <div class="slide" id="slide-4">
-      <div class="slide-badge">3. Quality & Accuracy Assurance</div>
-      <h2 class="slide-title">Khung Đánh Giá & Kiểm Định Độ Đúng Sai Dữ Liệu Đầu Ra</h2>
-      <p class="slide-subtitle">Làm thế nào để đo lường, kiểm soát ảo giác và đảm bảo dữ liệu sinh ra đạt chuẩn kiểm thử thực tế?</p>
+      <div class="slide-badge">3. Đảm Bảo Tính Đúng Đắn Của Dữ Liệu</div>
+      <h2 class="slide-title">Khung Đánh Giá & Quy Trình Kiểm Chứng Sâu 3 Tầng</h2>
+      <p class="slide-subtitle">Giải pháp kỹ thuật để xóa bỏ hoàn toàn tình trạng test case hời hợt "Verify HTTP 200" và đảm bảo độ chính xác ≥92%.</p>
 
-      <div class="kpi-row">
-        <div class="kpi-box">
-          <div class="kpi-title">Semantic Accuracy</div>
-          <div class="kpi-value" style="color:var(--primary)">≥ 92%</div>
-          <div class="kpi-sub">Tính đúng đắn logic & nghiệp vụ</div>
+      <!-- 4 Chỉ số KPI chất lượng đầu ra -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-title">Semantic Accuracy</div>
+          <div class="metric-num" style="color:var(--primary);">≥ 92%</div>
+          <div class="metric-desc">Đúng đắn quy tắc nghiệp vụ</div>
         </div>
-        <div class="kpi-box green">
-          <div class="kpi-title">Schema Validity</div>
-          <div class="kpi-value" style="color:var(--success)">100%</div>
-          <div class="kpi-sub">Chuẩn 3 tầng UI/API Body/DB</div>
+        <div class="metric-card green">
+          <div class="metric-title">Schema Validity</div>
+          <div class="metric-num" style="color:var(--success);">100%</div>
+          <div class="metric-desc">Bắt buộc đủ 3 tầng UI/API/DB</div>
         </div>
-        <div class="kpi-box teal">
-          <div class="kpi-title">Risk Coverage</div>
-          <div class="kpi-value" style="color:var(--accent)">100%</div>
-          <div class="kpi-sub">Bao phủ 5 nhóm kịch bản & 5 góc khuất</div>
+        <div class="metric-card teal">
+          <div class="metric-title">Risk Coverage</div>
+          <div class="metric-num" style="color:var(--accent);">100%</div>
+          <div class="metric-desc">Bao phủ 5 loại kịch bản ma trận</div>
         </div>
-        <div class="kpi-box red">
-          <div class="kpi-title">Hallucination Rate</div>
-          <div class="kpi-value" style="color:var(--danger)">&lt; 5%</div>
-          <div class="kpi-sub">Tỷ lệ suy diễn sai lệch requirement</div>
+        <div class="metric-card red">
+          <div class="metric-title">Hallucination Rate</div>
+          <div class="metric-num" style="color:var(--danger);">&lt; 5%</div>
+          <div class="metric-desc">Khống chế sai lệch so với spec</div>
         </div>
       </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header primary">💎 3 NGUYÊN TẮC VÀNG CHUẨN QA/QC THỰC CHIẾN</div>
-          <ul class="bullet-list" style="gap:10px; font-size:12.5px;">
-            <li><strong>1. Step Disaggregation (Tách bước độc lập):</strong> Tách biệt bước nhập liệu chuẩn bị và bước bấm gửi request. Đưa tiền đề vào Pre-conditions để Automation chạy ổn định.</li>
-            <li><strong>2. Synchronized Deep Verification (Kiểm chứng 3 tầng):</strong><br>
-              • <em>UI:</em> Thông báo, viền cảnh báo, ID hiển thị.<br>
-              • <em>API:</em> HTTP Status Code + trường cụ thể trong JSON Body (vd: <code>order_id</code> khớp UI).<br>
-              • <em>DB & Event:</em> Tên bảng, tên cột, giá trị biến động và Kafka Event phát ra.</li>
-            <li><strong>3. Cột Trạng thái kiểm thử (Status):</strong> Mặc định <code>NOT_RUN</code>, hỗ trợ dropdown PASS/FAIL/BLOCKED kèm màu sắc trực quan.</li>
-          </ul>
+      <!-- Sơ đồ Kiến trúc 3 Tầng Kiểm Chứng (3-Tier Stack Diagram) -->
+      <div style="display:flex; gap:16px; flex:1;">
+        <!-- Left: Tháp 3 tầng -->
+        <div class="tier-stack">
+          <!-- Tầng 1: UI -->
+          <div class="tier-box tier-ui">
+            <div class="tier-badge">🖥️ TẦNG 1: UI / CLIENT</div>
+            <div class="tier-content">
+              <strong>Trải nghiệm người dùng & Giao diện:</strong><br>
+              Toast notification, viền highlight đỏ/xanh, trạng thái button bị vô hiệu hóa, mã đơn hàng hiển thị.
+            </div>
+            <div class="tier-example">
+              UI Alert: "Tài khoản bị tạm khóa"<br>
+              Border: #EF4444 (Red Alert)
+            </div>
+          </div>
+
+          <!-- Tầng 2: API -->
+          <div class="tier-box tier-api">
+            <div class="tier-badge">⚙️ TẦNG 2: API GATEWAY</div>
+            <div class="tier-content">
+              <strong>HTTP Protocol & JSON Response Body:</strong><br>
+              Status code + Schema trường dữ liệu cụ thể (ví dụ: <code>order_id</code>, <code>errorCode</code>, <code>lockUntil</code>).
+            </div>
+            <div class="tier-example">
+              HTTP 423 Locked<br>
+              {"error": "ERR_LOCKED", "retry": 300}
+            </div>
+          </div>
+
+          <!-- Tầng 3: DB -->
+          <div class="tier-box tier-db">
+            <div class="tier-badge">🗄️ TẦNG 3: DB & BROKER</div>
+            <div class="tier-content">
+              <strong>Trạng thái Dữ liệu Thực & Message Bus:</strong><br>
+              Bảng, Cột, Giá trị cập nhật thực tế trong DB + Sự kiện Kafka / Event Queue phát ra cho microservices.
+            </div>
+            <div class="tier-example">
+              accounts.is_locked = TRUE<br>
+              Kafka: AccountLockedEvent
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header accent">🛡️ CƠ CHẾ ĐẢM BẢO CHẤT LƯỢNG DỮ LIỆU ĐẦU RA</div>
-          <ul class="bullet-list" style="gap:10px; font-size:12.5px;">
-            <li><strong>Anchor bằng Kho Bug Lịch Sử (Ground Truth):</strong> Agent bắt buộc đối chiếu với 10 Bug Production Patterns (BUG-001 đến BUG-010), buộc AI bám sát lỗi thực tế thay vì suy diễn.</li>
-            <li><strong>Syntactic & Schema Validator:</strong> Kịch bản thiếu bảng DB hoặc thiếu trường API body đều bị từ chối trước khi hiển thị cho Tester.</li>
-            <li><strong>Human-in-the-Loop Feedback Loop:</strong> Tester là chốt chặn cuối cùng phê duyệt logic ở Phase 1 trước khi sang Phase 2.</li>
-            <li><strong>Traceability Xuyên Suốt:</strong> Khóa <code>requirement_id</code> liên kết chặt chẽ giữa bảng Phân tích và bảng Test Case trên Google Sheets.</li>
-          </ul>
+        <!-- Right: Vòng lặp Kiểm định Chất lượng (Quality Control Loop) -->
+        <div style="flex:1; background:#FFFFFF; border:1px solid var(--border-color); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:12px; font-weight:700; color:var(--text-main); border-bottom:1px solid #F1F5F9; padding-bottom:6px;">
+            🛡️ VÒNG LẶP KIỂM SOÁT TÍNH ĐÚNG ĐẮN (QC LOOP)
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap:8px; font-size:11.5px;">
+            <div style="background:#F8FAFC; padding:8px 10px; border-radius:6px; border-left:3px solid var(--primary);">
+              <strong>1. Ground Truth Anchoring:</strong> Đối chiếu với 10 Bug Production chuẩn hóa (`BUG-001` đến `BUG-010`) để ép AI bám sát dữ liệu lịch sử thay vì tự tưởng tượng.
+            </div>
+            <div style="background:#F8FAFC; padding:8px 10px; border-radius:6px; border-left:3px solid var(--accent);">
+              <strong>2. Step Disaggregation:</strong> Tách biệt tuyệt đối thao tác nhập liệu và hành động gửi request. Mọi tiền đề dữ liệu chuyển vào <code>Pre-conditions</code>.
+            </div>
+            <div style="background:#F8FAFC; padding:8px 10px; border-radius:6px; border-left:3px solid var(--success);">
+              <strong>3. Traceability Toàn Diện:</strong> Gắn <code>requirement_id</code> xuyên suốt từ khâu phân tích sang từng dòng test case trên Google Sheets Master.
+            </div>
+            <div style="background:#F8FAFC; padding:8px 10px; border-radius:6px; border-left:3px solid #6366F1;">
+              <strong>4. Data Validation Dropdown:</strong> Cột trạng thái kiểm thử có sẵn menu chọn nhanh (PASS, FAIL, BLOCKED, NOT_RUN) kèm tô màu tự động.
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 5: Proof Points -->
+    <!-- =====================================================================
+         SLIDE 5: Proof Points & Self-Correction Process Diagram
+         ===================================================================== -->
     <div class="slide" id="slide-5">
-      <div class="slide-badge">4. Experimental Proof Points</div>
-      <h2 class="slide-title">Minh Chứng Thực Nghiệm: Bắt Lỗ Hổng & Tự Nắn Chỉnh Thực Tế</h2>
-      <p class="slide-subtitle">Bằng chứng cụ thể từ Repo: Những điểm làm tốt, sai sót ban đầu được phát hiện và nắn chỉnh ra sao.</p>
+      <div class="slide-badge">4. Minh Chứng Thực Nghiệm</div>
+      <h2 class="slide-title">Minh Chứng Thực Nghiệm: Vòng Lặp Tự Nắn Chỉnh Qua 3 Bài Toán Mẫu</h2>
+      <p class="slide-subtitle">Bằng chứng thực tế từ Repo: Cách hệ thống tự phát hiện sai sót, nắn chỉnh prompt và chuẩn hóa kết quả đầu ra.</p>
 
-      <table class="table-container">
-        <thead>
-          <tr>
-            <th>TIÊU CHÍ ĐÁNH GIÁ</th>
-            <th>REQ A: KHÓA TÀI KHOẢN (Auth)</th>
-            <th>REQ B: CHỐNG BÁN ÂM KHO (Inventory)</th>
-            <th>REQ C: VOUCHER 1 LẦN (Promotion)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Điểm làm tốt nổi bật</td>
-            <td>• Bắt kẽ hở Force Logout / Thu hồi Token tức thì trên thiết bị khác.<br>• Đặt câu hỏi Sliding Window đếm sai.<br>• Liên kết BUG-001, BUG-003, BUG-008.</td>
-            <td>• Phân biệt Tồn kho vật lý vs Tồn kho khả dụng (Holding Window).<br>• Thiết kế test Concurrency: 2 user tranh mua 1 hàng (N=1) trong ≤50ms.<br>• Ánh xạ BUG-005, BUG-007.</td>
-            <td>• Bóc tách trọn vẹn Vòng đời Voucher & Giao dịch bù trừ (Compensating Transaction) khi hủy đơn.<br>• Bắt lỗi Race condition 2 tab đồng thời.<br>• Ánh xạ BUG-003 chuẩn 100%.</td>
-          </tr>
-          <tr>
-            <td>Sai sót ban đầu phát hiện</td>
-            <td>• Lạm dụng thuật ngữ hàn lâm (Lost Update, Redis INCR) khiến BA khó hiểu.<br>• Bố cục dạng text wall dài.<br>• Bỏ sót kiểm tra Token trên service vệ tinh.</td>
-            <td>• Gom cụm hành động: dồn chọn số lượng + checkout vào 1 bước.<br>• Kỳ vọng API/DB sơ sài (chỉ ghi HTTP 200/400).<br>• Bảng tính Google Sheets ban đầu bị co rúm, xấu.</td>
-            <td>• Bỏ sót chính sách hoàn tiền 1 phần khi mua nhiều món có áp voucher.<br>• Bỏ sót nguy cơ kẹt voucher vĩnh viễn ở trạng thái RESERVED nếu cronjob timeout chết.</td>
-          </tr>
-          <tr>
-            <td>Cải tiến Prompt & Code</td>
-            <td>• Thêm cấu hình user_preferences.json ghi nhớ góc nhìn (business vs technical).<br>• Tái cấu trúc sang Thẻ & Bảng Ma trận.<br>• Bổ sung kịch bản kiểm tra Event thu hồi Token.</td>
-            <td>• Đưa 3 Nguyên Tắc Vàng vào prompt & AGENTS.md (Tách bước, Verify 3 tầng).<br>• Viết script Styler Ant Design Blue tự động định dạng Sheets, thêm Dropdown Status.</td>
-            <td>• Mở rộng risk-checklist.md thêm rủi ro Lifecycle Reversal & Partial Refund.<br>• Bổ sung kịch bản kiểm chứng khôi phục voucher tự động khi hết hạn giữ chỗ.</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Sơ đồ vòng lặp tự nắn chỉnh thực tế (Self-Correction Lifecycle) -->
+      <div style="background:#F1F5F9; border:1px solid var(--border-color); border-radius:10px; padding:10px 16px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:11px; font-weight:800; color:var(--text-main); text-transform:uppercase;">
+          🔄 VÒNG LẶP NẮN CHỈNH:
+        </span>
+        <div style="display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:600;">
+          <span style="background:#FFFFFF; border:1px solid var(--border-color); padding:4px 10px; border-radius:6px;">1. Chạy Thực Nghiệm</span>
+          <span>➔</span>
+          <span style="background:#FEE2E2; color:#991B1B; padding:4px 10px; border-radius:6px;">2. Phát Hiện Sai Sót</span>
+          <span>➔</span>
+          <span style="background:#FEF3C7; color:#92400E; padding:4px 10px; border-radius:6px;">3. Nắn Chỉnh Rules & Code</span>
+          <span>➔</span>
+          <span style="background:#DCFCE7; color:#166534; padding:4px 10px; border-radius:6px;">4. Chuẩn Hóa Bền Vững</span>
+        </div>
+      </div>
+
+      <!-- 3 Case Study so sánh trực quan -->
+      <div class="case-grid">
+        <!-- Req A: Auth -->
+        <div class="case-card">
+          <div class="case-header">
+            <span style="font-size:18px;">🔐</span>
+            <div>
+              <div class="case-title">REQ A: KHÓA TÀI KHOẢN (Auth)</div>
+              <div style="font-size:10px; color:var(--text-muted);">Sai mật khẩu 5 lần liên tiếp</div>
+            </div>
+          </div>
+          
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--success)">✔</span>
+            <div><strong>Điểm sáng:</strong> Bắt kẽ hở Force Logout trên thiết bị khác; liên kết BUG-001 & BUG-003.</div>
+          </div>
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--danger)">⚠️</span>
+            <div><strong>Sai sót ban đầu:</strong> Dùng từ ngữ quá hàn lâm (Lost Update, Redis INCR) khiến BA khó hiểu.</div>
+          </div>
+          <div class="flow-node" style="background:#EFF6FF; padding:6px 8px; border-radius:6px; margin-top:auto;">
+            <span class="flow-icon" style="color:var(--primary)">🛠️</span>
+            <div><strong>Nắn chỉnh:</strong> Thêm <code>user_preferences.json</code> ghi nhớ góc nhìn BA vs SDET; bổ sung kịch bản kiểm tra Event thu hồi Token.</div>
+          </div>
+        </div>
+
+        <!-- Req B: Inventory -->
+        <div class="case-card">
+          <div class="case-header">
+            <span style="font-size:18px;">📦</span>
+            <div>
+              <div class="case-title">REQ B: BÁN ÂM KHO (Inventory)</div>
+              <div style="font-size:10px; color:var(--text-muted);">Flash Sale Concurrency cao</div>
+            </div>
+          </div>
+          
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--success)">✔</span>
+            <div><strong>Điểm sáng:</strong> Phân biệt Tồn kho vật lý vs Khả dụng; sinh test 2 user tranh mua N=1 trong ≤50ms.</div>
+          </div>
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--danger)">⚠️</span>
+            <div><strong>Sai sót ban đầu:</strong> Gom cụm bước (chọn số lượng + checkout dồn 1 bước); verify API chung chung.</div>
+          </div>
+          <div class="flow-node" style="background:#EFF6FF; padding:6px 8px; border-radius:6px; margin-top:auto;">
+            <span class="flow-icon" style="color:var(--primary)">🛠️</span>
+            <div><strong>Nắn chỉnh:</strong> Đưa 3 Nguyên Tắc Vàng vào Rules cứng; viết script Styler tự động kẻ viền & format Sheets chuẩn Ant Design.</div>
+          </div>
+        </div>
+
+        <!-- Req C: Voucher -->
+        <div class="case-card">
+          <div class="case-header">
+            <span style="font-size:18px;">🎟️</span>
+            <div>
+              <div class="case-title">REQ C: VOUCHER 1 LẦN (Promo)</div>
+              <div style="font-size:10px; color:var(--text-muted);">Áp mã thanh toán giỏ hàng</div>
+            </div>
+          </div>
+          
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--success)">✔</span>
+            <div><strong>Điểm sáng:</strong> Bóc tách vòng đời Voucher & Giao dịch bù trừ (Compensating Transaction) khi hủy đơn.</div>
+          </div>
+          <div class="flow-node">
+            <span class="flow-icon" style="color:var(--danger)">⚠️</span>
+            <div><strong>Sai sót ban đầu:</strong> Bỏ sót trường hợp voucher bị treo vĩnh viễn ở trạng thái RESERVED nếu gateway timeout.</div>
+          </div>
+          <div class="flow-node" style="background:#EFF6FF; padding:6px 8px; border-radius:6px; margin-top:auto;">
+            <span class="flow-icon" style="color:var(--primary)">🛠️</span>
+            <div><strong>Nắn chỉnh:</strong> Mở rộng <code>risk-checklist.md</code> thêm rủi ro Lifecycle Reversal; bổ sung kịch bản tự khôi phục sau timeout.</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- SLIDE 6: 90-Day Roadmap -->
+    <!-- =====================================================================
+         SLIDE 6: 90-Day Roadmap Pipeline
+         ===================================================================== -->
     <div class="slide" id="slide-6">
-      <div class="slide-badge">5. The 90-Day Roadmap</div>
-      <h2 class="slide-title">Lộ Trình 3 Tháng: Nâng 2.5x Effort Của Team QA</h2>
-      <p class="slide-subtitle">Kế hoạch triển khai thực chiến từng giai đoạn để biến AI thành bệ phóng năng suất cho toàn bộ QA Team.</p>
+      <div class="slide-badge">5. Lộ Trình 3 Tháng Đột Phá Effort</div>
+      <h2 class="slide-title">Tiến Trình 3 Giai Đoạn: Nâng Gấp 2.5x Năng Suất (Effort) Của Đội Ngũ QA</h2>
+      <p class="slide-subtitle">Kế hoạch chuyển đổi từng bước có thể đo lường bằng số liệu định lượng, không gây gián đoạn dự án hiện tại.</p>
 
-      <div class="grid-3">
-        <div class="card">
-          <div class="card-header primary">THÁNG 1: FOUNDATION & BASELINE</div>
-          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Chuẩn Hóa Quy Trình & Pilot</div>
-          <ul class="bullet-list" style="font-size:12px; gap:8px;">
-            <li><strong>Xây dựng Golden Dataset:</strong> Chuẩn bị 50 User Stories thực tế kèm kịch bản mẫu làm thước đo Ground Truth.</li>
-            <li><strong>Đóng gói Plugin:</strong> Cài đặt Rules, Skills, Subagents cho 1 Scrum Team (3-5 QA) thử nghiệm.</li>
-            <li><strong>Training QA:</strong> Đào tạo QA cách review Phase 1, chất vấn BA và phê duyệt kịch bản giả lập.</li>
-          </ul>
-          <div style="margin-top:auto; background:#F0FDF4; border:1px solid #BBF7D0; padding:8px 10px; border-radius:6px; font-size:11.5px; color:#166534;">
-            <strong>🎯 KPI Tháng 1:</strong><br>
+      <!-- Sơ đồ đường ống 3 giai đoạn (Pipeline Stages) -->
+      <div class="roadmap-pipeline">
+        <!-- Stage 1 -->
+        <div class="roadmap-stage stage-1">
+          <div class="stage-header">
+            <span class="stage-month">THÁNG 1: FOUNDATION & BASELINE</span>
+            <span class="stage-name">Chuẩn Hóa & Pilot Thử Nghiệm</span>
+          </div>
+
+          <div class="stage-box">
+            <strong>🎯 Mục tiêu chính:</strong> Xây dựng bộ 'Golden Dataset' 50 Stories chuẩn làm thước đo Ground Truth.
+          </div>
+          <div class="stage-box">
+            <strong>🛠️ Hành động:</strong> Đóng gói Plugin, tích hợp Google Sheets MCP, triển khai pilot cho 1 Scrum Team (3-5 QA).
+          </div>
+          <div class="stage-box">
+            <strong>📖 Đào tạo:</strong> Hướng dẫn QA kỹ năng chất vấn BA và phê duyệt kịch bản tại Gate 1 & 2.
+          </div>
+
+          <div class="stage-kpi">
+            <strong>📈 KPI THÁNG 1:</strong><br>
             • Độ chính xác dữ liệu ≥ 85%<br>
-            • Giảm 40% thời gian viết test case<br>
-            • Bắt sớm 5 lỗi logic ngay khâu requirement
+            • Giảm 40% thời gian viết test ban đầu<br>
+            • Bắt sớm 5 lỗi logic ngay khâu spec
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header accent">THÁNG 2: INTEGRATION & SCALING</div>
-          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Tích Hợp Hệ Sinh Thái & Mở Rộng</div>
-          <ul class="bullet-list" style="font-size:12px; gap:8px;">
-            <li><strong>Tích hợp Jira / Xray MCP:</strong> Tự động đọc Story Description từ Jira và sync test cases lên Xray/TestRail.</li>
-            <li><strong>Feedback Loop:</strong> Thêm Upvote/Downvote test case để liên tục nắn chỉnh Prompt theo văn hóa công ty.</li>
-            <li><strong>Nhân rộng toàn bộ QA:</strong> Áp dụng cho 10-15 QA trên toàn bộ các squad.</li>
-          </ul>
-          <div style="margin-top:auto; background:#F0FDF4; border:1px solid #BBF7D0; padding:8px 10px; border-radius:6px; font-size:11.5px; color:#166534;">
-            <strong>🎯 KPI Tháng 2:</strong><br>
+        <!-- Mũi tên chuyển giao 1-2 -->
+        <div class="step-arrow" style="align-self:center; font-size:24px; color:var(--primary);">➔</div>
+
+        <!-- Stage 2 -->
+        <div class="roadmap-stage stage-2">
+          <div class="stage-header">
+            <span class="stage-month">THÁNG 2: INTEGRATION & SCALING</span>
+            <span class="stage-name">Tích Hợp Hệ Thống & Mở Rộng</span>
+          </div>
+
+          <div class="stage-box">
+            <strong>🎯 Mục tiêu chính:</strong> Đưa AI Agent vào quy trình làm việc thường nhật của toàn bộ QA Team (10-15 QA).
+          </div>
+          <div class="stage-box">
+            <strong>🛠️ Hành động:</strong> Tích hợp Jira/Xray MCP (tự động đọc Story và sync test lên Jira); xây dựng Feedback Loop.
+          </div>
+          <div class="stage-box">
+            <strong>⚡ Tinh chỉnh:</strong> Huấn luyện prompt theo văn hóa sản phẩm dựa trên dữ liệu đánh giá thực tế.
+          </div>
+
+          <div class="stage-kpi">
+            <strong>📈 KPI THÁNG 2:</strong><br>
             • Độ chính xác dữ liệu ≥ 92%<br>
-            • Giảm 60% lead-time phân tích & test design<br>
-            • Tăng 3x số test case Concurrency được kiểm thử
+            • Giảm 60% lead-time phân tích yêu cầu<br>
+            • Tăng 3x số test case Concurrency
           </div>
         </div>
 
-        <div class="card highlight">
-          <div class="card-header primary">THÁNG 3: AUTONOMOUS MULTIPLIER</div>
-          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Sinh Automation Code & Đột Phá Effort</div>
-          <ul class="bullet-list" style="font-size:12px; gap:8px;">
-            <li><strong>Simulated to Executable Code:</strong> Chuyển đổi các bước giả lập 3 tầng thành Playwright / k6 Load Script chạy trực tiếp.</li>
-            <li><strong>CI/CD Regression Trigger:</strong> Tự động chạy test case P1 ngay khi Dev tạo Pull Request.</li>
-            <li><strong>Dashboard Đo Lường ROI:</strong> Theo dõi Defect Leakage Rate, QA Throughput và Man-hours saved.</li>
-          </ul>
-          <div style="margin-top:auto; background:#ECFDF5; border:1.5px solid var(--success); padding:8px 10px; border-radius:6px; font-size:11.5px; color:#065F46;">
-            <strong>🎯 KPI Tháng 3:</strong><br>
+        <!-- Mũi tên chuyển giao 2-3 -->
+        <div class="step-arrow" style="align-self:center; font-size:24px; color:var(--accent);">➔</div>
+
+        <!-- Stage 3 -->
+        <div class="roadmap-stage stage-3">
+          <div class="stage-header">
+            <span class="stage-month">THÁNG 3: AUTONOMOUS MULTIPLIER</span>
+            <span class="stage-name">Tự Động Hóa Mã & Đột Phá Effort</span>
+          </div>
+
+          <div class="stage-box">
+            <strong>🎯 Mục tiêu chính:</strong> Chuyển hóa kịch bản giả lập thành mã kiểm thử thực thi (Playwright / k6 Scripts).
+          </div>
+          <div class="stage-box">
+            <strong>🛠️ Hành động:</strong> Tích hợp CI/CD tự động trigger bộ test P1 ngay khi Dev tạo Pull Request.
+          </div>
+          <div class="stage-box">
+            <strong>📊 Giám sát:</strong> Dashboard đo lường Defect Leakage Rate và Man-hours saved cho công ty.
+          </div>
+
+          <div class="stage-kpi" style="background:#ECFDF5; border-color:var(--success); color:#065F46;">
+            <strong>🚀 KPI THÁNG 3 (ĐỘT PHÁ):</strong><br>
             • <strong>NÂNG EFFORT (THROUGHPUT) GẤP 2.5X</strong><br>
             • Giảm 50% bug lọt sang Production<br>
             • Tiết kiệm 15-20 giờ làm việc/QA/sprint
@@ -631,46 +1244,86 @@
       </div>
     </div>
 
-    <!-- SLIDE 7: Strategic Conclusion -->
+    <!-- =====================================================================
+         SLIDE 7: Strategic Paradigm Shift & Value Proposition
+         ===================================================================== -->
     <div class="slide" id="slide-7">
-      <div class="slide-badge">6. Strategic Conclusion</div>
-      <h2 class="slide-title">Kết Luận: Chuyển Dịch Vị Thế QA Từ 'Thủ Công' Sang 'AI Orchestrator'</h2>
-      <p class="slide-subtitle">Giá trị bền vững mang lại cho doanh nghiệp và cam kết hành động thực chiến.</p>
+      <div class="slide-badge">6. Kết Luận & Định Hướng Đóng Góp</div>
+      <h2 class="slide-title">Sơ Đồ Chuyển Dịch Vị Thế: Từ 'Tester Thủ Công' Sang 'AI QA Orchestrator'</h2>
+      <p class="slide-subtitle">Tái định hình cấu trúc thời gian và giá trị của đội ngũ QA trong kỷ nguyên trí tuệ nhân tạo.</p>
 
-      <div class="grid-3" style="margin-bottom:16px;">
-        <div class="card">
-          <div class="card-header primary">🎯 TƯ DUY SHIFT-LEFT</div>
-          <ul class="bullet-list" style="font-size:12.5px;">
-            <li>AI không chỉ giúp viết test nhanh hơn, mà giúp QA <strong>chặn đứng lỗi ngay từ khâu requirement</strong>.</li>
-            <li>Bộ câu hỏi chất vấn BA sắc bén giúp Dev & PO nhìn thấy góc khuất trước khi bắt đầu viết code.</li>
-            <li>Chi phí sửa lỗi ở khâu Requirement rẻ hơn <strong>10-30 lần</strong> so với sửa ở Production.</li>
-          </ul>
+      <!-- Sơ đồ Chuyển dịch Cơ cấu Công việc (Workload Transformation Bars) -->
+      <div class="shift-container">
+        <!-- Thanh 1: Mô hình cũ -->
+        <div class="shift-bar-row">
+          <div class="shift-label" style="color:var(--danger);">⏳ QA TRUYỀN THỐNG:</div>
+          <div class="shift-bar">
+            <div class="bar-seg" style="flex:65; background:#EF4444;">
+              65% Gõ test thủ công & Đoán mò Spec
+            </div>
+            <div class="bar-seg" style="flex:25; background:#F59E0B;">
+              25% Chạy Test Lặp Đi Lặp Lại
+            </div>
+            <div class="bar-seg" style="flex:10; background:#64748B;">
+              10% Khác
+            </div>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-header success">🛡️ DỮ LIỆU ĐÚNG ĐẮN LÀ TỐI THƯỢNG</div>
-          <ul class="bullet-list" style="font-size:12.5px;">
-            <li>Tuyệt đối <strong>không đánh đổi tốc độ lấy ảo giác</strong>. Human-in-the-loop là nguyên tắc bắt buộc.</li>
-            <li>Chuẩn kiểm chứng 3 tầng (UI/API Body/DB State) giúp kịch bản test sẵn sàng cho Automation thực thi ngay.</li>
-            <li>Lưu trữ Local-First & Drive Sync bảo toàn 100% dữ liệu lịch sử tích lũy qua các phiên.</li>
-          </ul>
+        <!-- Mũi tên chuyển đổi -->
+        <div style="text-align:center; font-size:16px; font-weight:800; color:var(--primary); margin:-6px 0;">
+          ⬇️ CHUYỂN DỊCH VỊ THẾ BẰNG ANTIGRAVITY AI ASSISTANT ⬇️
         </div>
 
-        <div class="card highlight">
-          <div class="card-header primary">🚀 NÂNG TẦM VỊ THẾ QA</div>
-          <ul class="bullet-list success" style="font-size:12.5px;">
-            <li>QA chuyển đổi từ "người gõ test case thủ công" sang <strong>"AI QA Orchestrator & System Thinker"</strong>.</li>
-            <li>Giải phóng 60% thời gian cơ bắp để tập trung vào Exploratory, Security, Performance và AI Tuning.</li>
-            <li>Sẵn sàng dẫn dắt team QA chuyển đổi số thành công ngay từ tuần làm việc đầu tiên!</li>
-          </ul>
+        <!-- Thanh 2: Mô hình mới -->
+        <div class="shift-bar-row">
+          <div class="shift-label" style="color:var(--success);">🚀 AI QA ORCHESTRATOR:</div>
+          <div class="shift-bar">
+            <div class="bar-seg" style="flex:15; background:#3B82F6;">
+              15% Review AI
+            </div>
+            <div class="bar-seg" style="flex:15; background:#10B981;">
+              15% Auto CI/CD
+            </div>
+            <div class="bar-seg" style="flex:70; background:#047857;">
+              ✨ 70% Thiết Kế Rủi Ro, Exploratory, Security & Chiến Lược Chất Lượng
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="background:var(--bg-dark); color:#FFFFFF; border-radius:10px; padding:14px 24px; text-align:center; border:1px solid var(--primary);">
-        <p style="font-size:14px; font-weight:700; margin-bottom:4px;">
-          💬 "Mục tiêu của tôi không phải là thay thế QA bằng AI, mà là biến mỗi QA trong team thành một Super QA có năng suất và tầm nhìn gấp 3 lần."
-        </p>
-        <span style="font-size:12px; color:#94A3B8;">Sẵn sàng trao đổi chuyên sâu và đồng hành cùng quý công ty!</span>
+      <!-- 3 Trụ Cột Giá Trị Cốt Lõi -->
+      <div style="display:flex; gap:16px; margin-bottom:14px;">
+        <div style="flex:1; background:#FFFFFF; border:1px solid var(--border-color); border-radius:10px; padding:12px 14px; border-top:4px solid var(--primary);">
+          <div style="font-weight:700; font-size:12.5px; color:var(--primary); margin-bottom:4px;">🎯 TƯ DUY SHIFT-LEFT</div>
+          <div style="font-size:11px; color:var(--text-main); line-height:1.4;">
+            Chặn đứng lỗi ngay từ khâu viết requirement. Chi phí sửa lỗi sớm rẻ hơn <strong>10-30 lần</strong> so với sửa trên Production.
+          </div>
+        </div>
+
+        <div style="flex:1; background:#FFFFFF; border:1px solid var(--border-color); border-radius:10px; padding:12px 14px; border-top:4px solid var(--accent);">
+          <div style="font-weight:700; font-size:12.5px; color:var(--accent); margin-bottom:4px;">🛡️ DỮ LIỆU ĐÚNG ĐẮN TỐI THƯỢNG</div>
+          <div style="font-size:11px; color:var(--text-main); line-height:1.4;">
+            Tuyệt đối không đánh đổi tốc độ lấy ảo giác. Chuẩn 3 tầng UI/API/DB giúp test case sẵn sàng tự động hóa ngay lập tức.
+          </div>
+        </div>
+
+        <div style="flex:1; background:#FFFFFF; border:1px solid var(--border-color); border-radius:10px; padding:12px 14px; border-top:4px solid var(--success);">
+          <div style="font-weight:700; font-size:12.5px; color:var(--success); margin-bottom:4px;">🚀 NÂNG TẦM ĐỘI NGŨ</div>
+          <div style="font-size:11px; color:var(--text-main); line-height:1.4;">
+            Giải phóng 60% sức lao động cơ bắp để QA tập trung nâng cao năng lực chuyên môn và đồng hành kiến tạo giá trị doanh nghiệp.
+          </div>
+        </div>
+      </div>
+
+      <!-- Hộp cam kết đanh thép -->
+      <div style="background:var(--bg-dark); color:#FFFFFF; border-radius:10px; padding:12px 20px; text-align:center; border:1px solid var(--primary); display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-size:13px; font-weight:700; color:#F8FAFC;">
+          💬 "Tôi không thay thế tester bằng AI — Tôi biến mỗi tester thành một Super QA có năng suất và tầm nhìn gấp 2.5 lần!"
+        </div>
+        <span style="font-size:11.5px; color:#38BDF8; font-weight:600; white-space:nowrap; margin-left:16px;">
+          Sẵn sàng cống hiến ngay từ tuần đầu tiên 🤝
+        </span>
       </div>
     </div>
 
