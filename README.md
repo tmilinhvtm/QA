@@ -4,6 +4,7 @@
 > **Dự án:** Trợ lý AI Phân tích Requirement & Tự động sinh Kịch bản Test 
 > **Nền tảng:** Antigravity Customization Plugin (Rules, Skills, Subagents & Google Workspace MCP)  
 > **Google Spreadsheet Master (Trực tiếp trên Drive):** [Xem Master Sheet tại đây](https://docs.google.com/spreadsheets/d/1BG5HNlQBEqyG_hjM9WwklrME2lZbysNFHBSggsSQetk/edit)  
+> **Google Slides Thuyết Trình Phỏng Vấn:** [Xem Google Slides tại đây](https://docs.google.com/presentation/d/1IKuVKcfW5AIfOmO8CHJTDl2j8hnI8Pahe0d2DmeBdTg/edit?usp=drivesdk)  
 > **Video Demo Trực Tiếp:** [Tại đây](https://drive.google.com/file/d/1B09n2Vz652U4Ix9ivEHpQdl33lM1tOpS/view?usp=sharing)
 
 ---

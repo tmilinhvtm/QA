@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA AI Specialist - Thuyết Trình Phỏng Vấn (Vũ Thị Mai Linh)</title>
+  <style>
+    :root {
+      --primary: #1677FF;
+      --primary-dark: #0958D9;
+      --primary-light: #E6F4FF;
+      --bg-dark: #0F172A;
+      --bg-card: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --success: #16A34A;
+      --danger: #E11D48;
+      --warning: #D97706;
+      --accent: #0D9488;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: #0B1120;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Presentation Container (16:9 Aspect Ratio) */
+    .deck-container {
+      position: relative;
+      width: 92vw;
+      max-width: 1400px;
+      aspect-ratio: 16 / 9;
+      background: #F8FAFC;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 40px 56px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      transform: translateX(30px);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 2;
+    }
+
+    /* Top Accent Line */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #1677FF, #0D9488);
+    }
+
+    /* Slide Header */
+    .slide-badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(22, 119, 255, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .slide-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Title Slide (Special Dark Layout) */
+    .slide-dark {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      color: #FFFFFF;
+      justify-content: center;
+      padding: 60px 80px;
+    }
+
+    .slide-dark .slide-badge {
+      background: rgba(22, 119, 255, 0.2);
+      color: #60A5FA;
+      border-color: #3B82F6;
+    }
+
+    .slide-dark .slide-title {
+      color: #FFFFFF;
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .slide-dark .slide-subtitle {
+      color: #94A3B8;
+      font-size: 18px;
+      margin-bottom: 32px;
+    }
+
+    .candidate-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 14px;
+      color: #CBD5E1;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 24px;
+    }
+
+    .target-highlight-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1.5px solid var(--primary);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .target-highlight-box h4 {
+      color: #60A5FA;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .target-highlight-box p {
+      color: #F8FAFC;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Grids & Cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .card.highlight {
+      background: var(--primary-light);
+      border: 1.5px solid var(--primary);
+    }
+
+    .card-header {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .card-header.danger { color: var(--danger); }
+    .card-header.warning { color: var(--warning); }
+    .card-header.primary { color: var(--primary-dark); }
+    .card-header.accent { color: var(--accent); }
+    .card-header.success { color: var(--success); }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      color: #334155;
+    }
+
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .bullet-list.danger li::before { color: var(--danger); }
+    .bullet-list.warning li::before { color: var(--warning); }
+    .bullet-list.success li::before { content: '✔'; font-size: 12px; color: var(--success); }
+
+    /* KPI Metric Bar */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      border-top: 4px solid var(--primary);
+    }
+
+    .kpi-box.green { border-top-color: var(--success); }
+    .kpi-box.red { border-top-color: var(--danger); }
+    .kpi-box.teal { border-top-color: var(--accent); }
+
+    .kpi-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin: 4px 0;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: #475569;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .table-container th {
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 10px 14px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .table-container td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    .table-container tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-container td:first-child {
+      font-weight: 700;
+      background: #F8FAFC;
+      color: var(--primary-dark);
+      width: 18%;
+    }
+
+    /* Footer Controls */
+    .deck-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-color);
+      font-size: 13px;
+      color: var(--text-muted);
+      z-index: 10;
+    }
+
+    .btn-nav {
+      background: #F1F5F9;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      height: 4px;
+      background: #E2E8F0;
+      border-radius: 2px;
+      margin: 0 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 14%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide slide-dark active" id="slide-1">
+      <div class="slide-badge">CHIẾN LƯỢC ỨNG DỤNG AI TRONG QA (AI-DRIVEN QA LEAD)</div>
+      <h1 class="slide-title">Tối Ưu Năng Suất (Effort) & Đảm Bảo Tính Đúng Đắn<br>Bộ Dữ Liệu QA Bằng Tác Tử AI Trong 3 Tháng</h1>
+      <p class="slide-subtitle">Mô hình thực chiến: Antigravity Native Plugin • 2-Phase State Machine • 3 Tầng Kiểm Chứng Sâu</p>
+      
+      <div class="candidate-meta">
+        <div><strong>Ứng viên:</strong> Vũ Thị Mai Linh</div>
+        <div><strong>Vị trí:</strong> AI QA Specialist / Senior QA Engineer</div>
+        <div><strong>Thời gian:</strong> Tháng 10/2026</div>
+      </div>
+
+      <div class="target-highlight-box">
+        <h4>🎯 MỤC TIÊU 90 NGÀY CAM KẾT VỚI DOANH NGHIỆP</h4>
+        <p>1. Nâng Effort (Throughput) Team lên gấp 2.5x  •  2. Độ Chính Xác (Accuracy/Ground Truth) Bộ Dữ Liệu Đầu Ra ≥ 92%  •  3. Giảm 50% Defect Lọt Sang Dev/Prod</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Problem & Context -->
+    <div class="slide" id="slide-2">
+      <div class="slide-badge">1. Problem & Opportunity</div>
+      <h2 class="slide-title">Bối Cảnh & Bài Toán Cốt Lõi: Năng Suất (Effort) vs. Độ Đúng Sai Dữ Liệu</h2>
+      <p class="slide-subtitle">Vì sao các giải pháp AI Test Case ngây thơ đều thất bại và giải pháp thực chiến của chúng ta là gì?</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header danger">🚨 NỖI ĐAU EFFORT HIỆN TẠI</div>
+          <ul class="bullet-list danger">
+            <li><strong>60-70% thời gian QA</strong> bị chôn vào việc đọc requirement mập mờ và gõ test case thủ công lặp lại.</li>
+            <li><strong>Năng suất thấp:</strong> Trung bình 1 QA chỉ phân tích được 2-3 User Stories phức tạp mỗi sprint.</li>
+            <li><strong>Thiếu chiều sâu kỹ thuật:</strong> Bỏ sót các lỗi rủi ro kiến trúc cao (Race Condition, State Drift, Timeout).</li>
+            <li><strong>Tắc nghẽn bàn giao:</strong> Dev chờ Test Case, QA chờ BA chốt yêu cầu, kéo dài lead-time release.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header warning">⚠️ BẪY 'ẢO GIÁC' CỦA AI THƯỜNG</div>
+          <ul class="bullet-list warning">
+            <li><strong>Garbage In - Garbage Out:</strong> Requirement mập mờ khiến AI sinh test case sai hoàn toàn với nghiệp vụ.</li>
+            <li><strong>Ảo giác (Hallucination):</strong> Tự bịa API endpoint, tự suy diễn logic trái với quy tắc thực tế của cty.</li>
+            <li><strong>Gộp cụm hành động (Bundling):</strong> Dồn chọn số lượng + checkout vào 1 bước, dev automation không dùng được.</li>
+            <li><strong>Kỳ vọng sơ sài:</strong> Chỉ ghi "Verify HTTP 200" mà không có JSON Body hay thay đổi dữ liệu Database.</li>
+          </ul>
+        </div>
+
+        <div class="card highlight">
+          <div class="card-header primary">✨ GIẢI PHÁP ĐỘT PHÁ CỦA REPO</div>
+          <ul class="bullet-list success">
+            <li><strong>Strict 2-Phase State Machine:</strong> Bắt buộc dừng ở Human Gate 1 để chốt logic trước khi sinh test.</li>
+            <li><strong>3 Nguyên Tắc Vàng QA/QC:</strong> Step Disaggregation + Kiểm chứng sâu 3 tầng (UI/API Body/DB State).</li>
+            <li><strong>Grounding Kho Bug Lịch Sử:</strong> Đối chiếu 10 Bug Production Patterns làm tri thức chuẩn hóa.</li>
+            <li><strong>Local-First & Drive Sync:</strong> Lưu trữ tích lũy (Append-Only) và đẩy lên Google Sheets thời gian thực.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Architecture -->
+    <div class="slide" id="slide-3">
+      <div class="slide-badge">2. Architecture & Design</div>
+      <h2 class="slide-title">Kiến Trúc Tác Tử: 2-Phase State Machine & Human Gates</h2>
+      <p class="slide-subtitle">Hệ thống Native Customization Plugin không cần backend CRUD - Tự điều phối qua Subagents & Rules.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header primary">🔄 QUY TRÌNH ĐIỀU PHỐI 2 PHA NGHIÊM NGẶT</div>
+          <div style="display:flex; flex-direction:column; gap:12px; font-size:12.5px;">
+            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
+              <strong>BƯỚC 0: PRE-FLIGHT CACHE VALIDATION</strong><br>
+              <span style="color:var(--text-muted)">Kiểm tra Drive modifiedTime vs .sync_metadata.json. Tự động fallback Offline khi mất mạng.</span>
+            </div>
+            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
+              <strong>PHASE 1: STATIC ANALYSIS (req-risk-analyst)</strong><br>
+              <span style="color:var(--text-muted)">Bóc tách 4 thành tố Business Rules • Hỏi phản biện BA • Quét 5 rủi ro kỹ thuật • Đối chiếu 10 Bug lịch sử.</span>
+            </div>
+            <div style="background:#FEE2E2; padding:8px 12px; border-radius:6px; border-left:3px solid var(--danger);">
+              <strong style="color:var(--danger)">🛑 HUMAN GATE 1 (CỔNG KIỂM DUYỆT 1)</strong><br>
+              <span style="color:#7F1D1D">DỪNG LẠI! Tester duyệt & tinh chỉnh logic. Tự động Rollback nếu requirement thay đổi.</span>
+            </div>
+            <div style="background:#F1F5F9; padding:8px 12px; border-radius:6px; border-left:3px solid var(--primary);">
+              <strong>PHASE 2: TEST SPECIFICATION (test-automation-architect)</strong><br>
+              <span style="color:var(--text-muted)">Sinh 5 kịch bản chuẩn: Happy Path, Boundary, Negative, Concurrency (≤50ms), State Conflict & Recovery.</span>
+            </div>
+            <div style="background:#DCFCE7; padding:8px 12px; border-radius:6px; border-left:3px solid var(--success);">
+              <strong style="color:var(--success)">🛑 HUMAN GATE 2 & LOCAL-FIRST CLOUD SYNC</strong><br>
+              <span style="color:#14532D">Tester duyệt kịch bản -> Append JSON local -> Đẩy lên Google Sheets Master bằng MCP.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header accent">🤖 PHÂN QUYỀN TÁC TỬ & BỘ NHỚ GÓC NHÌN</div>
+          <ul class="bullet-list" style="gap:14px; font-size:12.5px;">
+            <li><strong>Subagent 1: req-risk-analyst:</strong> Đảm nhiệm Static Analysis. Tham chiếu <code>risk-checklist.md</code> quét 5 góc khuất: Concurrency, State Drift, Clock Drift, Non-Idempotency, Distributed Transaction Failure.</li>
+            <li><strong>Subagent 2: test-automation-architect:</strong> Chỉ kích hoạt khi Phase 1 đã duyệt. Áp dụng <code>test-design-matrix.md</code> để xếp hạng P1/P2/P3 và mô tả chi tiết bước giả lập 3 tầng.</li>
+            <li><strong>Bộ nhớ góc nhìn (user_preferences.json):</strong> Hỗ trợ 3 góc nhìn: <em>business</em> (nghiệp vụ đời sống cho BA), <em>technical</em> (kiến trúc SDET chuyên sâu), <em>hybrid</em>. Tự động ghi nhớ xuyên suốt.</li>
+            <li><strong>Progressive Disclosure tối ưu Context:</strong> Đưa cẩm nang kỹ thuật vào thư mục <code>references/</code>, nạp khi cần thay vì nhồi nhét vào prompt chính làm loãng context.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Data Quality & Evaluation -->
+    <div class="slide" id="slide-4">
+      <div class="slide-badge">3. Quality & Accuracy Assurance</div>
+      <h2 class="slide-title">Khung Đánh Giá & Kiểm Định Độ Đúng Sai Dữ Liệu Đầu Ra</h2>
+      <p class="slide-subtitle">Làm thế nào để đo lường, kiểm soát ảo giác và đảm bảo dữ liệu sinh ra đạt chuẩn kiểm thử thực tế?</p>
+
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-title">Semantic Accuracy</div>
+          <div class="kpi-value" style="color:var(--primary)">≥ 92%</div>
+          <div class="kpi-sub">Tính đúng đắn logic & nghiệp vụ</div>
+        </div>
+        <div class="kpi-box green">
+          <div class="kpi-title">Schema Validity</div>
+          <div class="kpi-value" style="color:var(--success)">100%</div>
+          <div class="kpi-sub">Chuẩn 3 tầng UI/API Body/DB</div>
+        </div>
+        <div class="kpi-box teal">
+          <div class="kpi-title">Risk Coverage</div>
+          <div class="kpi-value" style="color:var(--accent)">100%</div>
+          <div class="kpi-sub">Bao phủ 5 nhóm kịch bản & 5 góc khuất</div>
+        </div>
+        <div class="kpi-box red">
+          <div class="kpi-title">Hallucination Rate</div>
+          <div class="kpi-value" style="color:var(--danger)">&lt; 5%</div>
+          <div class="kpi-sub">Tỷ lệ suy diễn sai lệch requirement</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header primary">💎 3 NGUYÊN TẮC VÀNG CHUẨN QA/QC THỰC CHIẾN</div>
+          <ul class="bullet-list" style="gap:10px; font-size:12.5px;">
+            <li><strong>1. Step Disaggregation (Tách bước độc lập):</strong> Tách biệt bước nhập liệu chuẩn bị và bước bấm gửi request. Đưa tiền đề vào Pre-conditions để Automation chạy ổn định.</li>
+            <li><strong>2. Synchronized Deep Verification (Kiểm chứng 3 tầng):</strong><br>
+              • <em>UI:</em> Thông báo, viền cảnh báo, ID hiển thị.<br>
+              • <em>API:</em> HTTP Status Code + trường cụ thể trong JSON Body (vd: <code>order_id</code> khớp UI).<br>
+              • <em>DB & Event:</em> Tên bảng, tên cột, giá trị biến động và Kafka Event phát ra.</li>
+            <li><strong>3. Cột Trạng thái kiểm thử (Status):</strong> Mặc định <code>NOT_RUN</code>, hỗ trợ dropdown PASS/FAIL/BLOCKED kèm màu sắc trực quan.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header accent">🛡️ CƠ CHẾ ĐẢM BẢO CHẤT LƯỢNG DỮ LIỆU ĐẦU RA</div>
+          <ul class="bullet-list" style="gap:10px; font-size:12.5px;">
+            <li><strong>Anchor bằng Kho Bug Lịch Sử (Ground Truth):</strong> Agent bắt buộc đối chiếu với 10 Bug Production Patterns (BUG-001 đến BUG-010), buộc AI bám sát lỗi thực tế thay vì suy diễn.</li>
+            <li><strong>Syntactic & Schema Validator:</strong> Kịch bản thiếu bảng DB hoặc thiếu trường API body đều bị từ chối trước khi hiển thị cho Tester.</li>
+            <li><strong>Human-in-the-Loop Feedback Loop:</strong> Tester là chốt chặn cuối cùng phê duyệt logic ở Phase 1 trước khi sang Phase 2.</li>
+            <li><strong>Traceability Xuyên Suốt:</strong> Khóa <code>requirement_id</code> liên kết chặt chẽ giữa bảng Phân tích và bảng Test Case trên Google Sheets.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Proof Points -->
+    <div class="slide" id="slide-5">
+      <div class="slide-badge">4. Experimental Proof Points</div>
+      <h2 class="slide-title">Minh Chứng Thực Nghiệm: Bắt Lỗ Hổng & Tự Nắn Chỉnh Thực Tế</h2>
+      <p class="slide-subtitle">Bằng chứng cụ thể từ Repo: Những điểm làm tốt, sai sót ban đầu được phát hiện và nắn chỉnh ra sao.</p>
+
+      <table class="table-container">
+        <thead>
+          <tr>
+            <th>TIÊU CHÍ ĐÁNH GIÁ</th>
+            <th>REQ A: KHÓA TÀI KHOẢN (Auth)</th>
+            <th>REQ B: CHỐNG BÁN ÂM KHO (Inventory)</th>
+            <th>REQ C: VOUCHER 1 LẦN (Promotion)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Điểm làm tốt nổi bật</td>
+            <td>• Bắt kẽ hở Force Logout / Thu hồi Token tức thì trên thiết bị khác.<br>• Đặt câu hỏi Sliding Window đếm sai.<br>• Liên kết BUG-001, BUG-003, BUG-008.</td>
+            <td>• Phân biệt Tồn kho vật lý vs Tồn kho khả dụng (Holding Window).<br>• Thiết kế test Concurrency: 2 user tranh mua 1 hàng (N=1) trong ≤50ms.<br>• Ánh xạ BUG-005, BUG-007.</td>
+            <td>• Bóc tách trọn vẹn Vòng đời Voucher & Giao dịch bù trừ (Compensating Transaction) khi hủy đơn.<br>• Bắt lỗi Race condition 2 tab đồng thời.<br>• Ánh xạ BUG-003 chuẩn 100%.</td>
+          </tr>
+          <tr>
+            <td>Sai sót ban đầu phát hiện</td>
+            <td>• Lạm dụng thuật ngữ hàn lâm (Lost Update, Redis INCR) khiến BA khó hiểu.<br>• Bố cục dạng text wall dài.<br>• Bỏ sót kiểm tra Token trên service vệ tinh.</td>
+            <td>• Gom cụm hành động: dồn chọn số lượng + checkout vào 1 bước.<br>• Kỳ vọng API/DB sơ sài (chỉ ghi HTTP 200/400).<br>• Bảng tính Google Sheets ban đầu bị co rúm, xấu.</td>
+            <td>• Bỏ sót chính sách hoàn tiền 1 phần khi mua nhiều món có áp voucher.<br>• Bỏ sót nguy cơ kẹt voucher vĩnh viễn ở trạng thái RESERVED nếu cronjob timeout chết.</td>
+          </tr>
+          <tr>
+            <td>Cải tiến Prompt & Code</td>
+            <td>• Thêm cấu hình user_preferences.json ghi nhớ góc nhìn (business vs technical).<br>• Tái cấu trúc sang Thẻ & Bảng Ma trận.<br>• Bổ sung kịch bản kiểm tra Event thu hồi Token.</td>
+            <td>• Đưa 3 Nguyên Tắc Vàng vào prompt & AGENTS.md (Tách bước, Verify 3 tầng).<br>• Viết script Styler Ant Design Blue tự động định dạng Sheets, thêm Dropdown Status.</td>
+            <td>• Mở rộng risk-checklist.md thêm rủi ro Lifecycle Reversal & Partial Refund.<br>• Bổ sung kịch bản kiểm chứng khôi phục voucher tự động khi hết hạn giữ chỗ.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SLIDE 6: 90-Day Roadmap -->
+    <div class="slide" id="slide-6">
+      <div class="slide-badge">5. The 90-Day Roadmap</div>
+      <h2 class="slide-title">Lộ Trình 3 Tháng: Nâng 2.5x Effort Của Team QA</h2>
+      <p class="slide-subtitle">Kế hoạch triển khai thực chiến từng giai đoạn để biến AI thành bệ phóng năng suất cho toàn bộ QA Team.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header primary">THÁNG 1: FOUNDATION & BASELINE</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Chuẩn Hóa Quy Trình & Pilot</div>
+          <ul class="bullet-list" style="font-size:12px; gap:8px;">
+            <li><strong>Xây dựng Golden Dataset:</strong> Chuẩn bị 50 User Stories thực tế kèm kịch bản mẫu làm thước đo Ground Truth.</li>
+            <li><strong>Đóng gói Plugin:</strong> Cài đặt Rules, Skills, Subagents cho 1 Scrum Team (3-5 QA) thử nghiệm.</li>
+            <li><strong>Training QA:</strong> Đào tạo QA cách review Phase 1, chất vấn BA và phê duyệt kịch bản giả lập.</li>
+          </ul>
+          <div style="margin-top:auto; background:#F0FDF4; border:1px solid #BBF7D0; padding:8px 10px; border-radius:6px; font-size:11.5px; color:#166534;">
+            <strong>🎯 KPI Tháng 1:</strong><br>
+            • Độ chính xác dữ liệu ≥ 85%<br>
+            • Giảm 40% thời gian viết test case<br>
+            • Bắt sớm 5 lỗi logic ngay khâu requirement
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header accent">THÁNG 2: INTEGRATION & SCALING</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Tích Hợp Hệ Sinh Thái & Mở Rộng</div>
+          <ul class="bullet-list" style="font-size:12px; gap:8px;">
+            <li><strong>Tích hợp Jira / Xray MCP:</strong> Tự động đọc Story Description từ Jira và sync test cases lên Xray/TestRail.</li>
+            <li><strong>Feedback Loop:</strong> Thêm Upvote/Downvote test case để liên tục nắn chỉnh Prompt theo văn hóa công ty.</li>
+            <li><strong>Nhân rộng toàn bộ QA:</strong> Áp dụng cho 10-15 QA trên toàn bộ các squad.</li>
+          </ul>
+          <div style="margin-top:auto; background:#F0FDF4; border:1px solid #BBF7D0; padding:8px 10px; border-radius:6px; font-size:11.5px; color:#166534;">
+            <strong>🎯 KPI Tháng 2:</strong><br>
+            • Độ chính xác dữ liệu ≥ 92%<br>
+            • Giảm 60% lead-time phân tích & test design<br>
+            • Tăng 3x số test case Concurrency được kiểm thử
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <div class="card-header primary">THÁNG 3: AUTONOMOUS MULTIPLIER</div>
+          <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:var(--text-main);">Sinh Automation Code & Đột Phá Effort</div>
+          <ul class="bullet-list" style="font-size:12px; gap:8px;">
+            <li><strong>Simulated to Executable Code:</strong> Chuyển đổi các bước giả lập 3 tầng thành Playwright / k6 Load Script chạy trực tiếp.</li>
+            <li><strong>CI/CD Regression Trigger:</strong> Tự động chạy test case P1 ngay khi Dev tạo Pull Request.</li>
+            <li><strong>Dashboard Đo Lường ROI:</strong> Theo dõi Defect Leakage Rate, QA Throughput và Man-hours saved.</li>
+          </ul>
+          <div style="margin-top:auto; background:#ECFDF5; border:1.5px solid var(--success); padding:8px 10px; border-radius:6px; font-size:11.5px; color:#065F46;">
+            <strong>🎯 KPI Tháng 3:</strong><br>
+            • <strong>NÂNG EFFORT (THROUGHPUT) GẤP 2.5X</strong><br>
+            • Giảm 50% bug lọt sang Production<br>
+            • Tiết kiệm 15-20 giờ làm việc/QA/sprint
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Strategic Conclusion -->
+    <div class="slide" id="slide-7">
+      <div class="slide-badge">6. Strategic Conclusion</div>
+      <h2 class="slide-title">Kết Luận: Chuyển Dịch Vị Thế QA Từ 'Thủ Công' Sang 'AI Orchestrator'</h2>
+      <p class="slide-subtitle">Giá trị bền vững mang lại cho doanh nghiệp và cam kết hành động thực chiến.</p>
+
+      <div class="grid-3" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header primary">🎯 TƯ DUY SHIFT-LEFT</div>
+          <ul class="bullet-list" style="font-size:12.5px;">
+            <li>AI không chỉ giúp viết test nhanh hơn, mà giúp QA <strong>chặn đứng lỗi ngay từ khâu requirement</strong>.</li>
+            <li>Bộ câu hỏi chất vấn BA sắc bén giúp Dev & PO nhìn thấy góc khuất trước khi bắt đầu viết code.</li>
+            <li>Chi phí sửa lỗi ở khâu Requirement rẻ hơn <strong>10-30 lần</strong> so với sửa ở Production.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header success">🛡️ DỮ LIỆU ĐÚNG ĐẮN LÀ TỐI THƯỢNG</div>
+          <ul class="bullet-list" style="font-size:12.5px;">
+            <li>Tuyệt đối <strong>không đánh đổi tốc độ lấy ảo giác</strong>. Human-in-the-loop là nguyên tắc bắt buộc.</li>
+            <li>Chuẩn kiểm chứng 3 tầng (UI/API Body/DB State) giúp kịch bản test sẵn sàng cho Automation thực thi ngay.</li>
+            <li>Lưu trữ Local-First & Drive Sync bảo toàn 100% dữ liệu lịch sử tích lũy qua các phiên.</li>
+          </ul>
+        </div>
+
+        <div class="card highlight">
+          <div class="card-header primary">🚀 NÂNG TẦM VỊ THẾ QA</div>
+          <ul class="bullet-list success" style="font-size:12.5px;">
+            <li>QA chuyển đổi từ "người gõ test case thủ công" sang <strong>"AI QA Orchestrator & System Thinker"</strong>.</li>
+            <li>Giải phóng 60% thời gian cơ bắp để tập trung vào Exploratory, Security, Performance và AI Tuning.</li>
+            <li>Sẵn sàng dẫn dắt team QA chuyển đổi số thành công ngay từ tuần làm việc đầu tiên!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-dark); color:#FFFFFF; border-radius:10px; padding:14px 24px; text-align:center; border:1px solid var(--primary);">
+        <p style="font-size:14px; font-weight:700; margin-bottom:4px;">
+          💬 "Mục tiêu của tôi không phải là thay thế QA bằng AI, mà là biến mỗi QA trong team thành một Super QA có năng suất và tầm nhìn gấp 3 lần."
+        </p>
+        <span style="font-size:12px; color:#94A3B8;">Sẵn sàng trao đổi chuyên sâu và đồng hành cùng quý công ty!</span>
+      </div>
+    </div>
+
+    <!-- Presentation Footer Controls -->
+    <div class="deck-footer">
+      <button class="btn-nav" id="prev-btn" onclick="prevSlide()">◀ Trang Trước</button>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div style="font-weight:700; color:var(--text-main);" id="slide-indicator">Slide 1 / 7</div>
+      <button class="btn-nav" id="next-btn" onclick="nextSlide()">Trang Sau ▶</button>
+      <button class="btn-nav" style="margin-left:12px;" onclick="toggleFullScreen()">⛶ Toàn Màn Hình</button>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 7;
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById(`slide-${i}`);
+        if (el) {
+          if (i === currentSlide) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
+
+      document.getElementById('slide-indicator').innerText = `Slide ${currentSlide} / ${totalSlides}`;
+      document.getElementById('progress-bar').style.width = `${(currentSlide / totalSlides) * 100}%`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      }
+    });
+  </script>
+</body>
+</html>
