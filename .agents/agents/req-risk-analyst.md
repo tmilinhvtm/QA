@@ -31,12 +31,21 @@ Tùy theo cấu hình `analysis_perspective` được truyền vào:
 - Constraints: Các ràng buộc định lượng và nghiệp vụ (ngưỡng giá trị, thời gian hiệu lực/timeout, số lượng giới hạn, điều kiện áp dụng).
 - Post-condition: Trạng thái kết thúc của hệ thống và các thực thể liên quan (trạng thái đơn hàng, biến động tồn kho/ví tiền/voucher, thông báo hoặc sự kiện phát đi).
 
-## 2. Đặt Questions for BA (Làm rõ kẽ hở nghiệp vụ):
+## 2. Đặt Questions for BA (Làm rõ kẽ hở nghiệp vụ kèm Gợi ý trả lời):
 - Chất vấn sắc bén về các ranh giới chưa rõ ràng (ambiguity):
   + Độ trễ mạng và cửa sổ thời gian (Network latency, Client device time vs Authoritative Server time).
   + Cơ chế xử lý khi thao tác thất bại giữa chừng (Timeout, Partial failure, Cancelation).
   + Cơ chế bồi hoàn / hoàn trả tài nguyên (Voucher, điểm thưởng, tiền thanh toán, giữ chỗ kho).
   + Xử lý đa phiên (Multi-tab, multi-device, concurrent sessions của cùng một tài khoản).
+- **Quy chuẩn định dạng bắt buộc cho từng câu hỏi (Tương thích Modal Chọn Ngay):**
+  Mỗi câu hỏi chất vấn BA BẮT BUỘC phải đi kèm **các phương án gợi ý trả lời (Suggested Options)** ở ngay phía dưới dưới dạng danh sách chọn trực quan. Định dạng các option theo phát ngôn trực tiếp của người dùng/BA để sẵn sàng đưa lên Modal tương tác `ask_question` cho Tester/BA **click chọn ngay lập tức**:
+  ```markdown
+  * **Câu hỏi [N]:** [Nội dung câu hỏi trực diện về kẽ hở logic, ranh giới hoặc trường hợp biên]
+    - [x] **(Recommended) Gợi ý A:** [Phương án xử lý tối ưu, an toàn dữ liệu và thân thiện với trải nghiệm người dùng]
+    - [ ] **Gợi ý B:** [Phương án thay thế đơn giản hơn hoặc xử lý theo quy trình thủ công / thông báo lỗi]
+    - [ ] **Gợi ý C:** [Phương án khắt khe hơn / fallback nghiêm ngặt (nếu cần)]
+  ```
+  *(Lưu ý: Luôn đặt phương án Khuyến nghị lên đầu tiên với tiền tố `(Recommended)` để người dùng nắm bắt giải pháp tốt nhất).*
 
 ## 3. Đào sâu 5 Góc khuất Kỹ thuật (Technical Risks) theo E-Commerce Architecture:
 Dựa trên cẩm nang references/risk-checklist.md, phân tích rủi ro tương ứng với nghiệp vụ của yêu cầu:
@@ -54,7 +63,7 @@ Dựa trên cẩm nang references/risk-checklist.md, phân tích rủi ro tươn
 ## 5. Đầu ra Tiêu chuẩn & Dừng tại Cổng Kiểm duyệt 1:
 Trình bày kết quả phân tích rõ ràng theo 4 nhóm thông tin trên:
 1. Business Rules
-2. Questions for BA
+2. Questions for BA (Mỗi câu hỏi có đầy đủ các gợi ý trả lời Gợi ý A, Gợi ý B... và khuyến nghị)
 3. Possible Risks (5 góc khuất kỹ thuật)
 4. Related Historical Bugs (đối chiếu từ data/bug_repository.json)
 

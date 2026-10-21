@@ -24,13 +24,22 @@ Khi nhận context sạch từ Phase 1:
 - **technical (Kỹ thuật & SDET):** Mô tả chi tiết 3 tầng kỹ thuật: HTTP endpoint & payload, Database state verification qua SQL query, và Event bus payload (Kafka/RabbitMQ).
 - **hybrid (Kết hợp Toàn diện):** Kết hợp cả hai: có cả mô tả hành vi người dùng (UI level) và chi tiết kỹ thuật 3 tầng (API/DB/Event).
 
-## 1. Thiết kế Ma trận 5 Kịch bản Kiểm thử Bắt buộc (5 Mandatory Test Scenarios):
-Bám sát cấu trúc của cẩm nang references/test-design-matrix.md để thiết kế tối thiểu 5 test case bao phủ đủ 5 loại:
-1. **Happy Path:** Luồng thành công chuẩn mực theo đúng quy trình nghiệp vụ với dữ liệu và điều kiện tiên quyết hợp lệ.
-2. **Boundary Value:** Khảo sát các giá trị biên chính xác dựa trên các constraints định lượng của requirement (ranh giới ngưỡng tiền, số lượng tồn/sản phẩm, mốc thời gian T-1s / T+1s, giới hạn ký tự).
-3. **Negative Path:** Cố tình vi phạm điều kiện tiền đề, vượt giới hạn ràng buộc, hoặc thực hiện hành vi trong trạng thái hệ thống không cho phép.
-4. **Concurrency / Race Condition:** Mô phỏng nhiều request (2+ threads) cùng bắn đồng thời trong khoảng thời gian cực ngắn (<= 10ms–50ms) thao tác trên cùng một tài nguyên dùng chung để kiểm chứng cơ chế Distributed Lock (Redis Redlock / DB Row Lock).
-5. **State Conflict & Recovery:** Mô phỏng xung đột trạng thái giữa các dịch vụ phân tán (ví dụ: User hành động trong lúc hệ thống thứ ba đang xử lý) và kiểm chứng cơ chế rollback / bồi hoàn dữ liệu (Compensating Transaction) khi xảy ra lỗi.
+## 1. Thiết Kế Bộ Kịch Bản Kiểm Thử Toàn Diện (Phụ thuộc Toàn bộ Dữ liệu Phase 1 & Không Giới Hạn 5 Test Case):
+Việc sinh test case BẮT BUỘC PHẢI DỰA TRÊN TOÀN BỘ DỮ LIỆU ĐÃ DUYỆT Ở PHASE 1:
+- **1. Business Rules:** Phản ánh đúng 4 thành tố (Pre-condition, Trigger, Constraints, Post-condition).
+- **2. Quyết định & Lựa chọn của BA (BA Decisions Log):** Tích hợp trực tiếp các phương án BA đã chọn từ phần gợi ý trả lời của Questions for BA (ví dụ: thời gian timeout cụ thể, hành vi hủy đơn một phần, chính sách thu hồi phiên...).
+- **3. 5 Chiều Rủi ro Kỹ thuật (Technical Risks):** Chuyển hóa các rủi ro kỹ thuật đã nêu ở Phase 1 thành các test case kiểm thử thực chiến (Race conditions, Lost updates, State drift, Clock drift, Idempotency retry).
+- **4. Đối chiếu Bug Lịch sử (Historical Bugs Prevention):** Thiết kế kịch bản nhằm đảm bảo không tái diễn các lỗi tương tự trong `data/bug_repository.json`.
+
+**QUY TẮC VỀ SỐ LƯỢNG TEST CASE (KHÔNG GIỚI HẠN 5 TEST CASE):**
+- 5 loại kịch bản cốt lõi trong references/test-design-matrix.md là **Khung phân loại nền tảng (Baseline Categories)**:
+  1. **Happy Path:** Luồng thành công chuẩn mực theo đúng quy trình nghiệp vụ với dữ liệu và điều kiện tiên quyết hợp lệ.
+  2. **Boundary Value:** Khảo sát các giá trị biên chính xác dựa trên các constraints định lượng của requirement (ngưỡng tiền, tồn kho, mốc thời gian T-1s / T+1s, giới hạn ký tự).
+  3. **Negative Path:** Cố tình vi phạm điều kiện tiền đề, vượt giới hạn ràng buộc, hoặc thực hiện hành vi trong trạng thái hệ thống không cho phép.
+  4. **Concurrency / Race Condition:** Mô phỏng nhiều request (2+ threads) cùng bắn đồng thời trong khoảng thời gian cực ngắn (<= 10ms–50ms) thao tác trên cùng một tài nguyên dùng chung để kiểm chứng Distributed Lock.
+  5. **State Conflict & Recovery:** Mô phỏng xung đột trạng thái giữa các dịch vụ phân tán và kiểm chứng cơ chế rollback / bồi hoàn dữ liệu (Compensating Transaction) khi xảy ra lỗi.
+- **MỞ RỘNG LINH HOẠT KHÔNG GIỚI HẠN:**
+  Không gò bó chỉ dừng lại ở 5 test case. Tùy thuộc vào độ phức tạp của requirement, các câu trả lời/chốt của BA và các rủi ro kỹ thuật, bạn BẮT BUỘC sinh thêm các test case chuyên biệt tương ứng (ví dụ: 6, 7, 8, 10+ test cases) để bao phủ đầy đủ tất cả các nhánh điều kiện, kịch bản lỗi và rủi ro đã xác định.
 
 ## 2. Xếp hạng Độ Ưu Tiên Rủi Ro (Risk-based Priority):
 - **P1 (Critical):** Các kịch bản liên quan đến mất mát tài chính, gian lận khuyến mãi, xung đột đồng thời làm âm kho/âm ví, hoặc phá vỡ tính toàn vẹn dữ liệu. Bắt buộc ưu tiên kiểm thử trước.
@@ -51,16 +60,17 @@ Tuyệt đối tuân thủ 3 nguyên tắc khi thiết kế từng kịch bản 
    - Nêu rõ sự kiện phân tán **[Event]** (Kafka topic, event name) nếu có.
 
 ## 4. Định Dạng Đầu Ra Chuẩn & Bảng Kịch Bản Chi Tiết:
-Với mỗi test case trong 5 test case bắt buộc, trình bày theo cấu trúc chuẩn:
+Với mỗi test case được thiết kế, trình bày theo cấu trúc chuẩn:
 
 ```markdown
 ### [TC_ID]: [[Test Type]] [Scenario Name]
 - **Mức độ ưu tiên:** P1 / P2 / P3 - *[Giải thích lý do ưu tiên rõ ràng]*
+- **Nguồn gốc / Khả năng truy vết:** [Business Rule / BA Decision Q{N} / Technical Risk {M} / Historical Bug {K}]
 - **Điều kiện tiên quyết (Pre-conditions):** [Tài nguyên có sẵn, tài khoản đăng nhập, trạng thái ban đầu của hệ thống]
 - **Trạng thái tổng thể:** `NOT_RUN` (Pass / Fail / Blocked)
 
 | STT | Bước thực hiện (Steps) | Kết quả mong đợi (Expected Results) | Trạng thái |
-| :---: | :--- | :--- | :---: |
+| :---: | :--- | :--- | :--- : |
 | 1 | Thao tác chọn/nhập dữ liệu cụ thể | **[UI]** Trạng thái hiển thị giao diện tương ứng | NOT_RUN |
 | 2 | Bấm nút kích hoạt hành động chính<br>*(Kích hoạt HTTP Method & Endpoint)* | **[UI]** Màn hình/thông báo kết quả<br><br>**[API]** HTTP Status + Response Body fields cụ thể<br><br>**[Database]** Tên bảng, cột và giá trị biến động<br><br>**[Event]** Sự kiện phát ra trên Broker (nếu có) | NOT_RUN |
 ```

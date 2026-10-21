@@ -15,15 +15,20 @@ The workflow consists of sequential phases separated by mandatory human checkpoi
         │  * If modifiedTime differs (or missing cache) -> Pull from Drive to local data/ -> Read local
         │  * If offline/MCP failure -> Fallback to local data/ and notify tester
         ▼
-[PHASE 1: Requirement & Risk Analysis (Invoke req-risk-analyst)]
-        │  * Read validated historical bugs from local data/bug_repository.json
-        │  * Must consult risk-checklist.md
+[PHASE 1A: Business Rules & Questions for BA]
+        │  * Hiển thị trực tiếp ra Chat: 1. Business Rules & 2. Questions for BA kèm options
         ▼
-[HUMAN GATE 1: Tester Critique & Approval] ◄── STOP! Do not generate test cases!
-        │
+[HUMAN GATE 1: Interactive BA Choice Modal via 'ask_question'] ◄── BẬT MODAL CHỌN NGAY TẠI ĐÂY!
+        │  * Tester/BA click chọn trực tiếp các phương án trên Modal (chặn tiến trình)
+        │  * Ghi nhận các lựa chọn vào BA Decisions Log
+        ▼
+[PHASE 1B: Technical Risks & Bug Correlation (Chạy tiếp sau khi BA chọn)]
+        │  * Hiển thị tiếp ra Chat dựa trên quyết định vừa chốt của BA:
+        │    3. 5 Technical Risks (bám sát phương án BA đã chọn & risk-checklist.md)
+        │    4. Related Historical Bugs (đối chiếu tệp local data/bug_repository.json)
         ▼
 [PHASE 2: Automation Test Design & Priority (Invoke test-automation-architect)]
-        │  * Must follow test-design-matrix.md
+        │  * Must follow test-design-matrix.md (5 baseline categories & unlimited dynamic expansion based on ALL Phase 1 data)
         ▼
 [HUMAN GATE 2: Tester Test Specification Approval]
         │
@@ -36,10 +41,16 @@ The workflow consists of sequential phases separated by mandatory human checkpoi
 
 ## 2. Non-Negotiable Rules
 
-1. **No Premature Test Generation:**
+1. **Phân Đoạn Phase 1 Tương Tác: Hiển thị 1 & 2 -> Bật Modal Chọn -> Hiển thị tiếp 3 & 4:**
    * NEVER generate test cases in the first turn.
-   * You must complete Phase 1 first (Business Rules, Questions for BA, 5 Technical Risks, Related Historical Bugs).
-   * Ask the user/tester to review and confirm Phase 1 before proceeding.
+   * **Bước 1 (Phase 1A):** Orchestrator in trực tiếp ra luồng chat chính:
+     * *1. Business Rules (4 thành tố)*
+     * *2. Questions for BA (Các câu hỏi chất vấn kèm gợi ý trả lời)*
+   * **Bước 2 (Bật Modal Chọn Ngay `ask_question`):** Ngay sau khi in xong Phần 1 & 2, Orchestrator **BẮT BUỘC GỌI NGAY CÔNG CỤ `ask_question`** đưa các câu hỏi BA lên Modal tương tác để Tester/BA **click chọn ngay bằng một cú nhấp chuột**. Quá trình dừng lại chờ người dùng submit modal.
+   * **Bước 3 (Phase 1B - Chạy tiếp sau khi có lựa chọn BA):** Ngay khi nhận kết quả từ modal, Orchestrator ghi nhận `BA Decisions Log`, sau đó mới in tiếp ra luồng chat chính:
+     * *3. 5 Technical Risks (Phân tích rủi ro kỹ thuật sâu dựa trên chính quyết định BA vừa chọn!)*
+     * *4. Related Historical Bugs (Đối chiếu kho bug lịch sử tương quan)*
+   * Toàn bộ nội dung đều được xuất trực tiếp ra chat chính (Visible Text), tuyệt đối KHÔNG ẩn trong collapsible card hay file artifact.
 
 2. **Local-First with Bidirectional Drive Sync & Cache Validation:**
    * Dữ liệu bug và requirement được lưu trữ cục bộ tại thư mục `data/` (`data/bug_repository.json`, `data/requirements_analysis.json`, `data/test_cases_specification.json`).
@@ -59,9 +70,9 @@ The workflow consists of sequential phases separated by mandatory human checkpoi
    * If the user modifies, adds, or cancels requirements while in Phase 2 or between phases, immediately invalidate Phase 2 test cases.
    * Rollback the state to Phase 1 and re-analyze with the new scope.
 
-5. **Subagent Delegation:**
-   * Delegate Phase 1 analysis to subagent `req-risk-analyst` (subagent đọc bug từ tệp cục bộ `data/bug_repository.json` và áp dụng đúng góc nhìn đã lưu).
-   * Delegate Phase 2 test generation to subagent `test-automation-architect`.
+5. **Subagent Delegation & Main Chat Transparency:**
+   * Delegate Phase 1 analysis to subagent `req-risk-analyst` (subagent đọc bug từ tệp cục bộ `data/bug_repository.json` và áp dụng đúng góc nhìn đã lưu). Sau khi subagent hoàn tất, Orchestrator BẮT BUỘC trích xuất toàn bộ nội dung và xuất ra luồng chat chính để hiển thị trực tiếp, không để bị gập/ẩn.
+   * Delegate Phase 2 test generation to subagent `test-automation-architect` (kế thừa toàn bộ data Phase 1: Business Rules, các quyết định/chốt của BA từ modal, 5 rủi ro kỹ thuật, và bugs lịch sử; sinh số lượng test case toàn diện không giới hạn ở 5 test case). Orchestrator cũng phải hiển thị toàn văn kịch bản test trên luồng chat chính.
 
 6. **Persistence & Traceability:**
    * Every analysis must have a unique `requirement_id` (e.g. `REQ_AUTH_001`, `REQ_INV_001`, `REQ_VOUCHER_001`, `REQ_20261015_001`).

@@ -1,10 +1,10 @@
 # E-Commerce Test Design Matrix & Priority Guide
 
-Every software requirement must generate at least 5 prioritized automated test scenarios covering the core architectural dimensions of modern shopping systems:
+Every software requirement must be comprehensively validated based on **ALL approved Phase 1 data** (Business Rules, BA Decisions, 5 Technical Risks, and Historical Bugs). The 5 core test types serve as **architectural baseline categories**, and the total number of test cases is **dynamically expandable without being capped at 5**:
 
 ---
 
-### 1. Mandatory 5 Test Types
+### 1. Architectural Baseline Categories (5 Nhóm Kiểm Thử Cốt Lõi)
 
 | Test Type | Objective & Scope | Priority Standard |
 | :--- | :--- | :--- |
@@ -13,6 +13,14 @@ Every software requirement must generate at least 5 prioritized automated test s
 | **Negative Path** | Deliberately violates business constraints, invalid state preconditions, unauthorized roles, or insufficient balance/inventory. | `P1 (Critical)` |
 | **Concurrency & Race Condition** | Simulates parallel multi-threaded requests (2+ threads within <= 10ms–50ms) competing for a shared resource (inventory, single-use voucher, wallet balance, flash sale slot). | `P1 (Critical)` |
 | **State Conflict & Recovery** | Simulates cross-service state discrepancies (e.g. Cart vs Order vs Warehouse WMS vs Payment) and verifies atomic rollback / compensation transactions. | `P2 (High)` |
+
+> [!NOTE]
+> **Quy Tắc Mở Rộng Không Giới Hạn (Unlimited Dynamic Test Expansion):**
+> Ngoài 5 kịch bản đại diện cho 5 nhóm trên, kiến trúc sư kiểm thử BẮT BUỘC sinh thêm các kịch bản kiểm thử phụ thuộc trực tiếp vào:
+> 1. Từng quyết định/lựa chọn cụ thể mà BA/Tester đã chốt từ các gợi ý trả lời (BA Decisions Log).
+> 2. Các rủi ro kỹ thuật phân tán chuyên sâu (ví dụ: mất kết nối bên thứ 3, token expiration, idempotency retry).
+> 3. Các kịch bản phòng chống tái diễn lỗi từ kho bug lịch sử (`bug_repository.json`).
+> Tổng số test cases được sinh ra là linh hoạt (ví dụ: 6, 8, 10+ test cases) nhằm bao phủ triệt để mọi ngóc ngách của requirement.
 
 ---
 

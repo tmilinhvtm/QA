@@ -11,9 +11,9 @@
 
 * **Giới thiệu toàn bộ luồng hoạt động:**
   1. *Input:* Tester gửi requirement tự nhiên vào Antigravity IDE.
-  2. *Phase 1:* Subagent `req-risk-analyst` bóc tách 4 thành tố nghiệp vụ, chất vấn BA, phân tích 5 góc khuất kỹ thuật (Concurrency, State Drift) và đối chiếu kho bug lịch sử.
+  2. *Phase 1:* Subagent `req-risk-analyst` bóc tách 4 thành tố nghiệp vụ, chất vấn BA kèm các phương án gợi ý trả lời (Option A, Option B, Recommended), phân tích 5 góc khuất kỹ thuật (Concurrency, State Drift) và đối chiếu kho bug lịch sử.
   3. *Human Gate 1:* Dừng lại chờ Tester phê duyệt & tinh chỉnh.
-  4. *Phase 2:* Chuyển giao sang `test-automation-architect` thiết kế 5 kịch bản kiểm thử giả lập 3 tầng sâu (UI/API Body/DB) theo thứ tự ưu tiên P1/P2/P3.
+  4. *Phase 2:* Chuyển giao sang `test-automation-architect` thiết kế bộ kịch bản kiểm thử giả lập 3 tầng sâu (UI/API Body/DB) theo thứ tự ưu tiên P1/P2/P3, kế thừa toàn bộ data Phase 1 (BA Decisions, Technical Risks, Bug patterns) và mở rộng linh hoạt không giới hạn ở 5 test cases.
   5. *Human Gate 2 & Phase 3:* Tester duyệt, Antigravity đẩy dữ liệu tích lũy thêm mới (Append-Only) lên Google Spreadsheet Master với định dạng chuẩn Enterprise Ant Design Blue.
 
 ---
@@ -31,7 +31,7 @@ QA/
 │   │   └── qa-requirement-assistant/   # Master Skill Bundle
 │   │       ├── references/             # Progressive Disclosure (Cẩm nang kỹ thuật chuyên sâu)
 │   │       │   ├── risk-checklist.md   # Khung 5 góc khuất kỹ thuật (Concurrency, State Drift...)
-│   │       │   └── test-design-matrix.md # Ma trận 5 loại kịch bản & chuẩn bước giả lập
+│   │       │   └── test-design-matrix.md # Ma trận 5 loại kịch bản nền tảng & mở rộng động không giới hạn
 │   │       └── scripts/
 │   │           └── google_sheets_sync_manager.py # Đồng bộ 2 chiều Drive - Local & Styler Ant Design
 │   └── agents/                         # Đặc tả chi tiết các Subagents
@@ -63,14 +63,14 @@ Antigravity tự động quét và nạp plugin từ thư mục `.agents/` khi b
 
 ### 2.2. Các Subagents Runtime Được Antigravity Điều Phối
 Hệ thống sử dụng 2 Subagents chuyên trách:
-1. **`req-risk-analyst`**: Subagent chịu trách nhiệm phân tích tĩnh (Static Analysis) ở Phase 1: Bóc tách Business Rules, đặt câu hỏi phản biện BA, phát hiện 5 rủi ro kỹ thuật sâu, và đối chiếu tương quan với [Kho Bug Lịch Sử](file:///home/linh/QA/data/bug_repository.json).
-2. **`test-automation-architect`**: Subagent chịu trách nhiệm thiết kế kiểm thử động (Dynamic Test Design) ở Phase 2: Sinh đúng 5 kịch bản kiểm thử giả lập (Happy, Boundary, Negative, Concurrency, State Conflict) kèm xếp hạng ưu tiên (P1, P2, P3).
+1. **`req-risk-analyst`**: Subagent chịu trách nhiệm phân tích tĩnh (Static Analysis) ở Phase 1: Bóc tách Business Rules, đặt câu hỏi phản biện BA kèm các gợi ý trả lời (Option A, B & Khuyến nghị), phát hiện 5 rủi ro kỹ thuật sâu, và đối chiếu tương quan với [Kho Bug Lịch Sử](file:///home/linh/QA/data/bug_repository.json).
+2. **`test-automation-architect`**: Subagent chịu trách nhiệm thiết kế kiểm thử động (Dynamic Test Design) ở Phase 2: Kế thừa toàn bộ data Phase 1 (Business Rules, BA chốt, 5 rủi ro, bug lịch sử) để sinh bộ kịch bản kiểm thử giả lập toàn diện không giới hạn ở 5 test cases kèm xếp hạng ưu tiên (P1, P2, P3).
 
 ### 2.3. Trải nghiệm phiên làm việc (Human-in-the-loop Flow)
 1. **Bước 1:** Tester gửi requirement bất kỳ vào ô chat Antigravity.
-2. **Bước 2 (Phase 1):** Antigravity kích hoạt `req-risk-analyst` để phân tích 4 nhóm thông tin bắt buộc và **dừng lại tại Cổng kiểm duyệt 1 (Human Gate 1)**.
-3. **Bước 3 (Thảo luận & Tinh chỉnh):** Tester phản biện hoặc bổ sung nghiệp vụ. Agent cập nhật lại context.
-4. **Bước 4 (Phase 2):** Khi Tester gõ *"Đồng ý, sinh test đi"*, Antigravity chuyển giao context đã được duyệt sang `test-automation-architect` để sinh 5 kịch bản test giả lập chi tiết.
+2. **Bước 2 (Phase 1 & Cổng Tương Tác Gate 1):** Antigravity kích hoạt `req-risk-analyst` phân tích 4 nhóm thông tin, đồng thời **tự động mở Modal tương tác (`ask_question`)** hiển thị danh sách câu hỏi BA kèm các options gợi ý (được gán nhãn `(Recommended)` cho giải pháp tối ưu) để Tester/BA **click chọn ngay bằng một cú nhấp chuột**, thay vì phải gõ câu trả lời thủ công.
+3. **Bước 3 (Ghi nhận Lựa chọn BA Decisions Log):** Hệ thống ghi nhận chính xác các phương án mà người dùng đã chọn từ modal (hoặc ý kiến bổ sung qua chat) thành `BA Decisions Log` để làm căn cứ đầu vào bắt buộc cho Phase 2.
+4. **Bước 4 (Phase 2):** Khi Tester gõ *"Đồng ý, sinh test đi"*, Antigravity chuyển giao context đã được duyệt sang `test-automation-architect` để sinh bộ kịch bản test giả lập chi tiết (bao phủ toàn bộ Business Rules, quyết định BA và rủi ro kỹ thuật, không giới hạn ở 5 test cases).
 5. **Bước 5 (Gate 2 & Sync):** Khi Tester gõ *"Đẩy lên Drive"*, Antigravity sinh mã `requirement_id` duy nhất và thực hiện đồng bộ tích lũy thêm mới (**Accumulative Append-Only Update**, không reset/clear bảng cũ):
    * Lưu trữ tích lũy vào `data/requirements_analysis.json` & `data/test_cases_specification.json`.
    * Ghi nối tiếp các dòng mới (append rows) vào cuối bảng tính Google Sheets `Requirements_Analysis` và `Test_Cases_Specification`.
