@@ -159,7 +159,7 @@ def create_deck():
     s2 = prs.slides.add_slide(blank_layout)
     add_header(s2, "Hệ Thống Đang Làm Gì? Khả Năng Xử Lý Chuyên Sâu Từng Khâu",
                "1. ĐỊNH DANH HỆ THỐNG",
-               "Cơ chế tự động hóa toàn diện từ lúc nhận tài liệu yêu cầu thô đến khi xuất ra bộ test suite hoàn chỉnh.")
+               "Quy trình tự động từ lúc nhận yêu cầu ban đầu đến khi xuất ra bảng kịch bản kiểm thử hoàn chỉnh, dễ hiểu và dùng được ngay.")
 
     c_w = Inches(3.7)
     c_gap = Inches(0.3)
@@ -169,39 +169,39 @@ def create_deck():
     s2_cards = [
         {
             "badge": "📥 GIAI ĐOẠN 1: ĐẦU VÀO",
-            "title": "Tiếp Nhận & Đọc Hiểu Spec",
-            "subtitle": "Xử lý đa dạng mọi nguồn tài liệu dự án",
+            "title": "Tiếp Nhận & Đọc Hiểu Yêu Cầu",
+            "subtitle": "Đọc hiểu linh hoạt mọi dạng tài liệu dự án",
             "border_color": COLOR_PRIMARY,
             "items": [
-                ("📄 User Story & Acceptance Criteria:", "Đọc hiểu bối cảnh người dùng, tiêu chí nghiệm thu còn sơ sài hoặc diễn đạt mơ hồ."),
-                ("📑 Tài liệu BA / PRD Chi Tiết:", "Phân tích tài liệu nghiệp vụ dài, phức tạp nhiều phân hệ chức năng."),
-                ("⚙️ API Swagger / JSON Schema:", "Đọc hiểu method HTTP, headers, request body, query params và response schema."),
-                ("🧠 Bộ nhớ góc nhìn (user_preferences):", "Tự động điều chỉnh giọng văn phân tích: Business (dễ hiểu) vs Technical (chuyên sâu).")
+                ("📄 Yêu cầu tính năng & mong muốn người dùng:", "Đọc hiểu bối cảnh và tiêu chí nghiệm thu kể cả khi diễn đạt còn mơ hồ, thiếu ý."),
+                ("📑 Tài liệu nghiệp vụ chi tiết:", "Phân tích mạch lạc tài liệu quy trình kinh doanh dài và phức tạp của dự án."),
+                ("⚙️ Thông số kỹ thuật & cổng dữ liệu:", "Tự động hiểu cấu trúc thông tin gửi đi và kết quả hệ thống cần trả về."),
+                ("🧠 Tự điều chỉnh cách hành văn:", "Linh hoạt dùng từ ngữ đời sống dễ hiểu cho Nghiệp vụ hoặc chuyên sâu cho Kỹ thuật.")
             ]
         },
         {
-            "badge": "⚙️ GIAI ĐOẠN 2: TÁC VỤ THỰC HIỆN",
-            "title": "Phân Tích, Phản Biện & Thiết Kế",
-            "subtitle": "5 tác vụ AI chuyên sâu thay thế công việc thủ công",
+            "badge": "⚙️ GIAI ĐOẠN 2: TỰ ĐỘNG XỬ LÝ",
+            "title": "Phân Tích & Soạn Kịch Bản",
+            "subtitle": "Chỉ ra điểm thiếu sót và dựng kịch bản kiểm tra toàn diện",
             "border_color": COLOR_PURPLE,
             "items": [
-                ("📋 Bóc tách 4 thành tố cốt lõi:", "Tự động phân tách Rules, Boundary Limits, Exception Flows và User Journey."),
-                ("❓ Soạn câu hỏi phản biện cho BA:", "Chỉ ra các điểm hở tài liệu, mâu thuẫn logic để chốt sớm với BA/PO."),
-                ("🔍 Quét 5 rủi ro kiến trúc sâu:", "Race condition (<=50ms), Lost Update, Concurrency Deadlock, JWT Drift, Clock Drift."),
-                ("🗄️ Đối chiếu 10 Bugs Ground Truth:", "Gắn mã Defect ID tương đồng từ kho bug thực tế để neo chuẩn logic."),
-                ("💎 3 Nguyên Tắc Vàng QA:", "Tách bước độc lập (Disaggregation), Verify 3 tầng sâu (UI/API/DB), Gán Status NOT_RUN.")
+                ("📋 Phân tách quy tắc & luồng hoạt động:", "Tự động chỉ ra quy tắc đúng, giới hạn số liệu, trường hợp phát sinh lỗi và luồng người dùng."),
+                ("❓ Đặt câu hỏi làm rõ điểm chưa rõ ràng:", "Tìm ra các kẽ hở logic, trường hợp bỏ sót để đội ngũ chốt sớm với nhau trước khi làm."),
+                ("🔍 Cảnh báo sớm các lỗi ngầm khó phát hiện:", "Dự đoán nguy cơ lỗi khi nhiều người cùng thao tác một lúc, trùng lặp đơn hàng hoặc phiên đăng nhập hết hạn."),
+                ("🗄️ Soi chiếu với các lỗi thực tế hay gặp:", "Dùng kho lỗi phổ biến ngoài đời thực để nhắc nhở và không bỏ sót tình huống kiểm tra."),
+                ("💎 Kịch bản chi tiết, rõ ràng từng bước:", "Tách nhỏ từng thao tác, đối soát kỹ giao diện người dùng, đường truyền dữ liệu và cơ sở dữ liệu thật.")
             ]
         },
         {
-            "badge": "📤 GIAI ĐOẠN 3: ĐẦU RA BÀN GIAO",
-            "title": "Sản Phẩm Bàn Giao Sạch 100%",
-            "subtitle": "Trực quan hóa Google Sheets & Lưu trữ bền vững",
+            "badge": "📤 GIAI ĐOẠN 3: BÀN GIAO KẾT QUẢ",
+            "title": "Bảng Kịch Bản Hoàn Chỉnh",
+            "subtitle": "Trình bày trực quan trên Google Sheets, dùng được ngay",
             "border_color": COLOR_SUCCESS,
             "items": [
-                ("📊 Google Sheets Master Ant Design Blue:", "Tự động ghi nối tiếp vào 2 tab Requirements & Test Cases, Header xanh #1677FF, freeze row 1."),
-                ("🎯 Dropdown Status & Conditional Format:", "Menu chọn nhanh PASS/FAIL/BLOCKED/NOT_RUN tự đổi màu tiện lợi cho Tester."),
-                ("💾 Local-First Append-Only:", "Lưu tích lũy vào file JSON cục bộ, bảo toàn 100% lịch sử các sprint trước, cấm reset."),
-                ("🤖 Sẵn sàng Playwright E2E Automation:", "Kịch bản đã chia nhỏ bước, code tự động hóa ngay mà không cần viết lại.")
+                ("📊 Bảng kịch bản trực quan trên Google Sheets:", "Tự động lưu trữ vào bảng tính chuẩn mực, phân mục rõ ràng, chuyên nghiệp và dễ xem."),
+                ("🎯 Menu chọn kết quả tiện lợi:", "Cho phép Tester bấm chọn Đạt / Không đạt / Đang chờ, tự động đổi màu trực quan khi làm việc."),
+                ("💾 Tích lũy liên tục, không lo mất lịch sử:", "Tự động lưu nối tiếp các đợt kiểm thử mới mà không làm mất dữ liệu của các kỳ trước."),
+                ("🤖 Sẵn sàng đưa vào kiểm thử tự động:", "Các bước kiểm tra được viết gãy gọn, giúp đội ngũ có thể cài đặt cho máy chạy tự động ngay.")
             ]
         }
     ]
