@@ -719,6 +719,7 @@ for svg_name, png_name, content in DIAGRAMS:
         "/usr/bin/google-chrome",
         "--headless",
         "--disable-gpu",
+        "--hide-scrollbars",
         f"--screenshot={png_path}",
         "--window-size=1600,680",
         svg_path

@@ -111,126 +111,47 @@ def create_deck():
     bar1.fill.fore_color.rgb = COLOR_PRIMARY
     bar1.line.fill.background()
 
-    # Badge & Title Box
-    tbox = s1.shapes.add_textbox(Inches(0.8), Inches(0.55), Inches(11.7), Inches(1.8))
+    # Badge & Title Box (Clean Minimalist Centered-Balance)
+    tbox = s1.shapes.add_textbox(Inches(1.2), Inches(2.0), Inches(10.933), Inches(3.0))
     tf1 = tbox.text_frame
     tf1.word_wrap = True
 
     p_badge = tf1.paragraphs[0]
     p_badge.text = "CHIẾN LƯỢC ỨNG DỤNG AI TRONG KIỂM THỬ (AI-DRIVEN QA SYSTEM)"
-    p_badge.font.size = Pt(10.5)
+    p_badge.font.size = Pt(12)
     p_badge.font.bold = True
     p_badge.font.color.rgb = COLOR_PRIMARY_DARK
-    p_badge.space_after = Pt(4)
+    p_badge.alignment = PP_ALIGN.CENTER
+    p_badge.space_after = Pt(12)
 
     p_title = tf1.add_paragraph()
     p_title.text = "QA REQUIREMENT & RISK ASSISTANT\nHệ Tác Tử Tự Động Phân Tích Yêu Cầu & Thiết Kế Kiểm Thử Thực Chiến"
-    p_title.font.size = Pt(24)
+    p_title.font.size = Pt(30)
     p_title.font.bold = True
     p_title.font.color.rgb = COLOR_TEXT_MAIN
-    p_title.space_after = Pt(4)
+    p_title.alignment = PP_ALIGN.CENTER
+    p_title.space_after = Pt(14)
 
     p_sub = tf1.add_paragraph()
     p_sub.text = "Chuyển hóa tài liệu yêu cầu thô thành Test Suite chuẩn 3 tầng UI/API/DB • Chặn đứng lỗi sớm • Chuẩn hóa dữ liệu QA"
-    p_sub.font.size = Pt(12)
+    p_sub.font.size = Pt(13.5)
     p_sub.font.color.rgb = COLOR_TEXT_MUTED
+    p_sub.alignment = PP_ALIGN.CENTER
 
-    # Center Box: 2 Columns (What It Does vs Core Mission)
-    c_outer = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(2.55), Inches(11.7), Inches(2.6))
-    c_outer.fill.solid()
-    c_outer.fill.fore_color.rgb = COLOR_WHITE
-    c_outer.line.color.rgb = COLOR_CARD_BORDER
-    c_outer.line.width = Pt(1.5)
-
-    # Left Sub-box: HỆ THỐNG ĐANG LÀM GÌ?
-    b_left = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(2.75), Inches(5.5), Inches(2.2))
-    b_left.fill.solid()
-    b_left.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
-    b_left.line.color.rgb = COLOR_PRIMARY
-    b_left.line.width = Pt(1.5)
-    tf_l = b_left.text_frame
-    tf_l.word_wrap = True
-    p_lh = tf_l.paragraphs[0]
-    p_lh.text = "🤖 HỆ THỐNG ĐANG LÀM GÌ? (WHAT IT DOES)"
-    p_lh.font.size = Pt(11)
-    p_lh.font.bold = True
-    p_lh.font.color.rgb = COLOR_PRIMARY_DARK
-    p_lh.space_after = Pt(6)
-
-    l_items = [
-        ("• Tiếp nhận tài liệu thô:", "User Story, PRD, API Swagger chưa rõ nét hoặc thiếu kịch bản biên."),
-        ("• Bóc tách 4 thành tố:", "Tự động phân tách Business Rules, Boundary Limits, Exceptions & User Flow."),
-        ("• Quét 5 rủi ro kiến trúc:", "Phát hiện lỗi ngầm: Concurrency (<=50ms), Lost Update, Deadlock, JWT Drift."),
-        ("• Thiết kế Test 3 tầng sâu:", "Sinh kịch bản tách bước kiểm chứng UI + API Body + DB & Sync Google Sheets.")
-    ]
-    for it_h, it_d in l_items:
-        p_it = tf_l.add_paragraph()
-        p_it.text = it_h + " " + it_d
-        p_it.font.size = Pt(9.5)
-        p_it.font.color.rgb = COLOR_TEXT_MAIN
-        p_it.space_after = Pt(3)
-
-    # Right Sub-box: NHIỆM VỤ TRỌNG TÂM CỦA HỆ THỐNG
-    b_right = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(2.75), Inches(5.5), Inches(2.2))
-    b_right.fill.solid()
-    b_right.fill.fore_color.rgb = COLOR_SUCCESS_LIGHT
-    b_right.line.color.rgb = COLOR_SUCCESS
-    b_right.line.width = Pt(1.5)
-    tf_r = b_right.text_frame
-    tf_r.word_wrap = True
-    p_rh = tf_r.paragraphs[0]
-    p_rh.text = "🎯 NHIỆM VỤ TRỌNG TÂM CỦA HỆ THỐNG (SYSTEM MISSIONS)"
-    p_rh.font.size = Pt(11)
-    p_rh.font.bold = True
-    p_rh.font.color.rgb = RGBColor(21, 128, 61)
-    p_rh.space_after = Pt(6)
-
-    r_items = [
-        ("• Shift-Left QA:", "Chặn đứng 50% lỗi ngay từ khâu phân tích yêu cầu trước khi Dev code."),
-        ("• Giải phóng thao tác thủ công:", "Tự động hóa toàn diện khâu đọc hiểu tài liệu và soạn đặc tả kịch bản."),
-        ("• Triệt tiêu 100% ảo giác:", "Ép AI bám sát 10 bugs production thực tế, Tester phê duyệt qua 2 cổng."),
-        ("• Chuẩn hóa tài sản kiểm thử:", "Lưu trữ tích lũy bền vững và làm bệ phóng trực tiếp cho Playwright E2E.")
-    ]
-    for it_h, it_d in r_items:
-        p_it = tf_r.add_paragraph()
-        p_it.text = it_h + " " + it_d
-        p_it.font.size = Pt(9.5)
-        p_it.font.color.rgb = COLOR_TEXT_MAIN
-        p_it.space_after = Pt(3)
-
-    # 3 Strategic Focus Cards at Bottom (Light Theme)
-    focus_items = [
-        ("🎯 ĐỘ CHÍNH XÁC DỮ LIỆU", "≥ 92%", "Kiểm chứng sâu 3 tầng, 0 ảo giác", COLOR_PRIMARY),
-        ("🛡️ CHẤT LƯỢNG RELEASE", "Giảm 50% Defect", "Chặn đứng lỗi sớm ngay khâu Spec", COLOR_SUCCESS),
-        ("⚡ TỰ ĐỘNG HÓA QUY TRÌNH", "80% Tác Vụ", "Tự động hóa đọc hiểu & viết test case", COLOR_WARNING)
-    ]
-    k_w = Inches(3.7)
-    k_gap = Inches(0.3)
-    for i, (ktitle, kval, kdesc, kcol) in enumerate(focus_items):
-        kbox = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(k_w + k_gap), Inches(5.35), k_w, Inches(1.5))
-        kbox.fill.solid()
-        kbox.fill.fore_color.rgb = COLOR_WHITE
-        kbox.line.color.rgb = COLOR_CARD_BORDER
-        kbox.line.width = Pt(1.5)
-        tf_k = kbox.text_frame
-        tf_k.word_wrap = True
-        
-        p1 = tf_k.paragraphs[0]
-        p1.text = ktitle
-        p1.font.size = Pt(9.5)
-        p1.font.bold = True
-        p1.font.color.rgb = kcol
-        
-        p2 = tf_k.add_paragraph()
-        p2.text = kval
-        p2.font.size = Pt(18)
-        p2.font.bold = True
-        p2.font.color.rgb = COLOR_TEXT_MAIN
-        
-        p3 = tf_k.add_paragraph()
-        p3.text = kdesc
-        p3.font.size = Pt(9.5)
-        p3.font.color.rgb = COLOR_TEXT_MUTED
+    # Presenter & Architecture Meta Box at Bottom Center (Minimalist & Clean)
+    meta_box = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(2.2), Inches(5.3), Inches(8.933), Inches(0.75))
+    meta_box.fill.solid()
+    meta_box.fill.fore_color.rgb = COLOR_WHITE
+    meta_box.line.color.rgb = COLOR_BORDER
+    meta_box.line.width = Pt(1)
+    tf_meta = meta_box.text_frame
+    tf_meta.word_wrap = True
+    p_meta = tf_meta.paragraphs[0]
+    p_meta.text = "👤 Vũ Thị Mai Linh  •  🎯 AI QA Specialist  •  ⚡ Antigravity Native Plugin & Google Workspace MCP"
+    p_meta.font.size = Pt(11)
+    p_meta.font.bold = True
+    p_meta.font.color.rgb = COLOR_TEXT_MAIN
+    p_meta.alignment = PP_ALIGN.CENTER
 
     # =========================================================================
     # SLIDE 2: HỆ THỐNG ĐANG LÀM GÌ? (What The System Does - Capabilities & Pipeline)
@@ -290,8 +211,8 @@ def create_deck():
         box = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos, top_pos, c_w, card_h)
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_WHITE
-        box.line.color.rgb = c["border_color"]
-        box.line.width = Pt(1.5)
+        box.line.color.rgb = COLOR_BORDER
+        box.line.width = Pt(1)
         
         tf = box.text_frame
         tf.word_wrap = True
@@ -395,8 +316,8 @@ def create_deck():
         box = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left_pos, top_pos, c_w3, card_h)
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_WHITE
-        box.line.color.rgb = c["border_color"]
-        box.line.width = Pt(1.5)
+        box.line.color.rgb = COLOR_BORDER
+        box.line.width = Pt(1)
         
         tf = box.text_frame
         tf.word_wrap = True
@@ -544,8 +465,8 @@ def create_deck():
         cbox = s10.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(c_w5 + c_gap5), c_top5, c_w5, c_h5)
         cbox.fill.solid()
         cbox.fill.fore_color.rgb = COLOR_WHITE
-        cbox.line.color.rgb = COLOR_CARD_BORDER
-        cbox.line.width = Pt(1.5)
+        cbox.line.color.rgb = COLOR_BORDER
+        cbox.line.width = Pt(1)
         tf_c = cbox.text_frame
         tf_c.word_wrap = True
         
@@ -614,8 +535,8 @@ def create_deck():
         mbox = s11.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(m_w6 + m_gap6), m_top6, m_w6, m_h6)
         mbox.fill.solid()
         mbox.fill.fore_color.rgb = COLOR_WHITE
-        mbox.line.color.rgb = mcol
-        mbox.line.width = Pt(1.5)
+        mbox.line.color.rgb = COLOR_BORDER
+        mbox.line.width = Pt(1)
         tf_m = mbox.text_frame
         tf_m.word_wrap = True
         
@@ -683,8 +604,8 @@ def create_deck():
         pbox = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + i*(p_w7 + p_gap7), p_top7, p_w7, p_h7)
         pbox.fill.solid()
         pbox.fill.fore_color.rgb = COLOR_WHITE
-        pbox.line.color.rgb = pcol
-        pbox.line.width = Pt(1.5)
+        pbox.line.color.rgb = COLOR_BORDER
+        pbox.line.width = Pt(1)
         tf_p = pbox.text_frame
         tf_p.word_wrap = True
         
@@ -712,8 +633,8 @@ def create_deck():
     callout = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(6.15), Inches(11.7), Inches(0.85))
     callout.fill.solid()
     callout.fill.fore_color.rgb = COLOR_PRIMARY_LIGHT
-    callout.line.color.rgb = COLOR_PRIMARY
-    callout.line.width = Pt(1.5)
+    callout.line.color.rgb = COLOR_BORDER
+    callout.line.width = Pt(1)
     tf_call = callout.text_frame
     tf_call.word_wrap = True
     
